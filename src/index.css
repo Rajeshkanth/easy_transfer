@@ -1,13 +1,150 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+
+  position: fixed;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+.paymentFormContainer {
+  height: 100vh;
+  width: 100vw;
+  /* background-color: rgb(235, 124, 130);
+   */
+  background: url(./components/images/589.jpg);
+  padding: 0.1px;
+  box-sizing: border-box;
+}
+.container {
+  margin: 5vh auto;
+  height: auto;
+  width: 90vw;
+  display: flex;
+}
+.left-box {
+  width: 35vw;
+  height: 90vh;
+  /* background-color: rgb(227, 12, 12);
+   */
+  background: url(./components/images/wallpaperflare.com_wallpaper.jpg)
+    no-repeat;
+}
+.right-box {
+  height: 90vh;
+  width: 55vw;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  /* justify-content: space-evenly; */
+  align-items: center;
+}
+.right-box h1 {
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+}
+.title {
+  overflow: hidden;
+  background: url(./components/images/wallpaperflare.com_wallpaper.jpg);
+  background-size: cover;
+  -webkit-background-clip: text; /* Use the text as a mask */
+  color: transparent; /* Hide the text color */
+  mix-blend-mode: multiply; /* Blend the background image and text */
+  /* position: absolute;
+  top: 0;
+  left: 0; */
+  /* z-index: -1; */
+}
+
+.amount {
+  position: relative;
+  top: 40%;
+  left: 35%;
+  height: auto;
+  width: 10vw;
+}
+.amount .input {
+  width: 97%;
+  color: #fff;
+  outline: none;
+  border: 0;
+  border-bottom: 2px solid;
+  font-size: 35px;
+  font-weight: 800;
+  background-color: inherit;
+  text-align: center;
+}
+
+.amount .label {
+  text-align: center;
+  margin: 0.5rem;
+  font-weight: 800;
+  color: #fff;
+}
+.amount h1 {
+  margin: 0;
+  font-size: 14px;
+}
+
+form {
+  width: 70%;
+  height: auto;
+  padding: 4%;
+  box-sizing: border-box;
+  border-radius: 10px 10px 0 0;
+  /* background-color: rgb(216, 224, 224); */
+  /* border: 2px solid; */
+  margin: 0 auto;
+}
+/* .right-box > form {
+  border-bottom: 0;
+  border-top: 0;
+}
+.right-box form:nth-child(2) {
+  border-top: 2px solid;
+}
+.right-box form:nth-last-child(1) {
+  border-radius: 0 0 10px 10px;
+  border-bottom: 2px solid;
+} */
+form h1 {
+  margin: 0;
+}
+form input {
+  background-color: rgb(250, 240, 240);
+  outline: none;
+  font-size: 16px;
+  margin: 0.4rem 0;
+  border: 0;
+  border-bottom: 2px solid #d0cdcd;
+  width: 80%;
+  padding: 0.4rem;
+  box-sizing: border-box;
+  border-radius: 5px;
+}
+.input-cont {
+  display: flex;
+  flex-direction: column;
+}
+
+#pay {
+  background-color: #5fb91e;
+  color: #fff;
+  font-weight: 800;
+}
+#pay:hover {
+  background-color: #74a352;
+  border: 2px solid;
+  cursor: pointer;
+}
+.alert {
+  padding: 5rem;
 }
