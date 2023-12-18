@@ -13,23 +13,68 @@ function Success() {
   const [uid, setUid] = useState("");
   let data;
 
+  // useEffect(() => {
+  //   const handleSuccess = (data) => {
+  //     if (typeof data === "boolean") {
+  //       console.log("received");
+  //       setCheck(data);
+  //       setFail(false);
+  //     }
+  //   };
+  //   const handleFailure = (data) => {
+  //     if (typeof data === "boolean") {
+  //       setFail(data);
+  //       setCheck(false);
+  //     }
+  //   };
+  //   // socket.on("paymentConfirmAlert", (data) => {
+  //   socket.emit("join_success_room");
+  //   // });
+
+  //   socket.on("success", handleSuccess);
+  //   socket.on("failed", handleFailure);
+
+  //   return () => {
+  //     socket.off("success", handleSuccess);
+  //     socket.off("failed", handleFailure);
+  //   };
+  // }, [socket]);
+
+  // useEffect(() => {
+  //   if (check || fail === true) {
+  //     setTimeout(() => {
+  //       navigate("/");
+  //     }, 3000);
+  //   }
+  //   socket.on("paymentConfirmAlert", (data) => {
+  //     setRoom(data.Room);
+  //   });
+  // }, [check, fail]);
+
+  // ... (existing code remains the same)
+
   useEffect(() => {
+    // Joining the success room using tabId
+    socket.on("connect", () => {
+      const tabId = sessionStorage.getItem("tabId");
+      if (tabId) {
+        socket.emit("join_success_room", { tabId });
+      }
+    });
+
     const handleSuccess = (data) => {
       if (typeof data === "boolean") {
-        console.log("received");
         setCheck(data);
         setFail(false);
       }
     };
+
     const handleFailure = (data) => {
       if (typeof data === "boolean") {
         setFail(data);
         setCheck(false);
       }
     };
-    // socket.on("paymentConfirmAlert", (data) => {
-    socket.emit("join_success_room");
-    // });
 
     socket.on("success", handleSuccess);
     socket.on("failed", handleFailure);
@@ -46,10 +91,16 @@ function Success() {
         navigate("/");
       }, 3000);
     }
-    socket.on("paymentConfirmAlert", (data) => {
-      setRoom(data.Room);
-    });
   }, [check, fail]);
+
+  useEffect(() => {
+    socket.on("paymentConfirmAlert", (data) => {
+      setRoom(data.UniqueId); // Use UniqueId
+    });
+    socket.emit("join_success_room", { tabId: room });
+  }, []);
+
+  // ... (rest of the existing code)
 
   return (
     <>

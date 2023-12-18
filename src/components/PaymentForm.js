@@ -2,6 +2,7 @@ import React, { memo, useContext, useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { v4 as uuid } from "uuid";
+import axios from "axios";
 
 import { store } from "../App";
 
@@ -24,6 +25,41 @@ function PaymentForm() {
 
   const navigate = useNavigate();
 
+  // const sendAmount = (e) => {
+  //   e.preventDefault();
+  //   if (
+  //     amount &&
+  //     toAccountNumber &&
+  //     toConfirmAccountNumber &&
+  //     toAccountHolderName &&
+  //     toIFSCNumber
+  //   ) {
+  //     const newReceiver = {
+  //       Amount: amount,
+  //       AccNum: toAccountNumber,
+  //       AccHolder: toAccountHolderName,
+  //     };
+
+  //     socket.emit("paymentPageConnected", {
+  //       connected: true,
+  //       NewReceiver: newReceiver,
+  //       Uid: uuid(),
+  //     });
+  //     navigate("/success");
+  //   } else {
+  //   }
+  //   setAmount("");
+
+  //   setToConfirmAccountNumber("");
+
+  //   setToAccountHolderName("");
+  //   setToAccountNumber("");
+  //   setToIFSCNumber("");
+  //   setToAccountHolderName("");
+  // };
+
+  // ... (existing code remains the same)
+
   const sendAmount = (e) => {
     e.preventDefault();
     if (
@@ -37,25 +73,36 @@ function PaymentForm() {
         Amount: amount,
         AccNum: toAccountNumber,
         AccHolder: toAccountHolderName,
+        tabId: sessionStorage.getItem("tabId"),
       };
 
-      socket.emit("paymentPageConnected", {
-        connected: true,
-        NewReceiver: newReceiver,
-        Uid: uuid(),
-      });
+      // socket.emit("paymentPageConnected", {
+      //   connected: true,
+      //   NewReceiver: newReceiver,
+      //   Uid: uuid(),
+      //   // Adding tabId
+      // });
+      axios
+        .post("http://localhost:3001", { newReceiver })
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
       navigate("/success");
     } else {
+      // Handle incomplete form
     }
+    // Resetting form values
     setAmount("");
-
     setToConfirmAccountNumber("");
-
     setToAccountHolderName("");
     setToAccountNumber("");
     setToIFSCNumber("");
-    setToAccountHolderName("");
   };
+
+  // ... (rest of the existing code)
 
   return (
     <>
