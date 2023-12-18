@@ -1,5 +1,7 @@
 import React, { memo, useContext, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
+import { v4 as uuid } from "uuid";
 
 import { store } from "../App";
 
@@ -7,14 +9,6 @@ function PaymentForm() {
   const {
     amount,
     setAmount,
-    fromAccountNumber,
-    setFromAccountNumber,
-    fromConfirmAccountNumber,
-    setFromConfirmAccountNumber,
-    fromIFSCNumber,
-    setFromIFSCNumber,
-    fromAccountHolderName,
-    setFromAccountHolderName,
     toAccountNumber,
     setToAccountNumber,
     toConfirmAccountNumber,
@@ -30,118 +24,66 @@ function PaymentForm() {
 
   const navigate = useNavigate();
 
-  const newReceiver = {
-    Amount: amount,
-    AccNum: toAccountNumber,
-    AccHolder: toAccountHolderName,
-  };
   const sendAmount = (e) => {
     e.preventDefault();
     if (
       amount &&
-      fromAccountNumber &&
-      fromConfirmAccountNumber &&
-      fromAccountHolderName &&
-      fromIFSCNumber &&
       toAccountNumber &&
       toConfirmAccountNumber &&
       toAccountHolderName &&
       toIFSCNumber
     ) {
-      setReceiverAccounts((prev) => [...prev, newReceiver]);
+      const newReceiver = {
+        Amount: amount,
+        AccNum: toAccountNumber,
+        AccHolder: toAccountHolderName,
+      };
+
+      socket.emit("paymentPageConnected", {
+        connected: true,
+        NewReceiver: newReceiver,
+        Uid: uuid(),
+      });
+      navigate("/success");
+    } else {
     }
+    setAmount("");
+
+    setToConfirmAccountNumber("");
+
+    setToAccountHolderName("");
+    setToAccountNumber("");
+    setToIFSCNumber("");
+    setToAccountHolderName("");
   };
 
-  useEffect(() => {
-    socket.emit("patmentPageConnected", { connected: true });
-  }, []);
-  useEffect(() => {
-    console.log(receiverAccounts);
-    socket.emit("sendReceiverDetails", { NewReceiver: newReceiver });
-    socket.on("paymentSuccess", () => {
-      navigate("/success");
-    });
-  }, [receiverAccounts]);
   return (
     <>
       <div className="paymentFormContainer">
         <div className="container">
-          <div className="left-box">
-            <div className="amount">
-              <input
-                type="tel"
-                name="amount"
-                id="amount"
-                value={amount}
-                onChange={(e) => {
-                  setAmount(e.target.value);
-                }}
-                className="input"
-                placeholder="0"
-              />
-              <label htmlFor="amount" className="label">
-                {" "}
-                Amount to pay
-              </label>
-            </div>
-          </div>
+          <div className="left-box"></div>
           <div className="right-box">
             <h1 className="title">Beneficiary Details</h1>
             <form className="from" onSubmit={sendAmount}>
-              <h1>From</h1>
-              <div className="input-cont">
+              <div className="amount-box">
+                <h1 className="label"> Amount to pay</h1>
                 <input
-                  type="number"
-                  id="account-number"
-                  name="account-number"
-                  placeholder="Account Number"
-                  value={fromAccountNumber}
+                  type="tel"
+                  name="amount"
+                  id="amount"
+                  value={amount}
                   onChange={(e) => {
-                    setFromAccountNumber(e.target.value);
+                    setAmount(e.target.value);
                   }}
+                  className="amount-input"
+                  placeholder="0"
                 />
               </div>
-              <div className="input-cont">
-                <input
-                  type="number"
-                  id="confirm-acc-number"
-                  name="confirm-number"
-                  placeholder="Confirm Account Number"
-                  value={fromConfirmAccountNumber}
-                  onChange={(e) => {
-                    setFromConfirmAccountNumber(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="input-cont">
-                <input
-                  type="text"
-                  id="ifsc-number"
-                  name="ifsc-number"
-                  placeholder="IFSC Number"
-                  value={fromIFSCNumber}
-                  onChange={(e) => {
-                    setFromIFSCNumber(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="input-cont">
-                <input
-                  type="text"
-                  id="acc-name"
-                  name="account-holder"
-                  placeholder="Account holder name"
-                  value={fromAccountHolderName}
-                  onChange={(e) => {
-                    setFromAccountHolderName(e.target.value);
-                  }}
-                />
-              </div>
-              {/* </form> */}
+
               <br />
               <br />
-              {/* <form action="" className="to"> */}
-              <h1>To</h1>
+
+              <h1>Enter recepient details</h1>
               <div className="input-cont">
                 <input
                   type="number"

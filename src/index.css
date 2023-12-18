@@ -32,8 +32,7 @@ code {
 .left-box {
   width: 35vw;
   height: 90vh;
-  /* background-color: rgb(227, 12, 12);
-   */
+
   background: url(./components/images/wallpaperflare.com_wallpaper.jpg)
     no-repeat;
 }
@@ -43,8 +42,12 @@ code {
   background-color: #fff;
   display: flex;
   flex-direction: column;
-  /* justify-content: space-evenly; */
+  justify-content: space-evenly;
   align-items: center;
+}
+.amount-box {
+  display: flex;
+  flex-direction: column;
 }
 .right-box h1 {
   font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
@@ -58,12 +61,15 @@ code {
   -webkit-background-clip: text; /* Use the text as a mask */
   color: transparent; /* Hide the text color */
   mix-blend-mode: multiply; /* Blend the background image and text */
-  /* position: absolute;
-  top: 0;
-  left: 0; */
-  /* z-index: -1; */
 }
-
+.amount-input {
+  text-align: center;
+  font-size: 30px;
+}
+.label {
+  font-weight: 800;
+  align-items: center;
+}
 .amount {
   position: relative;
   top: 40%;
@@ -100,8 +106,7 @@ form {
   padding: 4%;
   box-sizing: border-box;
   border-radius: 10px 10px 0 0;
-  /* background-color: rgb(216, 224, 224); */
-  /* border: 2px solid; */
+
   margin: 0 auto;
 }
 /* .right-box > form {
@@ -119,7 +124,8 @@ form h1 {
   margin: 0;
 }
 form input {
-  background-color: rgb(250, 240, 240);
+  /* background-color: rgb(250, 240, 240); */
+  background-color: transparent;
   outline: none;
   font-size: 16px;
   margin: 0.4rem 0;
@@ -147,4 +153,98 @@ form input {
 }
 .alert {
   padding: 5rem;
+}
+
+/* 
+ */
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 60px;
+  aspect-ratio: 1.154;
+  --c: #0000, #25b09b 2deg 59deg, #0000 61deg;
+  --c1: conic-gradient(from 149deg at top, var(--c));
+  --c2: conic-gradient(from -31deg at bottom, var(--c));
+  background: var(--c1) top, var(--c1) bottom right, var(--c2) bottom,
+    var(--c1) bottom left;
+  background-size: 50% 50%;
+  background-repeat: no-repeat;
+  animation: l37 1s infinite;
+}
+@keyframes l37 {
+  80%,
+  100% {
+    background-position: bottom right, bottom left, bottom, top;
+  }
+}
+
+.loading {
+  background-color: rgb(173, 246, 240);
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/*  */
+* {
+  padding: 0;
+  margin: 0;
+}
+.wrapper {
+  height: 10vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(173, 246, 240);
+}
+.checkmark__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #7ac142;
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+.checkmark {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: block;
+  stroke-width: 2;
+  stroke: #fff;
+  stroke-miterlimit: 10;
+  margin: 10% auto;
+  box-shadow: inset 0px 0px 0px #7ac142;
+  animation: fill 0.4s ease-in-out 0.4s forwards,
+    scale 0.3s ease-in-out 0.9s both;
+}
+.checkmark__check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes scale {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+@keyframes fill {
+  100% {
+    box-shadow: inset 0px 0px 0px 30px #7ac142;
+  }
 }
