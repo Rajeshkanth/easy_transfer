@@ -24,12 +24,7 @@ function App() {
   const [fail, setFail] = useState(false);
   const [tabId, setTabId] = useState("");
 
-  // const socket = io.connect("https://payment-server-461p.onrender.com", {
-  //   query: {
-  //     // source: uniqueID,
-  //   },
-  // });
-  const socket = io.connect("http://localhost:3004");
+  const socket = io.connect("https://payment-server-461p.onrender.com", {});
 
   useEffect(() => {
     // Retrieve tabId from sessionStorage if it exists

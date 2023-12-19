@@ -18,47 +18,11 @@ function PaymentForm() {
     setToIFSCNumber,
     toAccountHolderName,
     setToAccountHolderName,
-    receiverAccounts,
-    setReceiverAccounts,
+
     socket,
   } = useContext(store);
 
   const navigate = useNavigate();
-
-  // const sendAmount = (e) => {
-  //   e.preventDefault();
-  //   if (
-  //     amount &&
-  //     toAccountNumber &&
-  //     toConfirmAccountNumber &&
-  //     toAccountHolderName &&
-  //     toIFSCNumber
-  //   ) {
-  //     const newReceiver = {
-  //       Amount: amount,
-  //       AccNum: toAccountNumber,
-  //       AccHolder: toAccountHolderName,
-  //     };
-
-  //     socket.emit("paymentPageConnected", {
-  //       connected: true,
-  //       NewReceiver: newReceiver,
-  //       Uid: uuid(),
-  //     });
-  //     navigate("/success");
-  //   } else {
-  //   }
-  //   setAmount("");
-
-  //   setToConfirmAccountNumber("");
-
-  //   setToAccountHolderName("");
-  //   setToAccountNumber("");
-  //   setToIFSCNumber("");
-  //   setToAccountHolderName("");
-  // };
-
-  // ... (existing code remains the same)
 
   const sendAmount = (e) => {
     e.preventDefault();
@@ -76,20 +40,11 @@ function PaymentForm() {
         tabId: sessionStorage.getItem("tabId"),
       };
 
-      // socket.emit("paymentPageConnected", {
-      //   connected: true,
-      //   NewReceiver: newReceiver,
-      //   Uid: uuid(),
-      //   // Adding tabId
-      // });
-      axios
-        .post("http://localhost:3001", { newReceiver })
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      socket.emit("paymentPageConnected", {
+        connected: true,
+        NewReceiver: newReceiver,
+        Uid: uuid(),
+      });
       navigate("/success");
     } else {
       // Handle incomplete form
