@@ -2,6 +2,7 @@ import React, { memo, useContext, useEffect } from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { v4 as uuid } from "uuid";
+import { FaRupeeSign } from "react-icons/fa";
 import axios from "axios";
 
 import { store } from "../App";
@@ -18,11 +19,11 @@ function PaymentForm() {
     setToIFSCNumber,
     toAccountHolderName,
     setToAccountHolderName,
-
     socket,
   } = useContext(store);
 
   const navigate = useNavigate();
+  const [allInput, setAllInput] = useState(false);
 
   const sendAmount = (e) => {
     e.preventDefault();
@@ -45,8 +46,10 @@ function PaymentForm() {
         NewReceiver: newReceiver,
         Uid: uuid(),
       });
+      setAllInput(false);
       navigate("/success");
     } else {
+      setAllInput(true);
       // Handle incomplete form
     }
     // Resetting form values
@@ -57,18 +60,75 @@ function PaymentForm() {
     setToIFSCNumber("");
   };
 
-  // ... (rest of the existing code)
-
   return (
     <>
       <div className="paymentFormContainer">
         <div className="container">
-          <div className="left-box"></div>
+          <div className="left-box">
+            <h1>Easy Transfer</h1>
+          </div>
           <div className="right-box">
-            <h1 className="title">Beneficiary Details</h1>
             <form className="from" onSubmit={sendAmount}>
-              <div className="amount-box">
-                <h1 className="label"> Amount to pay</h1>
+              <h1>Enter recepient details</h1>
+
+              <div className="input-cont">
+                <label htmlFor="rec-account-number">Enter account number</label>
+                <input
+                  type="number"
+                  id="rec-account-number"
+                  name="rec-account-number"
+                  placeholder="account number"
+                  value={toAccountNumber}
+                  onChange={(e) => {
+                    setToAccountNumber(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="input-cont">
+                <label htmlFor="rec-confirm-number">
+                  Confirm Account number
+                </label>
+                <input
+                  type="number"
+                  id="rec-confirm-number"
+                  name="rec-confirm-number"
+                  placeholder="confirm account number"
+                  value={toConfirmAccountNumber}
+                  onChange={(e) => {
+                    setToConfirmAccountNumber(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="input-cont">
+                <label htmlFor="rec-ifsc-number">Enter IFSC code</label>
+                <input
+                  type="text"
+                  id="rec-ifsc-number"
+                  name="rec-ifsc-number"
+                  placeholder="IFSC code"
+                  value={toIFSCNumber}
+                  onChange={(e) => {
+                    setToIFSCNumber(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="input-cont">
+                <label htmlFor="receiver-account-holder">
+                  Enter Account holder's name
+                </label>
+                <input
+                  type="text"
+                  id="receiver-name"
+                  name="receiver-account-holder"
+                  placeholder="account holder's name"
+                  value={toAccountHolderName}
+                  onChange={(e) => {
+                    setToAccountHolderName(e.target.value);
+                  }}
+                />
+              </div>
+              <div className="input-cont">
+                <label className="label"> Amount </label>
                 <input
                   type="tel"
                   name="amount"
@@ -81,58 +141,8 @@ function PaymentForm() {
                   placeholder="0"
                 />
               </div>
-
-              <br />
-              <br />
-
-              <h1>Enter recepient details</h1>
+              {allInput ? <p>fill all input values</p> : null}
               <div className="input-cont">
-                <input
-                  type="number"
-                  id="rec-account-number"
-                  name="rec-account-number"
-                  placeholder="Account Number"
-                  value={toAccountNumber}
-                  onChange={(e) => {
-                    setToAccountNumber(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="input-cont">
-                <input
-                  type="number"
-                  id="rec-confirm-number"
-                  name="rec-confirm-number"
-                  placeholder="Confirm Account Number"
-                  value={toConfirmAccountNumber}
-                  onChange={(e) => {
-                    setToConfirmAccountNumber(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="input-cont">
-                <input
-                  type="text"
-                  id="rec-ifsc-number"
-                  name="rec-ifsc-number"
-                  placeholder="IFSC Number"
-                  value={toIFSCNumber}
-                  onChange={(e) => {
-                    setToIFSCNumber(e.target.value);
-                  }}
-                />
-              </div>
-              <div className="input-cont">
-                <input
-                  type="text"
-                  id="receiver-name"
-                  name="receiver-account-holder"
-                  placeholder="Account holder name"
-                  value={toAccountHolderName}
-                  onChange={(e) => {
-                    setToAccountHolderName(e.target.value);
-                  }}
-                />
                 <input type="submit" value="SEND" id="pay" />
               </div>
             </form>

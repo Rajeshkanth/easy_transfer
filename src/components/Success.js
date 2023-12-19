@@ -115,11 +115,11 @@ function Success() {
                   Open your payment application and confirm the payment...
                 </strong>{" "}
               </p>
-              <p>
+              {/* <p>
                 <strong>Reminder: </strong>Payments need confirmation within 2
                 seconds. Unconfirmed transactions will be canceled
                 automatically.{" "}
-              </p>
+              </p> */}
             </div>
           )}
         </>

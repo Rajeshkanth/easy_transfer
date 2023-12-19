@@ -2,13 +2,11 @@ import { createContext, useState, useEffect } from "react";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import { io } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
-import "./App.css";
+// import "./App.css";
 import PaymentForm from "./components/PaymentForm";
 import Success from "./components/Success";
 
 export const store = createContext();
-
-// const uniqueID = window.sessionStorage.getItem("uniqueID");
 
 function App() {
   const [amount, setAmount] = useState("");
