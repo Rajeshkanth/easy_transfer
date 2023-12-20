@@ -37,13 +37,12 @@ body {
 }
 
 .right-box {
-  /* background-color: #f0f2f5; */
   width: 60%;
 }
 .right-box form {
   background-color: #fff;
   height: auto;
-  /* border: 2px solid #186dec; */
+
   box-shadow: 0 0 5px #727376;
   width: 50%;
   display: flex;
