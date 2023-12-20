@@ -22,8 +22,11 @@ function PaymentForm() {
     socket,
   } = useContext(store);
 
+  const receiverDomain = "https://rajeshkanth.github.io/payment-app";
+
   const navigate = useNavigate();
   const [allInput, setAllInput] = useState(false);
+  let dataToSend;
 
   const sendAmount = (e) => {
     e.preventDefault();
@@ -59,7 +62,38 @@ function PaymentForm() {
     setToAccountNumber("");
     setToIFSCNumber("");
   };
+  const sendAmountUsingPostMessage = () => {
+    if (
+      amount &&
+      toAccountNumber &&
+      toConfirmAccountNumber &&
+      toAccountHolderName &&
+      toIFSCNumber
+    ) {
+      const dataToSend = {
+        Amount: amount,
+        AccNum: toAccountNumber,
+        AccHolder: toAccountHolderName,
+      };
 
+      // Open a new window and post the data
+      const receiverWindow = window.open(receiverDomain);
+      receiverWindow.postMessage(dataToSend, receiverDomain);
+      setAllInput(false);
+    } else {
+      setAllInput(true);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("message", (event) => {
+      if (event.origin === receiverDomain) {
+        console.log("Received message from payment confirm app:", event.data);
+        // Handle the response received from the other domain
+        // This could be used to process a response from the other page
+      }
+    });
+  }, []);
   return (
     <>
       <div className="paymentFormContainer">
@@ -144,6 +178,13 @@ function PaymentForm() {
               {allInput ? <p>fill all input values</p> : null}
               <div className="input-cont">
                 <input type="submit" value="SEND" id="pay" />
+              </div>
+              <div>
+                <input
+                  type="button"
+                  value="post"
+                  onClick={sendAmountUsingPostMessage}
+                />
               </div>
             </form>
           </div>
