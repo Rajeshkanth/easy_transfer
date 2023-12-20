@@ -2,6 +2,10 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d1910345aa4f153e090f77d32fcd94ef68cb53a7
 # Payment Application Overview
 
 This document provides an overview of the payment application's frontend and backend structure.
@@ -32,10 +36,15 @@ The Socket.io server handles various events like `paymentPageConnected`, `join_s
 
 This Markdown file outlines the structure and functionality of the payment application's frontend (built with React) and backend (Socket.io with Express).
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d1910345aa4f153e090f77d32fcd94ef68cb53a7
 ---to run the application
 
 # First install the dependencies
 
+<<<<<<< HEAD
 Navigate to the frontend directory (where package.json is located).
 Run
 
@@ -43,6 +52,16 @@ Run
 
 to install all the required dependencies.
 
+=======
+  Navigate to the frontend directory (where package.json is located).
+  Run 
+  
+  #### `npm install`
+  
+  to install all the required dependencies.
+ 
+ 
+>>>>>>> d1910345aa4f153e090f77d32fcd94ef68cb53a7
 ## Available Scripts
 
 In the project directory, you can run:
@@ -55,10 +74,20 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> d1910345aa4f153e090f77d32fcd94ef68cb53a7
 ### Deployment
 
 ### `npm run deploy` to deploy in github
 
 ### Note
+<<<<<<< HEAD
 
 Ensure that both frontend and backend servers are running simultaneously for the application to work correctly.
+=======
+
+Ensure that both frontend and backend servers are running simultaneously for the application to work correctly.
+
+>>>>>>> d1910345aa4f153e090f77d32fcd94ef68cb53a7
