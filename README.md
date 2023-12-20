@@ -40,7 +40,10 @@ This Markdown file outlines the structure and functionality of the payment appli
 
   Navigate to the frontend directory (where package.json is located).
   Run 
-  #### 'npm install'  to install all the required dependencies.
+  
+  #### `npm install`
+  
+  to install all the required dependencies.
  
  
 ## Available Scripts
@@ -58,5 +61,5 @@ You may also see any lint errors in the console.
 
 ### Deployment
 
-### `npm run build` to deploy
+### `npm run deploy` to deploy in github
 
