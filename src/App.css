@@ -68,7 +68,7 @@ body {
   box-sizing: border-box;
   border-radius: 5px;
   border: 2px solid rgb(229, 226, 226);
-  /* color: #186dec; */
+
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 .right-box input::-webkit-input-placeholder {
@@ -189,4 +189,32 @@ body {
 .fail-icon {
   font-size: 44px;
   color: red;
+}
+
+@media all and (max-width: 650px) {
+  .container {
+    display: block;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
+  .left-box {
+    display: none;
+  }
+  .right-box {
+    width: 90%;
+    height: 90%;
+    padding: 1rem;
+  }
+  .right-box form {
+    width: 70%;
+    margin: 4rem auto;
+  }
+  .input-cont {
+    width: 90%;
+  }
+  .right-box form input {
+    width: 90%;
+  }
 }
