@@ -63,3 +63,7 @@ You may also see any lint errors in the console.
 
 ### `npm run deploy` to deploy in github
 
+### Note
+
+Ensure that both frontend and backend servers are running simultaneously for the application to work correctly.
+
