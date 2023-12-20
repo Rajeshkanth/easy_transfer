@@ -217,7 +217,7 @@ body {
   .right-box form input {
     width: 90%;
   }
-  .loader p {
+  .loader strong {
     font-size: 10px;
   }
 }
