@@ -45,21 +45,26 @@ body {
   height: auto;
   /* border: 2px solid #186dec; */
   box-shadow: 0 0 5px #727376;
-  width: 60%;
+  width: 50%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 10% auto;
+  margin: 13% auto;
   padding: 2rem;
   box-sizing: border-box;
   border-radius: 15px;
 }
+.right-box form h1 {
+  font-size: 18px;
+  margin: 0;
+  margin-bottom: 1rem;
+}
 .right-box input {
   outline: 0;
   width: 20vw;
-  font-size: 22px;
-  padding: 0.2rem;
+  font-size: 14px;
+  padding: 0.4rem;
   padding-left: 0.7rem;
   box-sizing: border-box;
   border-radius: 5px;
@@ -69,10 +74,9 @@ body {
 }
 .right-box input::-webkit-input-placeholder {
   color: #adb4c0;
-  font-size: 19px;
 }
 .right-box label {
-  font-size: 90%;
+  font-size: 14px;
 }
 .right-box form label {
   margin-bottom: 0.2rem;
