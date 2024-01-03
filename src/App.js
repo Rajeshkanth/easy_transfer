@@ -17,20 +17,17 @@ function App() {
   const [toAccountHolderName, setToAccountHolderName] = useState("");
   const [receiverAccounts, setReceiverAccounts] = useState([]);
   const [confirmReceiver, setConfirmReceiver] = useState([]);
-  const [roomId, setRoomId] = useState("");
   const [check, setCheck] = useState(false);
   const [fail, setFail] = useState(false);
   const [tabId, setTabId] = useState("");
 
-  const socket = io.connect("https://payment-server-461p.onrender.com", {});
+  const socket = io.connect("https://polling-server.onrender.com");
 
   useEffect(() => {
-    // Retrieve tabId from sessionStorage if it exists
     const storedTabId = sessionStorage.getItem("tabId");
     if (storedTabId) {
       setTabId(storedTabId);
     } else {
-      // If tabId doesn't exist in sessionStorage, generate a new one
       const newTabId = uuidv4();
       sessionStorage.setItem("tabId", newTabId);
       setTabId(newTabId);
@@ -65,7 +62,6 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<PaymentForm />}></Route>
-
           <Route path="/success" element={<Success />}></Route>
         </Routes>
       </Router>

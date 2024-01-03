@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import axios from "axios";
 import { store } from "../App";
 
 import { MdOutlineCancel } from "react-icons/md";
@@ -44,15 +45,6 @@ function Success() {
   }, [socket]);
 
   useEffect(() => {
-    if (check || fail === true) {
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
-    }
-  }, [check, fail]);
-  useEffect(() => {}, []);
-
-  useEffect(() => {
     socket.on("paymentConfirmAlert", (data) => {
       setRoom(data.UniqueId); // Use UniqueId
       const receivedRoom = data.socketRoom;
@@ -61,7 +53,42 @@ function Success() {
     });
   }, [socket]);
 
-  // ... (rest of the existing code)
+  useEffect(() => {}, []);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const tabId = sessionStorage.getItem("tabId");
+      try {
+        const response = await axios.post(
+          `https://polling-server.onrender.com/success/${tabId}`
+          // `http://localhost:8080/success/${tabId}`
+        );
+
+        if (response.status === 200) {
+          setCheck(true);
+          setFail(false);
+        }
+        if (response.status === 201) {
+          setCheck(false);
+          setFail(true);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [check, fail]);
+
+  useEffect(() => {
+    if (check || fail === true) {
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
+    }
+  }, [check, fail]);
 
   return (
     <>
@@ -72,7 +99,7 @@ function Success() {
             <div class="wrapper">
               <MdOutlineCancel className="fail-icon" />{" "}
             </div>
-            <h3>payment transaction failed!</h3>
+            <h3>Payment Transaction Failed!</h3>
             <br />
             <p>redirecting to the home page....</p>
           </div>
@@ -103,17 +130,15 @@ function Success() {
                   />
                 </svg>
               </div>
-              <h3>payment transaction successful!</h3>
+
+              <h3>Payment Transaction Successful !</h3>
               <br />
-              <p>redirecting to the home page....</p>
             </div>
           ) : (
             <div className="loading">
               <div className="loader"></div>
               <p>
-                <strong>
-                  Open your payment application and confirm the payment...
-                </strong>{" "}
+                <strong>waiting for the transaction confirmation</strong>{" "}
               </p>
               {/* <p>
                 <strong>Reminder: </strong>Payments need confirmation within 2
