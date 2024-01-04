@@ -26,7 +26,7 @@ module.exports = {
           },
         },
         ".loading": {
-          backgroundColor: "rgb(233, 227, 227)",
+          backgroundColor: "rgb(215, 231, 229)",
           height: "100vh",
           width: "100vw",
           display: "flex",

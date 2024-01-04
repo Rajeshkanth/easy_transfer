@@ -16,12 +16,11 @@ function PaymentForm() {
     toAccountHolderName,
     setToAccountHolderName,
     socket,
+    connectionMode,
   } = useContext(store);
 
   const navigate = useNavigate();
   const [allInput, setAllInput] = useState(false);
-
-  const useSocket = process.env.REACT_APP_SOCKET_API === "true";
 
   const sendAmountBySocket = (e) => {
     e.preventDefault();
@@ -191,19 +190,23 @@ function PaymentForm() {
 
                 {/* </div> */}
               </div>
-              <input
+              {/* <input
                 type="button"
                 value="SEND via Socket"
                 id="pay"
                 className="block  w-auto px-4 py-2 m-auto mb-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 bg-green-600 text-white hover:bg-green-700 hover:cursor-pointer"
                 onClick={sendAmountBySocket}
-              />
+              /> */}
 
               <input
                 type="submit"
-                value="SEND via Polling"
-                className="block w-auto px-4 py-2 m-auto mb-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 bg-green-600 text-white hover:bg-green-700 hover:cursor-pointer"
-                onClick={sendAmountByPolling}
+                value="SEND"
+                className="block w-1/2  px-4 py-2 m-auto mb-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 bg-green-600 text-white hover:bg-green-700 hover:cursor-pointer"
+                onClick={
+                  connectionMode === "socket"
+                    ? sendAmountBySocket
+                    : sendAmountByPolling
+                }
               />
             </form>
           </div>

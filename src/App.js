@@ -1,3 +1,4 @@
+import axios from "axios";
 import { createContext, useState, useEffect } from "react";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import { io } from "socket.io-client";
@@ -20,6 +21,7 @@ function App() {
   const [check, setCheck] = useState(false);
   const [fail, setFail] = useState(false);
   const [tabId, setTabId] = useState("");
+  const [connectionMode, setConnectionMode] = useState("");
 
   const socket = io.connect("https://polling-server.onrender.com");
 
@@ -32,6 +34,24 @@ function App() {
       sessionStorage.setItem("tabId", newTabId);
       setTabId(newTabId);
     }
+
+    socket.on("connection_type", (data) => {
+      if (data.type === "socket") {
+        setConnectionMode("socket");
+      } else {
+        setConnectionMode("polling");
+      }
+    });
+    // if (connectionMode !== "socket") {
+    //   const pollingConnection = axios.get(
+    //     "https://polling-server.onrender.com/connectionType"
+    //   );
+    //   if (pollingConnection.status === 201) {
+    //     setConnectionMode("polling");
+    //   } else {
+    //     setConnectionMode("socket");
+    //   }
+    // }
   }, []);
 
   return (
@@ -57,6 +77,7 @@ function App() {
         setCheck,
         fail,
         setFail,
+        connectionMode,
       }}
     >
       <Router>
