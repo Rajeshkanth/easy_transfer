@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { memo, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { store } from "../App";
 
@@ -53,8 +53,6 @@ function Success() {
     });
   }, [socket]);
 
-  useEffect(() => {}, []);
-
   useEffect(() => {
     const interval = setInterval(async () => {
       const tabId = sessionStorage.getItem("tabId");
@@ -85,7 +83,7 @@ function Success() {
   useEffect(() => {
     if (check || fail === true) {
       setTimeout(() => {
-        navigate("/");
+        navigate("/transferPage");
       }, 3000);
     }
   }, [check, fail]);
@@ -153,4 +151,4 @@ function Success() {
   );
 }
 
-export default Success;
+export default memo(Success);

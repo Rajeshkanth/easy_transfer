@@ -92,6 +92,19 @@ module.exports = {
           fontSize: "44px",
           color: "red",
         },
+        mortar: {
+          50: "#f7f6f8",
+          100: "#edeaef",
+          200: "#e0d9e4",
+          300: "#cabfd1",
+          400: "#b0a0ba",
+          500: "#9f89a8",
+          600: "#917799",
+          700: "#856b8a",
+          800: "#6f5a73",
+          900: "#534556",
+          950: "#39303b",
+        },
       };
 
       addUtilities(newUtilities);
