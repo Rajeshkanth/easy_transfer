@@ -34,7 +34,7 @@ function HomePage() {
         <div
           className={
             windowWidth < 640
-              ? "w-[100%]  h-[70vh] bg-white  rounded-xl m-auto pt-[3rem] border-box "
+              ? "w-[100%]  h-auto bg-white  rounded-xl m-auto pt-[3rem] border-box "
               : isLogin
               ? " sm:w-1/2 lg:w-1/2 h-[80vh] bg-white lg:h-[80vh] rounded-l-xl ml-[4rem] "
               : " sm:w-1/2  lg:w-3/5 h-[80vh] lg:h-[80vh]  bg-gradient-to-b from-green-300 to-green-100 rounded-l-xl ml-[4rem] pt-[4rem] border-box"
