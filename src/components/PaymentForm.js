@@ -339,7 +339,7 @@ function PaymentForm() {
               </div>
             </div>
 
-            <div className="border-t-2  flex items-center">
+            <div className="border-t-2 h-[15vh] flex items-center">
               <button
                 className={
                   windowWidth < 780

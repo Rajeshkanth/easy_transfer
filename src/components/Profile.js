@@ -280,11 +280,11 @@ function Profile() {
         <form
           action="submit"
           onSubmit={updateProfile}
-          className="w-full h-screen sm:w-[90%] md:w-3/4 bg-red-100  border-box items-center flex flex-col  font-['Open-Sans'] justify-center sm:space-y-0 "
+          className="w-full h-screen sm:w-[90%] md:w-3/4 bg-red-100 p-5 border-box items-center flex flex-col  font-['Open-Sans'] justify-center sm:space-y-2 "
         >
           <button
             onClick={cancelEdit}
-            className="fixed top-[85.5vh] left-[50vw] sm:top-[0] sm:left-[90vw] w-[46%] sm:w-auto border bg-white p-2 pl-4 pr-4 border-box font-extralight hover:font-bold rounded-md sm:rounded-full"
+            className="fixed top-[85.5vh] left-[50vw] sm:top-[-2vh] sm:left-[90vw] w-[46%] sm:w-auto border bg-white p-2 pl-4 pr-4 border-box font-extralight hover:font-bold rounded-md sm:rounded-full"
           >
             Cancel
           </button>
