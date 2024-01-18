@@ -10,6 +10,8 @@ import { RiMenuFoldFill } from "react-icons/ri";
 
 function PaymentForm() {
   const {
+    userNameFromDb,
+    setUserNameFromDb,
     amount,
     setAmount,
     toAccountNumber,
@@ -20,12 +22,9 @@ function PaymentForm() {
     setToAccountHolderName,
     socket,
     connectionMode,
-    loggedUser,
     setLoggedUser,
-    registeredUsers,
-    mobileNumber,
-    key,
-    setKey,
+    windowWidth,
+    setWindowWidth,
   } = useContext(store);
 
   const navigate = useNavigate();
@@ -112,39 +111,70 @@ function PaymentForm() {
   };
 
   useEffect(() => {
-    console.log(loggedUser);
-    console.log(mobileNumber);
-    // if (JSON.parse(sessionStorage.getItem(document.cookie)).UserName) {
-    //   setLoggedUser(
-    //     JSON.parse(sessionStorage.getItem(document.cookie)).UserName
-    // );
-    // }
+    if (connectionMode !== "socket") {
+      axios
+        .post("https://polling-server.onrender.com/checkUserName", {
+          regNumber: document.cookie,
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            setUserNameFromDb(response.data.user);
+          } else {
+            setUserNameFromDb("");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      socket.emit("checkUserName", {
+        regNumber: document.cookie,
+      });
+      socket.on("userNameAvailable", (data) => {
+        setUserNameFromDb(data.user);
+      });
+      socket.on("userNotFound", () => {
+        setUserNameFromDb("");
+      });
+    }
+  }, [userNameFromDb, connectionMode, socket]);
 
-    // if () {
-    //   setSessionTiemedOut(true);
-    // } else {
-    //   setSessionTiemedOut(false);
-    // }
-  }, []);
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [windowWidth]);
 
   return (
     <>
       <div className="paymentFormContainer h-screen w-screen bg-slate-50  fixed w-screen bg-blue-500">
         <div className="h-[10%] w-full fixed  top-0 flex text-center items-center pt-4 box-border align-center  bg-gradient-to-r  from-cyan-500 to-blue-500 p-1px ">
-          <h1 className="text-4xl italic font-extrabold text-white ml-[2rem] sm:ml-[4rem] lg:ml-[16rem] pointer-events-none text-center">
-            Easy Transfer
-          </h1>
+          {windowWidth < 600 ? null : (
+            <h1 className="text-4xl italic font-extrabold text-white ml-[2rem] sm:ml-[4rem] lg:ml-[16rem] pointer-events-none text-center">
+              Easy Transfer
+            </h1>
+          )}
 
           {sessionTiemedOut ? null : (
-            <div className="p-2 pl-8 pr-8 text-white font-bold   border-box absolute border-r-2   w-1/8 flex items-center space-x-2">
+            <div
+              className={
+                windowWidth < 600
+                  ? "p-2 pl-8 pr-8 text-white font-bold   border-box absolute   w-1/8 flex items-center space-x-2"
+                  : "p-2 pl-8 pr-8 text-white font-bold   border-box absolute border-r-2   w-1/8 flex items-center space-x-2"
+              }
+            >
               <AiOutlineMenuUnfold
                 onClick={profile}
                 className="text-3xl text-black"
               />
               <button className=" text-xl text-black">
-                {JSON.parse(sessionStorage.getItem(document.cookie)).UserName
-                  ? JSON.parse(sessionStorage.getItem(document.cookie)).UserName
-                  : document.cookie}
+                {userNameFromDb !== "" ? userNameFromDb : document.cookie}
               </button>
             </div>
           )}
@@ -242,18 +272,7 @@ function PaymentForm() {
                 {allInput ? (
                   <p className="text-left mb-2">*fill all input values</p>
                 ) : null}
-
-                {/* <div className="relative top-5  transition-all bg-white  pointer-events-none text-gray-600"> */}
-
-                {/* </div> */}
               </div>
-              {/* <input
-                type="button"
-                value="SEND via Socket"
-                id="pay"
-                className="block  w-auto px-4 py-2 m-auto mb-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 bg-green-600 text-white hover:bg-green-700 hover:cursor-pointer"
-                onClick={sendAmountBySocket}
-              /> */}
 
               <input
                 type="submit"
@@ -289,7 +308,13 @@ function PaymentForm() {
 
       {isProfileClicked ? (
         <>
-          <div className="w-1/4 h-screen   bg-blue-500  border rounded-2xl rounded-l-none fixed ">
+          <div
+            className={
+              windowWidth < 780
+                ? "w-1/2 h-screen   bg-blue-500  border rounded-2xl rounded-l-none fixed "
+                : " sm:w-[33vw]  h-screen   bg-blue-500  border rounded-2xl rounded-l-none fixed "
+            }
+          >
             <div className=" pt-2 pb-8 border-box h-[90vh]">
               <div className="flex justify-between items-center border-b-2 font-sans cursor-pointer ">
                 <h1 className="ml-[2rem] text-2xl font-bold text-white">
@@ -309,14 +334,18 @@ function PaymentForm() {
                 <h1 className="hover:font-bold hover:border-b-2">Rewards</h1>
                 <h1 className="hover:font-bold hover:border-b-2">Contact us</h1>
                 <h1 className="hover:font-bold hover:border-b-2">
-                  Transaction history
+                  Transactions
                 </h1>
               </div>
             </div>
 
             <div className="border-t-2 h-[10vh] flex items-center">
               <button
-                className="bg-green-500  rounded-full p-2 pl-8 pr-8 text-white z-[10]  left-[15vw] font-light absolute  w-1/8 hover:bg-blue-500 hover:border"
+                className={
+                  windowWidth < 780
+                    ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-white z-[10] left-[22vw] sm:left-[25vw]   font-light absolute  sm:w-1/8 hover:bg-blue-500 hover:border"
+                    : "bg-green-500  rounded-full p-2 pl-8 pr-8 text-white z-[10]  left-[18vw]  font-light absolute  w-1/8 hover:bg-blue-500 hover:border"
+                }
                 onClick={logout}
               >
                 Log out

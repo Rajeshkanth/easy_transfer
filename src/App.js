@@ -1,4 +1,3 @@
-import axios from "axios";
 import { createContext, useState, useEffect } from "react";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import { io } from "socket.io-client";
@@ -28,7 +27,6 @@ function App() {
   const [cvv, setCvv] = useState("");
   const [expireDate, setExpireDate] = useState("");
   const [key, setKey] = useState("");
-
   const [toAccountNumber, setToAccountNumber] = useState("");
   const [toConfirmAccountNumber, setToConfirmAccountNumber] = useState("");
   const [toIFSCNumber, setToIFSCNumber] = useState("");
@@ -40,6 +38,13 @@ function App() {
   const [tabId, setTabId] = useState("");
   const [connectionMode, setConnectionMode] = useState("");
   const [loggedUser, setLoggedUser] = useState("");
+  const [userNameFromDb, setUserNameFromDb] = useState("");
+  const [ageFromDb, setAgeFromDb] = useState("");
+  const [accFromDb, setAccFromDb] = useState("");
+  const [mobileFromDb, setMobileFromDb] = useState("");
+  const [dobFromDb, setDobFromDb] = useState("");
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [isLogin, setIsLogin] = useState(true);
 
   const handleRegMobileNumber = (e) => {
     const value = e.target.value;
@@ -71,7 +76,10 @@ function App() {
       setUserName(e.target.value);
     }
   };
-  const socket = io.connect("https://polling-server.onrender.com");
+  const socket =
+    connectionMode === "socket"
+      ? io.connect("https://polling-server.onrender.com")
+      : null;
 
   useEffect(() => {
     const storedTabId = sessionStorage.getItem("tabId");
@@ -83,14 +91,18 @@ function App() {
       setTabId(newTabId);
     }
 
-    socket.on("connection_type", (data) => {
-      if (data.type === "socket") {
-        setConnectionMode("socket");
-      } else {
-        setConnectionMode("polling");
-      }
-    });
-  }, []);
+    const socket = io.connect("https://polling-server.onrender.com");
+
+    setInterval(() => {
+      socket.on("connection_type", (data) => {
+        if (data.type === "socket") {
+          setConnectionMode("socket");
+        } else {
+          setConnectionMode("polling");
+        }
+      });
+    }, 100000);
+  }, [connectionMode]);
 
   return (
     <store.Provider
@@ -131,13 +143,11 @@ function App() {
         handleConfirmPassword,
         handleCreatePassword,
         handleRegMobileNumber,
-
         setUserName,
         handleUserName,
         loggedUser,
         setLoggedUser,
         userName,
-
         age,
         setAge,
         dob,
@@ -152,6 +162,20 @@ function App() {
         setExpireDate,
         key,
         setKey,
+        userNameFromDb,
+        setUserNameFromDb,
+        ageFromDb,
+        accFromDb,
+        mobileFromDb,
+        dobFromDb,
+        setAgeFromDb,
+        setAccFromDb,
+        setMobileFromDb,
+        setDobFromDb,
+        windowWidth,
+        setWindowWidth,
+        isLogin,
+        setIsLogin,
       }}
     >
       <Router>
