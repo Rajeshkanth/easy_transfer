@@ -367,7 +367,7 @@ function Profile() {
               value="Confirm"
               required
               onClick={updateProfile}
-              className="block px-4 py-2 mb-3 w-1/2 sm:left-[12.5vw] md:left-[19.5vw] relative text-white  bg-green-400 border-2 hover:border-white rounded-md focus:outline-none focus:border-blue-500"
+              className="block px-4 py-2 mb-3 w-1/2 w-[33%]  sm:left-[12.5vw] md:left-[19.5vw] relative text-white  bg-green-400 border-2 hover:border-white rounded-md focus:outline-none focus:border-blue-500"
             />
           </div>
         </form>
