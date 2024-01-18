@@ -284,7 +284,7 @@ function Profile() {
         >
           <button
             onClick={cancelEdit}
-            className="fixed top-[85.5vh] left-[50vw] sm:top-[-2vh] sm:left-[90vw] w-[46%] sm:w-auto border bg-white p-2 pl-4 pr-4 border-box font-extralight hover:font-bold rounded-md sm:rounded-full"
+            className="fixed top-[83vh] left-[50vw] sm:top-[1vh] sm:left-[90vw] w-[46%] sm:w-auto border bg-white p-2 pl-4 pr-4 border-box font-extralight hover:font-bold rounded-md sm:rounded-full"
           >
             Cancel
           </button>
