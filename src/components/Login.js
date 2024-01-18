@@ -158,7 +158,7 @@ function Login() {
           <input
             className={
               mobileNumber.length < 10
-                ? "outline-0 h-10  w-full border-2 border-red-500  rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100 "
+                ? "outline-0 h-10  w-full border-2 border-red-500  rounded-lg mb-3 p-[.4rem] font-['Open-Sans']  border-box bg-zinc-100 "
                 : loginFailed
                 ? "outline-0 h-10  w-full border-2 border-red-500  rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100 "
                 : "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100"
@@ -180,8 +180,8 @@ function Login() {
           <input
             className={
               loginFailed
-                ? "outline-0 h-10 w-full rounded-lg mb-5 p-[1rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100 "
-                : "outline-0 h-10 w-full rounded-lg mb-5 p-[1rem] border-2 border-slate-300 font-['Open-Sans'] border-box bg-zinc-100"
+                ? "outline-0 h-10 w-full rounded-lg mb-5 p-[.4rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100 "
+                : "outline-0 h-10 w-full rounded-lg mb-5 p-[.4rem] border-2 border-slate-300 font-['Open-Sans'] border-box bg-zinc-100"
             }
             type={showPassword ? "text" : "password"}
             minLength={6}

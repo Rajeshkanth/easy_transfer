@@ -162,7 +162,7 @@ function SignUpMobile() {
       <h1 className="text-3xl font-extrabold text-center m-0 font-['Open-Sans']">
         User Register
       </h1>
-      <form className="flex flex-col items-center  m-auto h-auto w-[98%] lg:w-[90%]  mt-[2rem]">
+      <form className="flex flex-col items-center  m-auto h-auto w-[full] lg:w-[90%]  mt-[2rem]">
         <div className="flex flex-col w-3/5">
           <label htmlFor="" className="font-medium font-['Open-Sans']">
             Mobile Number
@@ -170,7 +170,7 @@ function SignUpMobile() {
           <input
             className={
               regMobileNumber.length < 10
-                ? "outline-0 h-10 w-full border-2 border-red-500 rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100"
+                ? "outline-0 h-10 w-full border-2 border-red-500 rounded-lg mb-3 p-[.4rem] font-['Open-Sans']  border-box bg-zinc-100"
                 : isAlreadyUser
                 ? "outline-0 h-10 w-full border-2 border-red-500 rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100"
                 : "outline-0 h-10 w-full border-2 border-slate-200 rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100"
@@ -194,8 +194,8 @@ function SignUpMobile() {
           <input
             className={
               signUpFailed
-                ? "outline-0 h-10 w-full rounded-lg mb-0 p-[1rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100"
-                : "outline-0 h-10 w-full rounded-lg mb-0 p-[1rem] border-2 border-slate-200 font-['Open-Sans'] border-box bg-zinc-100"
+                ? "outline-0 h-10 w-full rounded-lg mb-0 p-[.4rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100"
+                : "outline-0 h-10 w-full rounded-lg mb-0 p-[.4rem] border-2 border-slate-200 font-['Open-Sans'] border-box bg-zinc-100"
             }
             type={showCreatePassword ? "text" : "password"}
             min={6}
@@ -226,8 +226,8 @@ function SignUpMobile() {
           <input
             className={
               signUpFailed
-                ? "outline-0 h-10 w-full rounded-lg mb-2 p-[1rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100"
-                : "outline-0 h-10 w-full rounded-lg mb-2 p-[1rem] border-2 border-slate-200 font-['Open-Sans'] border-box bg-zinc-100"
+                ? "outline-0 h-10 w-full rounded-lg mb-2 p-[.4rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100"
+                : "outline-0 h-10 w-full rounded-lg mb-2 p-[.4rem] border-2 border-slate-200 font-['Open-Sans'] border-box bg-zinc-100"
             }
             type={showConfirmPassword ? "text" : "password"}
             value={confirmPassword}
