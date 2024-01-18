@@ -311,11 +311,11 @@ function PaymentForm() {
           <div
             className={
               windowWidth < 780
-                ? "w-1/2 h-[100%] border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
+                ? "w-1/2 h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
                 : " sm:w-[33vw]  h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
             }
           >
-            <div className=" pt-2 pb-8 border-box h-[90vh]">
+            <div className=" pt-2 pb-8 border-box h-[85vh] ">
               <div className="flex justify-between items-center border-b-2 font-sans cursor-pointer ">
                 <h1 className="ml-[2rem] text-2xl font-bold text-white">
                   Dashboard
@@ -339,12 +339,12 @@ function PaymentForm() {
               </div>
             </div>
 
-            <div className="border-t-2 h-[10vh] flex items-center">
+            <div className="border-t-2  flex items-center">
               <button
                 className={
                   windowWidth < 780
-                    ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-white z-[10] left-[22vw] sm:left-[25vw]   font-light absolute  sm:w-1/8 hover:bg-blue-500 hover:border"
-                    : "bg-green-500  rounded-full p-2 pl-8 pr-8 text-white z-[10]  left-[18vw]  font-light absolute  w-1/8 hover:bg-blue-500 hover:border"
+                    ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-white z-[10] left-[21vw] sm:left-[25vw] mt-[10vh]   font-light absolute  sm:w-1/8 hover:bg-blue-500 hover:border"
+                    : "bg-green-500  rounded-full p-2 pl-8 pr-8 text-white z-[10]  left-[18vw] mt-[10vh] font-light absolute  w-1/8 hover:bg-blue-500 hover:border"
                 }
                 onClick={logout}
               >

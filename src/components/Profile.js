@@ -211,7 +211,7 @@ function Profile() {
 
   return (
     <div className=" w-screen fixed block h-[10vh] sm:flex font-serif">
-      <div className="w-screen sm:w-1/4 h-[10vh]  sm:h-screen flex sm:flex-col  sm:space-y-2  border-box text-2xl font-serif">
+      <div className="w-screen sm:w-1/4 h-[8vh]  sm:h-screen flex sm:flex-col  sm:space-y-2  border-box text-2xl font-serif">
         <h1 className=" w-[50%]  sm:w-full bg-black items-center  text-white p-2 border-box ">
           Profile
         </h1>
