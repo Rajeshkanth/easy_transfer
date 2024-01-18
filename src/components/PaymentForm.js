@@ -343,7 +343,7 @@ function PaymentForm() {
               <button
                 className={
                   windowWidth < 780
-                    ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-white z-[10] left-[21vw] sm:left-[25vw] mt-[10vh]   font-light absolute  sm:w-1/8 hover:bg-blue-500 hover:border"
+                    ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-white z-[10] left-[19vw] sm:left-[25vw] mt-[10vh]   font-light absolute  sm:w-1/8 hover:bg-blue-500 hover:border"
                     : "bg-green-500  rounded-full p-2 pl-8 pr-8 text-white z-[10]  left-[18vw] mt-[10vh] font-light absolute  w-1/8 hover:bg-blue-500 hover:border"
                 }
                 onClick={logout}
