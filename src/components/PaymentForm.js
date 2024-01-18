@@ -311,8 +311,8 @@ function PaymentForm() {
           <div
             className={
               windowWidth < 780
-                ? "w-1/2 h-screen   bg-blue-500  border rounded-2xl rounded-l-none fixed "
-                : " sm:w-[33vw]  h-screen   bg-blue-500  border rounded-2xl rounded-l-none fixed "
+                ? "w-1/2 h-[100%] border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
+                : " sm:w-[33vw]  h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
             }
           >
             <div className=" pt-2 pb-8 border-box h-[90vh]">
