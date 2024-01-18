@@ -339,12 +339,12 @@ function PaymentForm() {
               </div>
             </div>
 
-            <div className="border-t-2 h-[15vh] flex items-center">
+            <div className="border-t-2 h-[8vh] flex items-center">
               <button
                 className={
                   windowWidth < 780
-                    ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-white z-[10] left-[19vw] sm:left-[25vw] mt-[1vh]   font-light absolute  sm:w-1/8 hover:bg-blue-500 hover:border"
-                    : "bg-green-500  rounded-full p-2 pl-8 pr-8 text-white z-[10]  left-[18vw] mt-[0vh] font-light absolute  w-1/8 hover:bg-blue-500 hover:border"
+                    ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-white z-[10] left-[19vw] sm:left-[25vw] mt-[1vh]   font-light fixed  sm:w-1/8 hover:bg-blue-500 hover:border"
+                    : "bg-green-500  rounded-full p-2 pl-8 pr-8 text-white z-[10]  left-[18vw] mt-[0vh] font-light fixed  w-1/8 hover:bg-blue-500 hover:border"
                 }
                 onClick={logout}
               >
