@@ -270,7 +270,7 @@ function SignUpMobile() {
           Sign up
         </button>
 
-        <p className="font-light text-xs  mt-[2rem]">
+        <p className="font-light text-xs  mt-[2rem] mb-[2rem]">
           Already have an account?{" "}
           <strong className="font-bold text-green-700" onClick={login}>
             Login

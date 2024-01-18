@@ -147,7 +147,7 @@ function Login() {
       <form
         className={
           windowWidth < 640
-            ? "flex flex-col items-center  m-auto h-auto w-full  mt-[3rem]"
+            ? "flex flex-col items-center  m-auto h-auto w-full  mt-[3rem] "
             : "flex flex-col items-center  m-auto h-auto sm:w-full md:w-full lg:w-[70%]  mt-[3rem]"
         }
       >
@@ -246,7 +246,7 @@ function Login() {
         <p className="text-xs mt-[2rem] sm:mt-[5rem] md:mt-[3rem] underline cursor-pointer ">
           Forgot Password?
         </p>
-        <p className="font-light text-xs  mt-[.5rem]">
+        <p className="font-light text-xs  mt-[.5rem] mb-[2rem]">
           Don't have an account?{" "}
           <strong
             className="font-bold text-green-700 cursor-pointer"
