@@ -155,8 +155,8 @@ function PaymentForm() {
     <>
       <div className="paymentFormContainer h-screen w-screen bg-slate-50  fixed w-screen bg-blue-500">
         <div className="h-[10%] w-full fixed  top-0 flex text-center items-center pt-4 box-border align-center  bg-gradient-to-r  from-cyan-500 to-blue-500 p-1px ">
-          {windowWidth < 600 ? null : (
-            <h1 className="text-4xl italic font-extrabold text-white ml-[2rem] sm:ml-[4rem] lg:ml-[16rem] pointer-events-none text-center">
+          {windowWidth < 640 ? null : (
+            <h1 className="text-4xl italic font-extrabold text-white  sm:ml-[10rem] lg:ml-[16rem] pointer-events-none text-center">
               Easy Transfer
             </h1>
           )}
@@ -343,8 +343,8 @@ function PaymentForm() {
               <button
                 className={
                   windowWidth < 780
-                    ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-white z-[10] left-[19vw] sm:left-[25vw] mt-[5vh]   font-light absolute  sm:w-1/8 hover:bg-blue-500 hover:border"
-                    : "bg-green-500  rounded-full p-2 pl-8 pr-8 text-white z-[10]  left-[18vw] mt-[10vh] font-light absolute  w-1/8 hover:bg-blue-500 hover:border"
+                    ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-white z-[10] left-[19vw] sm:left-[25vw] mt-[1vh]   font-light absolute  sm:w-1/8 hover:bg-blue-500 hover:border"
+                    : "bg-green-500  rounded-full p-2 pl-8 pr-8 text-white z-[10]  left-[18vw] mt-[0vh] font-light absolute  w-1/8 hover:bg-blue-500 hover:border"
                 }
                 onClick={logout}
               >

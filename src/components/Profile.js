@@ -26,6 +26,8 @@ function Profile() {
     setExpireDate,
     connectionMode,
     socket,
+    setWindowWidth,
+    windowWidth,
   } = useContext(store);
   const navigate = useNavigate();
   const [isEditProfile, setIsEditProfile] = useState(false);
@@ -209,6 +211,18 @@ function Profile() {
     // };
   }, [socket, connectionMode, setUserNameFromDb]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [windowWidth]);
+
   return (
     <div className=" w-screen fixed block h-[10vh] sm:flex font-serif">
       <div className="w-screen sm:w-1/4 h-[8vh]  sm:h-screen flex sm:flex-col  sm:space-y-2  border-box text-2xl font-serif">
@@ -282,12 +296,14 @@ function Profile() {
           onSubmit={updateProfile}
           className="w-full h-screen sm:w-[90%] md:w-3/4 bg-red-100 p-5 border-box items-center flex flex-col  font-['Open-Sans'] justify-center sm:space-y-2 "
         >
-          <button
-            onClick={cancelEdit}
-            className="fixed top-[83vh] left-[50vw] sm:top-[1vh] sm:left-[90vw] w-[46%] sm:w-auto border bg-white p-2 pl-4 pr-4 border-box font-extralight hover:font-bold rounded-md sm:rounded-full"
-          >
-            Cancel
-          </button>
+          {windowWidth < 640 ? null : (
+            <button
+              onClick={cancelEdit}
+              className="fixed  sm:top-[1vh] sm:left-[86vw] w-[46%] sm:w-auto border bg-white p-2 pl-4 pr-4 border-box font-extralight hover:font-bold rounded-md sm:rounded-full"
+            >
+              Cancel
+            </button>
+          )}
           <div className="sm:flex flex-wrap  sm:space-x-2 w-full sm:w-full md:w-[80%]">
             <input
               className="block w-full sm:w-1/2  px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
@@ -361,14 +377,22 @@ function Profile() {
               className="block px-4 py-2 mb-3 w-full sm:w-1/2  bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
             />
           </div>
-          <div className=" w-full sm:w-full md:w-[80%]">
+          <div className=" w-full sm:w-full flex md:w-[80%]">
             <input
               type="button"
               value="Confirm"
               required
               onClick={updateProfile}
-              className="block px-4 py-2 mb-3 w-1/2 w-[33%]  sm:left-[12.5vw] md:left-[19.5vw] relative text-white  bg-green-400 border-2 hover:border-white rounded-md focus:outline-none focus:border-blue-500"
+              className="block px-4 py-2 mb-3 w-1/2  sm:left-[12.5vw] md:left-[19.5vw] relative text-white  bg-green-400 border-2 hover:border-white rounded-md focus:outline-none focus:border-blue-500"
             />
+            {windowWidth < 640 ? (
+              <button
+                onClick={cancelEdit}
+                className="relative block px-4 py-2 mb-3 w-1/2   sm:left-[12.5vw] md:left-[19.5vw] relative text-black  bg-white border-2 hover:border-white rounded-md focus:outline-none focus:border-blue-500"
+              >
+                Cancel
+              </button>
+            ) : null}
           </div>
         </form>
       ) : null}
