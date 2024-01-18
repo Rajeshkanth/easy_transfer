@@ -206,12 +206,12 @@ function SignUpMobile() {
           />
           {showCreatePassword ? (
             <FaRegEye
-              className="relative ml-[34vw] bottom-[1.8rem]"
+              className="relative ml-[40vw] bottom-[1.8rem]"
               onClick={() => handleShowPassword("create")}
             />
           ) : (
             <FaRegEyeSlash
-              className="relative ml-[34vw] bottom-[1.8rem]"
+              className="relative ml-[40vw] bottom-[1.8rem]"
               onClick={() => handleShowPassword("create")}
             />
           )}
@@ -236,12 +236,12 @@ function SignUpMobile() {
           />
           {showConfirmPassword ? (
             <FaRegEye
-              className="relative ml-[34vw] bottom-[2.3rem]"
+              className="relative ml-[40vw] bottom-[2.3rem]"
               onClick={() => handleShowPassword("confirm")}
             />
           ) : (
             <FaRegEyeSlash
-              className="relative ml-[34vw] bottom-[2.3rem]"
+              className="relative ml-[40vw] bottom-[2.3rem]"
               onClick={() => handleShowPassword("confirm")}
             />
           )}

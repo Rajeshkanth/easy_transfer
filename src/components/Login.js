@@ -194,8 +194,8 @@ function Login() {
             <FaRegEye
               className={
                 windowWidth < 640
-                  ? "relative ml-[34vw] bottom-[3rem]"
-                  : "relative  sm:ml-[18vw] md:ml-[21vw] lg:ml-[14vw] xl:ml-[15vw] bottom-[3rem]"
+                  ? "relative ml-[40vw] bottom-[3rem]"
+                  : "relative  sm:ml-[20vw] md:ml-[21vw] lg:ml-[14vw] xl:ml-[15vw] bottom-[3rem]"
               }
               onClick={() => handleShowPassword("login")}
             />
@@ -203,7 +203,7 @@ function Login() {
             <FaRegEyeSlash
               className={
                 windowWidth < 640
-                  ? "relative ml-[34vw] bottom-[3rem]"
+                  ? "relative ml-[40vw] bottom-[3rem]"
                   : "relative  sm:ml-[18vw]  md:ml-[21vw] lg:ml-[14vw] xl:ml-[15vw] bottom-[3rem]"
               }
               onClick={() => handleShowPassword("login")}
