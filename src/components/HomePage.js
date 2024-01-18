@@ -24,7 +24,7 @@ function HomePage() {
 
   return (
     <div className="h-screen fixed w-screen bg-gradient-to-b from-gray-500 to-black  ">
-      <div className="h-[10%]  align-center pt-[1rem] pl-[4rem] ">
+      <div className="h-[10%]  align-center pt-[1rem] pl-[5rem] ">
         <h1 className="font-extrabold text-4xl italic text-white">
           Easy Transfer
         </h1>

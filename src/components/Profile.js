@@ -8,6 +8,7 @@ function Profile() {
     userName,
     userNameFromDb,
     setUserNameFromDb,
+    ageFromDb,
     setAgeFromDb,
     setAccFromDb,
     setDobFromDb,
@@ -75,44 +76,12 @@ function Profile() {
       setCvv(sanitizedValue);
     }
   };
-  //   const updateProfile = (e) => {
-  //     e.preventDefault();
-  //     if (userName) {
-  //       setuserName(userName);
-
-  //       if (loggedUser) {
-  //         const user = JSON.parse(sessionStorage.getItem(loggedUser));
-  //         //   console.log(user);
-  //         user.UserName = userName;
-  //         sessionStorage.setItem(loggedUser, JSON.stringify(user));
-  //       }
-  //       //   setLoggedUser(JSON.parse(sessionStorage.getItem(loggedUser)).UserName);
-
-  //       console.log(userName);
-  //       setIsEditProfile(false);
-  //     }
-  //     setuserName("");
-  //   };
 
   const updateProfile = async (e) => {
     e.preventDefault();
     if (connectionMode !== "socket") {
       if (userName) {
-        // console.log(userName);
-        // const userData = JSON.parse(sessionStorage.getItem(document.cookie));
-        // console.log(userData);
-
-        // userData.UserName = userName;
-        // userData.Age = age;
-        // userData.DOB = dob;
-        // userData.AccountNumber = accNumber;
-        // userData.Card = card;
-        // userData.CVV = cvv;
-        // userData.ExpireDate = expireDate;
-        // console.log(userData.UserName, userData.Age);
-        // sessionStorage.setItem(document.cookie, JSON.stringify(userData));
         const userData = document.cookie;
-
         const response = await axios.post(
           "https://polling-server.onrender.com/updateProfile",
           {
@@ -148,12 +117,14 @@ function Profile() {
         socket.emit("updateProfile", {
           num: regNum,
           name: userName,
+          age: age,
         });
 
         socket.on("profileUpdated", (data) => {
           setUserNameFromDb(data.userName);
-
+          setAgeFromDb(data.age);
           setUserName("");
+          setAge("");
         });
         setIsEditProfile(false);
       }
@@ -200,9 +171,11 @@ function Profile() {
       });
       socket.on("userNameAvailable", (data) => {
         setUserNameFromDb(data.user);
+        setAgeFromDb(data.age);
       });
       socket.on("userNotFound", () => {
         setUserNameFromDb("");
+        setAgeFromDb("");
       });
     }
 
@@ -244,6 +217,13 @@ function Profile() {
               <h1 className=" text-xl w-1/2 text-left">
                 {/* {JSON.parse(sessionStorage.getItem(document.cookie)).UserName} */}
                 {userNameFromDb}
+              </h1>
+            </div>
+            <div className="flex items-center w-1/2 space-x-2">
+              <h1 className="w-1/2">Age</h1>
+              <h1 className=" text-xl text-left w-1/2">
+                {/* {JSON.parse(sessionStorage.getItem(document.cookie)).Age} */}
+                {ageFromDb}
               </h1>
             </div>
             {/* <div className="flex items-center w-1/2 space-x-2">

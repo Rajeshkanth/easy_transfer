@@ -101,7 +101,7 @@ function App() {
           setConnectionMode("polling");
         }
       });
-    }, 100000);
+    }, 1000);
   }, [connectionMode]);
 
   return (
