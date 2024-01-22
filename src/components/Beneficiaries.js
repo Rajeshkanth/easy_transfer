@@ -106,7 +106,7 @@ function Beneficiaries() {
         });
       }
 
-      setSavedAcc((prev) => [...prev, savedDetail]);
+      // setSavedAcc((prev) => [...prev, savedDetail]);
       setSavedBeneficiaryName("");
       setSavedAccNum("");
       setSavedIfsc("");
@@ -125,9 +125,9 @@ function Beneficiaries() {
     } else {
       socket.on("getSavedBeneficiary", (data) => {
         const savedDetail = {
-          SavedBeneficiaryName: data.SavedBeneficiaryName,
-          SavedAccNum: data.SavedAccNum,
-          SavedIfsc: data.SavedIfsc,
+          beneficiaryName: data.SavedBeneficiaryName,
+          accNum: data.SavedAccNum,
+          ifsc: data.SavedIfsc,
           editable: data.editable,
         };
         setSavedAcc((prev) => [...prev, savedDetail]);
