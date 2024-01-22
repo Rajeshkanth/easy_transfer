@@ -109,5 +109,8 @@ module.exports = {
 
       addUtilities(newUtilities);
     },
+    function ({ addVariant }) {
+      addVariant("contentEditable", '&[contentEditable="true"]');
+    },
   ],
 };

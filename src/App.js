@@ -2,8 +2,9 @@ import { createContext, useState, useEffect } from "react";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import { io } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
+import Beneficiaries from "./components/Beneficiaries";
 import HomePage from "./components/HomePage";
-// import "./App.css";
+import "./App.css";
 import PaymentForm from "./components/PaymentForm";
 import Profile from "./components/Profile";
 import Success from "./components/Success";
@@ -45,6 +46,8 @@ function App() {
   const [dobFromDb, setDobFromDb] = useState("");
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isLogin, setIsLogin] = useState(true);
+  const [passwordError, setPasswordError] = useState(true);
+  const [isProfileClicked, setIsProfileClicked] = useState(false);
 
   const handleRegMobileNumber = (e) => {
     const value = e.target.value;
@@ -56,17 +59,29 @@ function App() {
 
   const handleCreatePassword = (e) => {
     const value = e.target.value;
-    const allowedPattern = /^[a-zA-Z0-9@$]*$/;
-    if (allowedPattern.test(value)) {
-      setCreatePassword(value);
+
+    const allowedPattern =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()-_+={}[\]:;'"<>,./?]).{8,}$/;
+    const testedValue = allowedPattern.test(value);
+    setCreatePassword(value);
+    if (testedValue) {
+      setPasswordError(false);
+    } else {
+      setPasswordError(true);
     }
   };
 
   const handleConfirmPassword = (e) => {
     const value = e.target.value;
-    const allowedPattern = /^[a-zA-Z0-9@$]*$/;
-    if (allowedPattern.test(value)) {
-      setConfirmPassword(value);
+
+    const allowedPattern =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()-_+={}[\]:;'"<>,./?]).{8,}$/;
+    const testedValue = allowedPattern.test(value);
+    setConfirmPassword(value);
+    if (testedValue) {
+      setPasswordError(false);
+    } else {
+      setPassword(true);
     }
   };
 
@@ -75,6 +90,10 @@ function App() {
     if (value.length <= 15) {
       setUserName(e.target.value);
     }
+  };
+
+  const closeProfile = () => {
+    setIsProfileClicked(false);
   };
   const socket =
     connectionMode === "socket"
@@ -93,15 +112,13 @@ function App() {
 
     const socket = io.connect("https://polling-server.onrender.com");
 
-    setInterval(() => {
-      socket.on("connection_type", (data) => {
-        if (data.type === "socket") {
-          setConnectionMode("socket");
-        } else {
-          setConnectionMode("polling");
-        }
-      });
-    }, 1000);
+    socket.on("connection_type", (data) => {
+      if (data.type === "socket") {
+        setConnectionMode("socket");
+      } else {
+        setConnectionMode("polling");
+      }
+    });
   }, [connectionMode]);
 
   return (
@@ -176,6 +193,10 @@ function App() {
         setWindowWidth,
         isLogin,
         setIsLogin,
+        passwordError,
+        isProfileClicked,
+        setIsProfileClicked,
+        setPasswordError,
       }}
     >
       <Router>
@@ -184,6 +205,7 @@ function App() {
           <Route path="/transferPage" element={<PaymentForm />}></Route>
           <Route path="/success" element={<Success />}></Route>
           <Route path="/profile" element={<Profile />}></Route>
+          <Route path="/savedAccounts" element={<Beneficiaries />}></Route>
         </Routes>
       </Router>
     </store.Provider>

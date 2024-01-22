@@ -110,6 +110,10 @@ function PaymentForm() {
     navigate("/profile");
   };
 
+  const savedAccounts = () => {
+    navigate("/savedAccounts");
+  };
+
   useEffect(() => {
     if (connectionMode !== "socket") {
       axios
@@ -166,7 +170,7 @@ function PaymentForm() {
               className={
                 windowWidth < 600
                   ? "p-2 pl-8 pr-8 text-white font-bold   border-box absolute   w-1/8 flex items-center space-x-2"
-                  : "p-2 pl-8 pr-8 text-white font-bold   border-box absolute border-r-2   w-1/8 flex items-center space-x-2"
+                  : "p-2 pl-8 pr-8 text-white font-bold   border-box absolute    w-1/8 flex items-center space-x-2"
               }
             >
               <AiOutlineMenuUnfold
@@ -216,7 +220,7 @@ function PaymentForm() {
 
                 <label
                   // className="relative  top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-600"
-                  className="block   px-1 pointer-events-none leading-6 text-gray-600"
+                  className="block px-1 pointer-events-none leading-6 text-gray-600"
                 >
                   Account Number
                 </label>
@@ -289,42 +293,24 @@ function PaymentForm() {
         </div>
       </div>
 
-      {sessionTiemedOut ? (
-        <>
-          <div className=" fixed w-screen h-screen bg-white  text-2xl font-['Open-Sans'] text-red-500 space-y-2 flex flex-col items-center  justify-center">
-            <IoWarningOutline className="text-4xl text-red-500" />
-            <h1>Session Expired !</h1>
-            <h2>
-              Please{" "}
-              <strong className="underline" onClick={() => navigate("/")}>
-                {" "}
-                login
-              </strong>{" "}
-              again to continue
-            </h2>
-          </div>
-        </>
-      ) : null}
-
       {isProfileClicked ? (
         <>
           <div
-            className={
-              windowWidth < 780
-                ? "w-1/2 h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
-                : " sm:w-[33vw]  h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
-            }
+            className="w-1/2 sm:w-1/2 md:w-[33%] lg:w-1/4 bg-transparent backdrop-blur-xl h-screen font-serif fixed text-black"
+            // className={
+            // windowWidth < 780
+            // ? "w-1/2 h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
+            // : " sm:w-[33vw]  h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
+            // }
           >
             <div className=" pt-2 pb-8 border-box h-[85vh] ">
-              <div className="flex justify-between items-center border-b-2 font-sans cursor-pointer ">
-                <h1 className="ml-[2rem] text-2xl font-bold text-white">
-                  Dashboard
-                </h1>
-                <p className=" mr-[1rem] text-white " onClick={closeProfile}>
+              <div className="flex justify-between items-center border-b-2 border-black  cursor-pointer ">
+                <h1 className="ml-[2rem] text-2xl font-bold ">Dashboard</h1>
+                <p className=" mr-[1rem]  " onClick={closeProfile}>
                   <RiMenuFoldFill />
                 </p>
               </div>
-              <div className="space-y-2 flex  flex-col items-left pl-9 pt-5 border-box text-2xl text-white font-sans  cursor-pointer ">
+              <div className="space-y-2 flex  flex-col items-left pl-9 pt-5 border-box text-2xl    cursor-pointer ">
                 <h1
                   className="hover:font-bold hover:border-b-2 "
                   onClick={navigateToProfile}
@@ -336,15 +322,22 @@ function PaymentForm() {
                 <h1 className="hover:font-bold hover:border-b-2">
                   Transactions
                 </h1>
+                <h1
+                  className="hover:font-bold hover:border-b-2"
+                  onClick={savedAccounts}
+                >
+                  Saved Beneficiaries
+                </h1>
               </div>
             </div>
 
-            <div className="border-t-2 h-[8vh] sm:h-[15vh] flex items-center">
+            <div className=" h-[8vh] sm:h-[15vh] flex items-center">
               <button
                 className={
-                  windowWidth < 780
-                    ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-white z-[10] left-[19vw] sm:left-[25vw] mt-[1vh]   font-light fixed  sm:w-1/8 hover:bg-blue-500 hover:border"
-                    : "bg-green-500  rounded-full p-2 pl-8 pr-8 text-white z-[10]  left-[18vw] mt-[0vh] font-light fixed  w-1/8 hover:bg-blue-500 hover:border"
+                  "block w-1/2  px-4 py-2 m-auto ml-[10vw] mb-5 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 bg-green-600 text-white hover:bg-green-500 hover:cursor-pointer"
+                  // windowWidth < 780
+                  //   ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-white z-[10] left-[19vw] sm:left-[25vw] mt-[1vh]   font-light fixed  sm:w-1/8 hover:bg-blue-500 hover:border"
+                  //   : "bg-green-500  rounded-full p-2 pl-8 pr-8 text-white z-[10]  left-[18vw] mt-[0vh] font-light fixed  w-1/8 hover:bg-blue-500 hover:border"
                 }
                 onClick={logout}
               >

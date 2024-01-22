@@ -195,7 +195,7 @@ function Login() {
               className={
                 windowWidth < 640
                   ? "relative ml-[40vw] bottom-[3rem]"
-                  : "relative  sm:ml-[20vw] md:ml-[21vw] lg:ml-[14vw] xl:ml-[15vw] bottom-[3rem]"
+                  : "relative  sm:ml-[20vw] md:ml-[21vw] lg:ml-[14vw] xl:ml-[15vw] bottom-[3rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
@@ -204,7 +204,7 @@ function Login() {
               className={
                 windowWidth < 640
                   ? "relative ml-[40vw] bottom-[3rem]"
-                  : "relative  sm:ml-[18vw]  md:ml-[21vw] lg:ml-[14vw] xl:ml-[15vw] bottom-[3rem]"
+                  : "relative  sm:ml-[18vw]  md:ml-[21vw] lg:ml-[14vw] xl:ml-[15vw] bottom-[3rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />

@@ -30,7 +30,27 @@ function SignUpMobile() {
     socket,
     setIsLogin,
     connectionMode,
+    passwordError,
   } = useContext(store);
+
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [selectedCountryCode, setSelectedCountryCode] = useState("+1"); // Set a default country code
+
+  // Sample list of country codes, you can replace it with your own list
+  const countryCodes = [
+    { code: "+1", label: "US" },
+    { code: "+44", label: "UK" },
+    { code: "+91", label: "In" },
+    // Add more country codes as needed
+  ];
+
+  const handlePhoneNumberChange = (e) => {
+    setPhoneNumber(e.target.value);
+  };
+
+  const handleCountryCodeChange = (e) => {
+    setSelectedCountryCode(e.target.value);
+  };
 
   const login = () => {
     setIsLogin(true);
@@ -167,22 +187,57 @@ function SignUpMobile() {
           <label htmlFor="" className="font-medium font-['Open-Sans']">
             Mobile Number
           </label>
+          <select
+            value={selectedCountryCode}
+            onChange={handleCountryCodeChange}
+            className="p-[.4rem] pl-[0] pr-[0] border-box border-none outline-0 bg-zinc-100 fixed rounded-lg w-[11.5vw] top-[36.5vh] left-[26.8vw] "
+          >
+            {countryCodes.map((country) => (
+              <option key={country.code} value={country.code}>
+                {country.code}
+              </option>
+            ))}
+          </select>
           <input
             className={
               regMobileNumber.length < 10
-                ? "outline-0 h-10 w-full border-2 border-red-500 rounded-lg mb-3 p-[.4rem] font-['Open-Sans']  border-box bg-zinc-100"
+                ? "outline-0 h-10 w-full border-2 border-red-500 pl-[13vw] rounded-lg mb-3 p-[.4rem] font-['Open-Sans']  border-box bg-zinc-100"
                 : isAlreadyUser
                 ? "outline-0 h-10 w-full border-2 border-red-500 rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100"
                 : "outline-0 h-10 w-full border-2 border-slate-200 rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100"
             }
             type="tel"
-            minLength={10}
-            maxLength={10}
+            min={10}
+            max={10}
             value={regMobileNumber}
             onChange={handleRegMobileNumber}
             placeholder="Enter Mobile Number"
           />
         </div>
+        {/* <div className="flex  w-3/5">
+          <div className="">
+            <select
+              value={selectedCountryCode}
+              onChange={handleCountryCodeChange}
+              className="py-2 px-3 border border-gray-300 rounded w-[100%] focus:outline-none focus:ring focus:border-blue-300"
+            >
+              {countryCodes.map((country) => (
+                <option key={country.code} value={country.code}>
+                  {country.label} ({country.code})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="">
+            <input
+              type="text"
+              value={phoneNumber}
+              onChange={handlePhoneNumberChange}
+              placeholder="Enter your phone number"
+              className="py-2 px-3 border border-gray-300 rounded focus:outline-none  focus:ring focus:border-blue-300 flex-grow"
+            />
+          </div>
+        </div> */}
 
         <div className="flex flex-col w-3/5 ">
           <label
@@ -193,7 +248,9 @@ function SignUpMobile() {
           </label>
           <input
             className={
-              signUpFailed
+              passwordError
+                ? "outline-0 h-10 w-full rounded-lg mb-0 p-[.4rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100"
+                : signUpFailed
                 ? "outline-0 h-10 w-full rounded-lg mb-0 p-[.4rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100"
                 : "outline-0 h-10 w-full rounded-lg mb-0 p-[.4rem] border-2 border-slate-200 font-['Open-Sans'] border-box bg-zinc-100"
             }
@@ -206,12 +263,12 @@ function SignUpMobile() {
           />
           {showCreatePassword ? (
             <FaRegEye
-              className="relative ml-[40vw] bottom-[1.8rem]"
+              className="relative ml-[40vw] bottom-[1.8rem] text-gray-400"
               onClick={() => handleShowPassword("create")}
             />
           ) : (
             <FaRegEyeSlash
-              className="relative ml-[40vw] bottom-[1.8rem]"
+              className="relative ml-[40vw] bottom-[1.8rem] text-gray-400"
               onClick={() => handleShowPassword("create")}
             />
           )}
@@ -225,7 +282,9 @@ function SignUpMobile() {
           </label>
           <input
             className={
-              signUpFailed
+              passwordError
+                ? "outline-0 h-10 w-full rounded-lg mb-2 p-[.4rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100"
+                : signUpFailed
                 ? "outline-0 h-10 w-full rounded-lg mb-2 p-[.4rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100"
                 : "outline-0 h-10 w-full rounded-lg mb-2 p-[.4rem] border-2 border-slate-200 font-['Open-Sans'] border-box bg-zinc-100"
             }
@@ -236,12 +295,12 @@ function SignUpMobile() {
           />
           {showConfirmPassword ? (
             <FaRegEye
-              className="relative ml-[40vw] bottom-[2.3rem]"
+              className="relative ml-[40vw] bottom-[2.2rem] text-gray-400"
               onClick={() => handleShowPassword("confirm")}
             />
           ) : (
             <FaRegEyeSlash
-              className="relative ml-[40vw] bottom-[2.3rem]"
+              className="relative ml-[40vw] bottom-[2.2rem] text-gray-400"
               onClick={() => handleShowPassword("confirm")}
             />
           )}
@@ -260,6 +319,16 @@ function SignUpMobile() {
             *Mobile number already registered!
           </p>
         ) : null}
+        {passwordError ? (
+          <>
+            <p className="w-3/5 text-red-500 text-xs">
+              *password must have 1 upper case
+            </p>
+            <p className="w-3/5 text-red-500 text-xs">*1 lower case</p>
+            <p className="w-3/5 text-red-500 text-xs">*1 special character</p>
+            <p className="w-3/5 text-red-500 text-xs">*8 characters</p>
+          </>
+        ) : null}
 
         <button
           className="w-1/3 bg-gradient-to-b border-0 from-black to-green-700 text-white text-center p-[.5rem] font-bold font-['Open_Sans'] h-auto border-2 mt-[1rem] rounded-full "
@@ -270,7 +339,7 @@ function SignUpMobile() {
           Sign up
         </button>
 
-        <p className="font-light text-xs  mt-[2rem] mb-[2rem]">
+        <p className="font-light text-xs  mt-[.8rem] mb-[2rem]">
           Already have an account?{" "}
           <strong className="font-bold text-green-700" onClick={login}>
             Login
