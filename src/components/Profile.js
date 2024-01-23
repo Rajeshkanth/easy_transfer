@@ -261,13 +261,13 @@ function Profile() {
         <>
           <div className="w-1/2 z-10 sm:w-[28%] md:w-[25%] bg-transparent backdrop-blur-xl  h-screen border-r-2 border-white fixed text-black">
             <div className=" pt-2 pb-8 border-box  h-[85vh] ">
-              <div className="flex justify-between items-center pb-2 border-box border-b-2 border-white font-serif cursor-pointer ">
-                <h1 className="ml-[2rem] text-2xl font-bold ">Menu</h1>
+              <div className="flex justify-between items-center pb-2 border-box font-sans border-b-2 border-white  cursor-pointer ">
+                <h1 className="ml-[2.2rem] text-2xl font-bold ">Menu</h1>
                 <p className=" mr-[1rem]  " onClick={closeProfile}>
                   <RiMenuFoldFill />
                 </p>
               </div>
-              <div className="space-y-2 flex  flex-col items-left pl-9 pt-5 border-box text-2xl  font-serif  cursor-pointer ">
+              <div className="space-y-2 flex  flex-col items-left font-sans pl-9 pt-5 border-box text-2xl cursor-pointer ">
                 <h1
                   className="hover:font-bold hover:border-b-2 border-white"
                   onClick={gotoTransferPage}

@@ -296,7 +296,7 @@ function PaymentForm() {
       {isProfileClicked ? (
         <>
           <div
-            className="w-1/2 sm:w-1/2 md:w-[33%] lg:w-1/4 bg-transparent backdrop-blur-xl h-screen font-serif fixed text-black"
+            className="w-1/2 sm:w-1/2 md:w-[33%] lg:w-1/4 bg-transparent backdrop-blur-xl h-screen font-sans fixed text-black"
             // className={
             // windowWidth < 780
             // ? "w-1/2 h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "

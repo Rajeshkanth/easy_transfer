@@ -16,6 +16,7 @@ function Beneficiaries() {
     windowWidth,
     setWindowWidth,
     userNameFromDb,
+    setUserNameFromDb,
   } = useContext(store);
 
   const [isProfileClicked, setIsProfileClicked] = useState(false);
@@ -117,24 +118,60 @@ function Beneficiaries() {
       socket.emit("saveAccounts", {
         num: document.cookie,
       });
+
+      socket.on("getSavedBeneficiary", (data) => {
+        const savedDetail = {
+          beneficiaryName: data.beneficiaryName,
+          accNum: data.accNum,
+          ifsc: data.ifsc,
+          editable: data.editable,
+        };
+        const isAlreadyStored = savedAcc.some((detail) => {
+          return (
+            detail.beneficiaryName === savedDetail.beneficiaryName &&
+            detail.accNum === savedDetail.accNum &&
+            detail.ifsc === savedDetail.ifsc &&
+            detail.editable === savedDetail.editable
+          );
+        });
+
+        if (!isAlreadyStored) {
+          // If not already stored, add it to the array
+          setSavedAcc((prev) => [...prev, savedDetail]);
+          console.log(savedAcc);
+        }
+      });
     }
-  }, [socket, connectionMode]);
+  }, [socket]);
 
   useEffect(() => {
     if (connectionMode !== "socket") {
+      axios
+        .post("https://polling-server.onrender.com/checkUserName", {
+          regNumber: document.cookie,
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            setUserNameFromDb(response.data.user);
+          } else {
+            setUserNameFromDb("");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     } else {
-      socket.on("getSavedBeneficiary", (data) => {
-        const savedDetail = {
-          beneficiaryName: data.SavedBeneficiaryName,
-          accNum: data.SavedAccNum,
-          ifsc: data.SavedIfsc,
-          editable: data.editable,
-        };
-        setSavedAcc((prev) => [...prev, savedDetail]);
-        console.log(savedAcc);
+      socket.emit("checkUserName", {
+        regNumber: document.cookie,
+      });
+      socket.on("userNameAvailable", (data) => {
+        setUserNameFromDb(data.user);
+      });
+      socket.on("userNotFound", () => {
+        setUserNameFromDb("");
       });
     }
-  }, [savedAcc, socket]);
+  }, [userNameFromDb, connectionMode, socket]);
   return (
     <>
       <div className="h-screen w-screen  bg-gradient-to-r   from-blue-100 to-red-200">
@@ -158,7 +195,7 @@ function Beneficiaries() {
         {isProfileClicked ? (
           <>
             <div
-              className="w-1/2 sm:w-1/2 md:w-[33%] lg:w-1/4 bg-transparent backdrop-blur-xl border-r-1 border-white h-screen font-serif fixed text-black"
+              className="w-1/2 sm:w-1/2 md:w-[33%] lg:w-1/4 bg-transparent backdrop-blur-xl border-r-1 border-white h-screen font-sans fixed text-black"
               // className={
               // windowWidth < 780
               // ? "w-1/2 h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
@@ -172,26 +209,26 @@ function Beneficiaries() {
                     <RiMenuFoldFill />
                   </p>
                 </div>
-                <div className="space-y-2 flex  flex-col items-left pl-9 pt-5 border-box border-white text-2xl    cursor-pointer ">
+                <div className="space-y-2 flex  flex-col items-left text-left justify-center items-center  pt-5 border-box border-white text-2xl    cursor-pointer ">
                   <h1
-                    className="hover:font-bold hover:border-b-2 border-white"
+                    className="hover:font-bold hover:border-b-2 w-[80%] border-white  hover:rounded"
                     onClick={gotoTransferPage}
                   >
                     Back
                   </h1>
                   <h1
-                    className="hover:font-bold hover:border-b-2 border-white"
+                    className="hover:font-bold hover:border-b-2 w-[80%] border-white"
                     onClick={navigateToProfile}
                   >
                     Profile
                   </h1>
-                  <h1 className="hover:font-bold hover:border-b-2 border-white">
+                  <h1 className="hover:font-bold hover:border-b-2 w-[80%] border-white">
                     Rewards
                   </h1>
-                  <h1 className="hover:font-bold hover:border-b-2 border-white">
+                  <h1 className="hover:font-bold hover:border-b-2 w-[80%] border-white">
                     Contact us
                   </h1>
-                  <h1 className="hover:font-bold hover:border-b-2 border-white">
+                  <h1 className="hover:font-bold hover:border-b-2 w-[80%] border-white">
                     Transactions
                   </h1>
                 </div>
@@ -260,19 +297,19 @@ function Beneficiaries() {
                     className="w-[30%] capitalize contentEditable:bg-magenta-300 caret:text-white focus:outline-none"
                     contentEditable={item.editable}
                   >
-                    {item.SavedBeneficiaryName}
+                    {item.beneficiaryName}
                   </h1>
                   <h1
                     className="w-[30%]   contentEditable:bg-magenta-300  focus:outline-none"
                     contentEditable={item.editable}
                   >
-                    {item.SavedAccNum}
+                    {item.accNum}
                   </h1>
                   <h1
                     className="w-[30%]  uppercase contentEditable:bg-magenta-300  focus:outline-none"
                     contentEditable={item.editable}
                   >
-                    {item.SavedIfsc}
+                    {item.ifsc}
                   </h1>
 
                   <div className="w-[30%] items-center flex space-x-3">
