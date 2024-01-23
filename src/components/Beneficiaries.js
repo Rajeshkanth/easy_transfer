@@ -131,6 +131,7 @@ function Beneficiaries() {
           editable: data.editable,
         };
         setSavedAcc((prev) => [...prev, savedDetail]);
+        console.log(savedAcc);
       });
     }
   }, [savedAcc, socket]);
