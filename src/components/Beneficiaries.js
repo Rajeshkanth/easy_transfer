@@ -17,6 +17,14 @@ function Beneficiaries() {
     setWindowWidth,
     userNameFromDb,
     setUserNameFromDb,
+    amount,
+    setAmount,
+    toAccountNumber,
+    setToAccountNumber,
+    toIFSCNumber,
+    setToIFSCNumber,
+    toAccountHolderName,
+    setToAccountHolderName,
   } = useContext(store);
 
   const [isProfileClicked, setIsProfileClicked] = useState(false);
@@ -26,6 +34,7 @@ function Beneficiaries() {
   const [savedIfsc, setSavedIfsc] = useState("");
   const [savedAcc, setSavedAcc] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
+  const [newValueAdded, setNewValueAdded] = useState(false);
   const navigate = useNavigate();
 
   const profile = () => {
@@ -59,43 +68,50 @@ function Beneficiaries() {
     setSavedIfsc(e.target.value);
   };
 
-  const edit = (index) => {
-    setSavedAcc((prev) =>
-      prev.map((item, i) => {
-        if (i === index) {
-          setIsEdit(true);
-          return { ...item, editable: true };
-        } else {
-          setIsEdit(false);
-          return item;
-        }
-      })
-    );
+  const sendMoney = (index) => {
+    const selectedBeneficiary = savedAcc[index];
+
+    // Set the beneficiary details in the global state (or use any state management solution)
+    setToAccountHolderName(selectedBeneficiary.beneficiaryName);
+    setToAccountNumber(selectedBeneficiary.accNum);
+    setToIFSCNumber(selectedBeneficiary.ifsc);
+
+    // Navigate to the transfer page
+    navigate("/transferPage");
   };
 
-  const save = (index) => {
-    // setIsEdit(true);
-    setSavedAcc((prev) =>
-      prev.map((item, i) => {
-        if (i === index) {
-          setIsEdit(false);
-          return { ...item, editable: false };
-        } else {
-          setIsEdit(true);
-          return item;
-        }
-      })
-    );
-  };
+  // const edit = (index) => {
+  //   setSavedAcc((prev) =>
+  //     prev.map((item, i) => {
+  //       if (i === index) {
+  //         setIsEdit(true);
+  //         return { ...item, editable: true };
+  //       } else {
+  //         setIsEdit(false);
+  //         return item;
+  //       }
+  //     })
+  //   );
+  // };
+
+  // const save = (index) => {
+  //   // setIsEdit(true);
+  //   setSavedAcc((prev) =>
+  //     prev.map((item, i) => {
+  //       if (i === index) {
+  //         setIsEdit(false);
+  //         return { ...item, editable: false };
+  //       } else {
+  //         setIsEdit(true);
+  //         return item;
+  //       }
+  //     })
+  //   );
+  // };
 
   const saveBeneficiary = () => {
-    const savedDetail = {
-      SavedBeneficiaryName: savedBeneficiaryName,
-      SavedAccNum: savedAccNum,
-      SavedIfsc: savedIfsc,
-      editable: false,
-    };
     if (savedBeneficiaryName && savedAccNum && savedIfsc) {
+      setNewValueAdded(true);
       if (connectionMode !== "socket") {
       } else {
         socket.emit("saveNewBeneficiary", {
@@ -113,12 +129,48 @@ function Beneficiaries() {
       setSavedIfsc("");
     }
   };
-  useEffect(() => {
+
+  const handleSaveButtonClick = () => {
+    saveBeneficiary();
+
+    socket.emit("saveAccounts", {
+      num: document.cookie,
+    });
+  };
+
+  const deleteItem = async (index) => {
+    const updatedSavedAcc = [...savedAcc];
+    const deletedBeneficiary = updatedSavedAcc.splice(index, 1)[0];
+    console.log(deletedBeneficiary);
+
+    // Delete the item from the savedAccounts array based on accNum
+    const updatedSavedAccounts = savedAcc.filter(
+      (account) => account.accNum !== deletedBeneficiary.accNum
+    );
+
+    // Update the state with the new array
+    setSavedAcc(updatedSavedAccounts);
+
+    // If using socket connection, emit an event to inform others about the deletion
     if (connectionMode === "socket") {
+      try {
+        socket.emit("deleteItem", {
+          accNum: deletedBeneficiary.accNum,
+          num: document.cookie,
+        });
+      } catch (error) {
+        console.error("Error emitting socket event:", error);
+        // Handle the error as needed
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (connectionMode !== "socket") {
+    } else {
       socket.emit("saveAccounts", {
         num: document.cookie,
       });
-
       socket.on("getSavedBeneficiary", (data) => {
         const savedDetail = {
           beneficiaryName: data.beneficiaryName,
@@ -136,13 +188,12 @@ function Beneficiaries() {
         });
 
         if (!isAlreadyStored) {
-          // If not already stored, add it to the array
           setSavedAcc((prev) => [...prev, savedDetail]);
           console.log(savedAcc);
         }
       });
     }
-  }, [socket]);
+  }, []);
 
   useEffect(() => {
     if (connectionMode !== "socket") {
@@ -174,7 +225,13 @@ function Beneficiaries() {
   }, [userNameFromDb, connectionMode, socket]);
   return (
     <>
-      <div className="h-screen w-screen  bg-gradient-to-r   from-blue-100 to-red-200">
+      <div
+        className={
+          savedAcc.length < 8
+            ? " h-auto w-screen fixed bg-gradient-to-r   from-blue-100 to-red-200"
+            : " h-auto  w-screen  bg-gradient-to-r   from-blue-100 to-red-200"
+        }
+      >
         {sessionTiemedOut ? null : (
           <div
             className={
@@ -209,26 +266,26 @@ function Beneficiaries() {
                     <RiMenuFoldFill />
                   </p>
                 </div>
-                <div className="space-y-2 flex  flex-col items-left text-left justify-center items-center  pt-5 border-box border-white text-2xl    cursor-pointer ">
+                <div className="space-y-2 flex flex-col items-left text-left justify-center items-center pl-9 pt-5 border-box border-white text-2xl    cursor-pointer ">
                   <h1
-                    className="hover:font-bold hover:border-b-2 w-[80%] border-white  hover:rounded"
+                    className="hover:font-bold hover:border-b-2 w-full  border-white  hover:rounded"
                     onClick={gotoTransferPage}
                   >
                     Back
                   </h1>
                   <h1
-                    className="hover:font-bold hover:border-b-2 w-[80%] border-white"
+                    className="hover:font-bold hover:border-b-2 w-full  border-white"
                     onClick={navigateToProfile}
                   >
                     Profile
                   </h1>
-                  <h1 className="hover:font-bold hover:border-b-2 w-[80%] border-white">
+                  <h1 className="hover:font-bold hover:border-b-2 w-full  border-white">
                     Rewards
                   </h1>
-                  <h1 className="hover:font-bold hover:border-b-2 w-[80%] border-white">
+                  <h1 className="hover:font-bold hover:border-b-2 w-full  border-white">
                     Contact us
                   </h1>
-                  <h1 className="hover:font-bold hover:border-b-2 w-[80%] border-white">
+                  <h1 className="hover:font-bold hover:border-b-2 w-full  border-white">
                     Transactions
                   </h1>
                 </div>
@@ -250,7 +307,7 @@ function Beneficiaries() {
             </div>
           </>
         ) : null}
-        <div className="lg:space-x-2 w-[70vw] h-[auto] gap-1  border-l-2 border-white pt-[1.4rem] px-2 pl-[2vw] box-border font-sans flex flex-wrap ml-[25vw]">
+        <div className="lg:space-x-2 w-[80vw] h-[auto] gap-1  z-10  border-l-2 border-white pt-[1.4rem] px-2 pl-[2vw] box-border font-sans flex flex-wrap ml-[25vw]">
           <input
             type="text"
             placeholder="Enter Beneficiary Name"
@@ -275,23 +332,29 @@ function Beneficiaries() {
           <input
             type="button"
             value="Save"
-            onClick={saveBeneficiary}
+            onClick={handleSaveButtonClick}
             className="block w-[20%] px-4 py-2 box-border border border-gray-300 text-white mb-3    bg-green-600 rounded-md focus:outline-none cursor-pointer "
           />
           {/* <input type="text" placeholder="Enter Beneficiary Name" /> */}
         </div>
-        <div className="border-2 h-[100vh] w-[75%] border-white ml-[25vw]">
-          <div>
+        <div
+          className={
+            savedAcc.length < 11
+              ? "border-2 h-screen  w-[75%] border-b-0 border-white ml-[25vw]"
+              : "border-2 h-auto  w-[75%] border-b-0 border-white ml-[25vw]"
+          }
+        >
+          <div className="">
             <li className="flex  pl-[2rem]  border-b-2 pb-[1rem] items-center border-white pt-[1rem]  space-x-2 box-border ">
               <h1 className="w-[24.3%] font-bold">Name</h1>
               <h1 className="w-[24.3%] font-bold">Account Number</h1>
               <h1 className="w-[24.3%] font-bold">IFSC Code</h1>
             </li>
-            <ul className=" ">
+            <ul className="  ">
               {savedAcc.map((item, index) => (
                 <li
                   key={index}
-                  className="flex space-x-2 border-b-2  pl-[2rem] h-[8vh] border-white  box-border items-center "
+                  className="flex space-x-2 border-b-2 overflow-auto pl-[2rem] h-[8vh] border-white  box-border items-center "
                 >
                   <h1
                     className="w-[30%] capitalize contentEditable:bg-magenta-300 caret:text-white focus:outline-none"
@@ -313,20 +376,25 @@ function Beneficiaries() {
                   </h1>
 
                   <div className="w-[30%] items-center flex space-x-3">
-                    <button className=" px-4 py-2 w-1/2  border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 bg-green-600 text-white hover:bg-green-700 hover:cursor-pointer">
+                    <button
+                      className=" px-4 py-2 w-1/2  border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 bg-green-600 text-white hover:bg-green-700 hover:cursor-pointer"
+                      onClick={() => sendMoney(index)}
+                    >
                       Send
                     </button>
-                    {isEdit ? (
+                    {/* {isEdit ? (
                       <CiBookmarkCheck
+                        key={index}
                         className="text-2xl cursor-pointer hover:text-green-600 "
                         onClick={() => save(index)}
                       />
                     ) : (
                       <MdEdit
+                        key={index}
                         className=" text-2xl hover:text-white cursor-pointer"
                         onClick={() => edit(index)}
                       />
-                    )}
+                    )} */}
                     {/* {isEdit ? (
                       <IoIosCheckboxOutline onClick={save} />
                     ) : (
@@ -335,7 +403,11 @@ function Beneficiaries() {
                         onClick={() => edit(index)}
                       />
                     )} */}
-                    <MdDeleteOutline className=" text-2xl text-red-600" />
+                    <MdDeleteOutline
+                      key={index}
+                      onClick={() => deleteItem(index)}
+                      className="w-1/2 text-2xl text-red-600"
+                    />
                   </div>
                 </li>
               ))}
