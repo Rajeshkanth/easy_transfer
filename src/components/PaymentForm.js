@@ -1,12 +1,13 @@
 import React, { memo, useContext, useEffect } from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { v4 as uuid } from "uuid";
 import axios from "axios";
 import { store } from "../App";
 import { IoWarningOutline } from "react-icons/io5";
 import { AiOutlineMenuUnfold } from "react-icons/ai";
 import { RiMenuFoldFill } from "react-icons/ri";
+import Menu from "./Menu";
 
 function PaymentForm() {
   const {
@@ -25,12 +26,70 @@ function PaymentForm() {
     setLoggedUser,
     windowWidth,
     setWindowWidth,
+    isProfileClicked,
+    setIsProfileClicked,
+    sendByBeneficiaries,
+    setSendByBeneficiaries,
+    savedAcc,
+    setSavedAcc,
   } = useContext(store);
 
   const navigate = useNavigate();
+  const location = useLocation();
   const [allInput, setAllInput] = useState(false);
   const [sessionTiemedOut, setSessionTiemedOut] = useState(false);
-  const [isProfileClicked, setIsProfileClicked] = useState(false);
+
+  const handleMenuClick = (menuItem) => {
+    switch (menuItem) {
+      case "Profile":
+        navigate("/Profile ", { state: { prevPath: location.pathname } });
+        break;
+      case "Back":
+        navigate("/transferPage", { state: { prevPath: location.pathname } });
+        break;
+      case "Beneficiaries":
+        navigate("/Beneficiaries", { state: { prevPath: location.pathname } });
+        break;
+      case "Rewards":
+        console.log("Navigating to Rewards page");
+        break;
+      case "Contact":
+        console.log("Navigating to Contact page");
+        break;
+      case "Transactions":
+        console.log("Navigating to Transactions page");
+        break;
+      case "Menu":
+        setIsProfileClicked(true);
+        break;
+      case "Log out":
+        logout();
+        break;
+      default:
+        console.log(`Unknown menu item: ${menuItem}`);
+    }
+  };
+
+  const handleAmountToSend = (e) => {
+    const value = e.target.value;
+    const sanitizedValue = value.replace(/[^0-9]/g, "");
+    setAmount(sanitizedValue);
+  };
+
+  const handleAccNumToSend = (e) => {
+    const value = e.target.value;
+    if (value.length <= 16) {
+      const sanitizedValue = value.replace(/[^0-9]/g, "");
+      setToAccountNumber(sanitizedValue);
+    }
+  };
+
+  const handleToIfsc = (e) => {
+    const value = e.target.value;
+    if (value.length <= 10) {
+      setToIFSCNumber(e.target.value);
+    }
+  };
 
   const logout = () => {
     setLoggedUser("");
@@ -54,11 +113,11 @@ function PaymentForm() {
         Uid: uuid(),
       });
       setAllInput(false);
+      handleAllInput();
       navigate("/success");
     } else {
       setAllInput(true);
     }
-    handleAllInput();
   };
 
   const sendAmountByPolling = async (e) => {
@@ -75,6 +134,7 @@ function PaymentForm() {
         };
         console.log("hello");
         navigate("/success");
+        handleAllInput();
         const response = await axios.post(
           "https://polling-server.onrender.com/fromPaymentAlert",
           // `http://localhost:8080/fromPaymentAlert`,
@@ -86,7 +146,6 @@ function PaymentForm() {
       } else {
         setAllInput(true);
       }
-      handleAllInput();
     } catch (err) {
       console.log(err);
     }
@@ -99,10 +158,6 @@ function PaymentForm() {
     setToIFSCNumber("");
   };
 
-  const profile = () => {
-    setIsProfileClicked(true);
-  };
-
   const closeProfile = () => {
     setIsProfileClicked(false);
   };
@@ -111,7 +166,42 @@ function PaymentForm() {
   };
 
   const savedAccounts = () => {
-    navigate("/savedAccounts");
+    navigate("/Beneficiaries");
+  };
+
+  const getMenuProps = () => {
+    if (windowWidth > 1024) {
+      return {
+        nav: [
+          "Profile",
+          "Beneficiaries",
+          "Rewards",
+          "Contact",
+          "Transactions",
+          "Log out",
+        ],
+        onClickHandler: handleMenuClick,
+      };
+    } else if (windowWidth > 768) {
+      return {
+        nav: ["Profile", "Beneficiaries", "Menu"],
+        onClickHandler: handleMenuClick,
+      };
+    } else if (windowWidth > 640) {
+      return {
+        nav: ["Profile", "Beneficiaries", "Menu"],
+        onClickHandler: handleMenuClick,
+      };
+    }
+  };
+
+  const menuProps = getMenuProps();
+
+  const cancelTransfer = () => {
+    setSendByBeneficiaries(false);
+    handleAllInput("");
+    setAllInput(false);
+    navigate("/Beneficiaries");
   };
 
   useEffect(() => {
@@ -134,11 +224,11 @@ function PaymentForm() {
       socket.emit("checkUserName", {
         regNumber: document.cookie,
       });
-      socket.on("userNameAvailable", (data) => {
-        setUserNameFromDb(data.user);
+      socket.on("userNameAvailable", async (data) => {
+        await setUserNameFromDb(data.user);
       });
-      socket.on("userNotFound", () => {
-        setUserNameFromDb("");
+      socket.on("userNotFound", async () => {
+        await setUserNameFromDb("");
       });
     }
   }, [userNameFromDb, connectionMode, socket]);
@@ -157,37 +247,14 @@ function PaymentForm() {
 
   return (
     <>
-      <div className="paymentFormContainer h-screen w-screen bg-slate-50  fixed w-screen bg-blue-500">
-        <div className="h-[10%] w-full fixed  top-0 flex text-center items-center pt-4 box-border align-center  bg-gradient-to-r  from-cyan-500 to-blue-500 p-1px ">
-          {windowWidth < 640 ? null : (
-            <h1 className="text-4xl italic font-extrabold text-white  sm:ml-[10rem] lg:ml-[16rem] pointer-events-none text-center">
-              Easy Transfer
-            </h1>
-          )}
+      <div className="paymentFormContainer h-screen w-screen  bg-gray-800 text-white font-sans fixed w-screen ">
+        <Menu {...menuProps} onClickHandler={handleMenuClick} />
 
-          {sessionTiemedOut ? null : (
-            <div
-              className={
-                windowWidth < 600
-                  ? "p-2 pl-8 pr-8 text-white font-bold   border-box absolute   w-1/8 flex items-center space-x-2"
-                  : "p-2 pl-8 pr-8 text-white font-bold   border-box absolute    w-1/8 flex items-center space-x-2"
-              }
-            >
-              <AiOutlineMenuUnfold
-                onClick={profile}
-                className="text-3xl text-black"
-              />
-              <button className=" text-xl text-black">
-                {userNameFromDb !== "" ? userNameFromDb : document.cookie}
-              </button>
-            </div>
-          )}
-        </div>
-        <div className="flex  w-full fixed top-[10%]  flex justify-center  bg-gradient-to-r from-cyan-500 to-blue-500 ">
+        <div className="flex  w-full fixed top-[10%]  flex justify-center   ">
           <div className="w-[100vw]  flex justify-evenly h-[90vh]  ">
             <div className="hidden sm:block sm:w-1/2 md:w-auto">
               {" "}
-              <h1 className="text-4xl font-sans text-white font-light mt-[11rem] ml-[1rem]   lg:text-6xl ">
+              <h1 className="text-4xl font-sans  font-light mt-[11rem] ml-[1rem]   lg:text-6xl ">
                 The Secure, <br /> easiest and fastest <br /> way to transfer
                 money.{" "}
               </h1>
@@ -197,19 +264,19 @@ function PaymentForm() {
             </div>
             <form className=" sm:w-5/12  sm:h-[90%] md:w-2/5  lg:w-1/3 relative  px-10 py-10 box-border h-5/6 z-20 bg-white border-2 border-cyan-200   rounded-md  mt-[2rem]   flex flex-col justify-center ">
               {/* <h1>Enter recepient details</h1> */}
-              <div className=" bg-white h-1/6 text-slate-500 m-auto mt-4  mb-6 w-full text-center flex justify-center  rounded-md rounded-b-none  ">
-                <h1 className=" my-auto  text-4xl font-extrabold text-gray-600 text-[34px]">
+              <div className=" bg-white h-1/6 text-slate-500 m-auto mt-1  mb-6 w-full text-center flex justify-center  rounded-md rounded-b-none  ">
+                <h1 className=" my-auto  text-4xl font-extrabold text-gray-800 text-[34px]">
                   Money Transfer
                 </h1>
               </div>
               <div className="md:ml-8  lg:ml-12 w-full">
-                <label className="block   px-1 pointer-events-none leading-6 text-gray-600">
+                <label className="block   px-1 pointer-events-none leading-6 text-gray-800">
                   Beneficiary Name
                 </label>
                 <input
                   type="text"
                   id="receiver-name"
-                  className="block w-[95%] sm-w-11/12 md:w-4/5  lg:w-9/12  px-4 py-2 border mb-3 border-gray-300 bg-slate-100 rounded-md focus:outline-none focus:border-blue-500"
+                  className="block w-[95%] sm-w-11/12 mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-gray-300  rounded-md focus:outline-none focus:border-gray-800"
                   name="receiver-account-holder"
                   placeholder="Account Holder's Name"
                   value={toAccountHolderName}
@@ -219,44 +286,44 @@ function PaymentForm() {
                 />
 
                 <label
-                  // className="relative  top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-600"
-                  className="block px-1 pointer-events-none leading-6 text-gray-600"
+                  // className="relative  top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-800"
+                  className="block px-1 pointer-events-none leading-6 text-gray-800"
                 >
                   Account Number
                 </label>
                 <input
-                  className="block  w-[95%] sm:11/2 md:w-4/5  lg:w-9/12  px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
-                  type="number"
+                  className="block  w-[95%] sm:11/2 mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  type="tel"
                   id="rec-account-number"
                   name="rec-account-number"
                   placeholder="Account Number"
                   value={toAccountNumber}
                   onChange={(e) => {
-                    setToAccountNumber(e.target.value);
+                    handleAccNumToSend(e);
                   }}
                 />
 
                 <label
-                  // className="relative w-25 top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-600"
-                  className="block   px-1 pointer-events-none leading-6 text-gray-600"
+                  // className="relative w-25 top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-800"
+                  className="block   px-1 pointer-events-none leading-6 text-gray-800"
                 >
                   IFSC code
                 </label>
                 <input
-                  className="block  w-[95%] sm:11/12 md:w-4/5  lg:w-9/12  px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                  className="block  w-[95%] sm:11/12 mb-[1rem] md:w-4/5 text-gray-800  lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
                   type="text"
                   id="rec-ifsc-number"
                   name="rec-ifsc-number"
                   placeholder="IFSC Code"
                   value={toIFSCNumber}
                   onChange={(e) => {
-                    setToIFSCNumber(e.target.value);
+                    handleToIfsc(e);
                   }}
                 />
 
                 <label
-                  //  className="relative w-20 top-3 left-2 transition-all bg-black px-1 box-border pointer-events-none text-gray-600"
-                  className="block   px-1 pointer-events-none leading-6 text-gray-600"
+                  //  className="relative w-20 top-3 left-2 transition-all bg-black px-1 box-border pointer-events-none text-gray-800"
+                  className="block   px-1 pointer-events-none leading-6 text-gray-800"
                 >
                   {" "}
                   Amount{" "}
@@ -265,85 +332,103 @@ function PaymentForm() {
                   type="tel"
                   name="amount"
                   id="amount"
-                  className=" block  w-[95%] sm:10/12 md:w-4/5  lg:w-9/12  px-4 py-2 mb-8 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                  className=" block  w-[95%] sm:10/12 mb-[1rem] md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-8  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
                   value={amount}
-                  onChange={(e) => {
-                    setAmount(e.target.value);
-                  }}
+                  onChange={(e) => handleAmountToSend(e)}
                   placeholder="Amount"
                 />
 
                 {allInput ? (
-                  <p className="text-left mb-2">*fill all input values</p>
+                  <p className="text-left text-sm text-gray-800 mb-2">
+                    *fill all input values
+                  </p>
                 ) : null}
               </div>
 
               <input
                 type="submit"
                 value="SEND"
-                className="block w-1/2  px-4 py-2 m-auto mb-3 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 bg-green-600 text-white hover:bg-green-700 hover:cursor-pointer"
+                className="block w-1/2  px-4 py-2 m-auto mb-3 border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                 onClick={
                   connectionMode === "socket"
                     ? sendAmountBySocket
                     : sendAmountByPolling
                 }
               />
+              {sendByBeneficiaries ? (
+                <input
+                  type="button"
+                  value="CANCEL"
+                  onClick={cancelTransfer}
+                  className="block w-1/2  px-4 py-2 m-auto mb-3 border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                />
+              ) : null}
             </form>
           </div>
         </div>
       </div>
 
-      {isProfileClicked ? (
+      {windowWidth > 1024 ? null : isProfileClicked ? (
         <>
           <div
-            className="w-1/2 sm:w-1/2 md:w-[33%] lg:w-1/4 bg-transparent backdrop-blur-xl h-screen font-sans fixed text-black"
+            className="w-1/2 sm:w-1/2 md:w-[33%] lg:w-1/4 bg-gray-800 backdrop-blur-xl h-screen font-sans fixed text-black"
             // className={
             // windowWidth < 780
             // ? "w-1/2 h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
             // : " sm:w-[33vw]  h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
             // }
           >
-            <div className=" pt-2 pb-8 border-box h-[85vh] ">
-              <div className="flex justify-between items-center border-b-2 border-black  cursor-pointer ">
-                <h1 className="ml-[2rem] text-2xl font-bold ">Dashboard</h1>
+            <div className=" pt-2 pb-8 border-box h-[85vh] font-sans">
+              <div className="flex justify-between items-center border-b-2 border-gray-600  text-white box-border pb-[.8rem] cursor-pointer ">
+                <h1 className="ml-[2rem] text-xl font-bold ">Menu</h1>
                 <p className=" mr-[1rem]  " onClick={closeProfile}>
                   <RiMenuFoldFill />
                 </p>
               </div>
-              <div className="space-y-2 flex  flex-col items-left pl-9 pt-5 border-box text-2xl    cursor-pointer ">
+              <div className="space-y-2 flex text-white w-[80%] justify-center pl-6 flex-col items-left  pt-5 border-box text-lg    cursor-pointer ">
                 <h1
-                  className="hover:font-bold hover:border-b-2 "
+                  className="hover:font-bold hover:border-2   rounded px-4 box-border rounded- px-4 box-border py-1"
                   onClick={navigateToProfile}
                 >
                   Profile
                 </h1>
-                <h1 className="hover:font-bold hover:border-b-2">Rewards</h1>
-                <h1 className="hover:font-bold hover:border-b-2">Contact us</h1>
-                <h1 className="hover:font-bold hover:border-b-2">
+                <h1 className="hover:font-bold  hover:border-2   rounded px-4 box-border hover:border-b-2  py-1">
+                  Rewards
+                </h1>
+                <h1 className="hover:font-bold  hover:border-2   rounded px-4 box-border hover:border-b-2 py-1">
+                  Contact us
+                </h1>
+                <h1 className="hover:font-bold  hover:border-2   rounded px-4 box-border hover:border-b-2 py-1">
                   Transactions
                 </h1>
                 <h1
-                  className="hover:font-bold hover:border-b-2"
+                  className="hover:font-bold hover:border-2   rounded px-4 box-border  px-4 box-border py-1"
                   onClick={savedAccounts}
                 >
-                  Saved Beneficiaries
+                  Beneficiaries
+                </h1>
+                <h1
+                  className="hover:font-bold hover:border-2   rounded px-4 box-border  px-4 box-border py-1"
+                  onClick={logout}
+                >
+                  Log out
                 </h1>
               </div>
             </div>
 
-            <div className=" h-[8vh] sm:h-[15vh] flex items-center">
+            {/* <div className=" h-[8vh] sm:h-[15vh] flex items-center">
               <button
                 className={
-                  "block w-1/2  px-4 py-2 m-auto ml-[10vw] mb-5 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 bg-green-600 text-white hover:bg-green-500 hover:cursor-pointer"
+                  "block w-1/2  px-4 py-2 m-auto ml-[10vw] mb-5 border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-white text-black hover:bg-gray-600 hover:cursor-pointer"
                   // windowWidth < 780
-                  //   ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-white z-[10] left-[19vw] sm:left-[25vw] mt-[1vh]   font-light fixed  sm:w-1/8 hover:bg-blue-500 hover:border"
-                  //   : "bg-green-500  rounded-full p-2 pl-8 pr-8 text-white z-[10]  left-[18vw] mt-[0vh] font-light fixed  w-1/8 hover:bg-blue-500 hover:border"
+                  //   ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-black z-[10] left-[19vw] sm:left-[25vw] mt-[1vh]   font-light fixed  sm:w-1/8 hover:bg-blue-500 hover:border"
+                  //   : "bg-green-500  rounded-full p-2 pl-8 pr-8 text-black z-[10]  left-[18vw] mt-[0vh] font-light fixed  w-1/8 hover:bg-blue-500 hover:border"
                 }
                 onClick={logout}
               >
                 Log out
               </button>
-            </div>
+            </div> */}
           </div>
         </>
       ) : null}

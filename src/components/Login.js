@@ -71,7 +71,7 @@ function Login() {
 
   const loginToDashboard = async (e) => {
     e.preventDefault();
-    if (mobileNumber && password) {
+    if (mobileNumber && password && mobileNumber.length > 8) {
       const request = await axios.post(
         "https://polling-server.onrender.com/loginRequest",
         {
@@ -92,16 +92,17 @@ function Login() {
       } else if (request.status === 202) {
         setLoginFailed(true);
       }
+      setMobileNumber("");
+      setPassword("");
     } else {
       setLoginInputAlert(true);
+      // alert("Enter Valid Number");
     }
-    setMobileNumber("");
-    setPassword("");
   };
 
   const loginToDashboardUsingSocket = async (e) => {
     e.preventDefault();
-    if (mobileNumber && password) {
+    if (mobileNumber && password && mobileNumber.length > 8) {
       await socket.emit("login", {
         Mobile: mobileNumber,
         Password: password,
@@ -109,6 +110,8 @@ function Login() {
       socket.on("loginSuccess", () => {
         navigate("/transferPage");
         document.cookie = mobileNumber;
+        setMobileNumber("");
+        setPassword("");
         setKey(document.cookie);
         setLoginFailed(false);
         setLoginInputAlert(false);
@@ -121,9 +124,8 @@ function Login() {
       });
     } else {
       setLoginInputAlert(true);
+      // alert("Enter Valid Number");
     }
-    setMobileNumber("");
-    setPassword("");
   };
 
   useEffect(() => {
@@ -141,27 +143,27 @@ function Login() {
   }, [windowWidth]);
   return (
     <>
-      <h1 className="text-center text-[6vw] sm:text-[3vh] md:text-4xl font-bold font-['Open_Sans'] sm:mt-[18%] cursor-default ">
+      <h1 className="text-center text-[6vw] sm:text-[3vh] md:text-4xl font-bold font-sans sm:mt-[14%] cursor-default ">
         Welcome Back
       </h1>
       <form
         className={
           windowWidth < 640
-            ? "flex flex-col items-center  m-auto h-auto w-full  mt-[3rem] "
-            : "flex flex-col items-center  m-auto h-auto sm:w-full md:w-full lg:w-[70%]  mt-[3rem]"
+            ? "flex flex-col items-center bg-white m-auto h-auto w-full rounded-2xl  mt-[3rem] "
+            : "flex flex-col items-center bg-white m-auto rounded-2xl h-auto w-full  mt-[3rem]"
         }
       >
         <div className="flex flex-col w-3/5">
-          <label htmlFor="" className="font-medium font-['Open-Sans']">
+          <label htmlFor="" className="font-medium font-sans">
             Mobile Number
           </label>
           <input
             className={
               mobileNumber.length < 10
-                ? "outline-0 h-10  w-full border-2 border-red-500  rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100 "
+                ? "outline-0 h-10  w-full border-2 border-red-500  rounded-lg mb-3 p-[1rem]  font-sans  border-box  "
                 : loginFailed
-                ? "outline-0 h-10  w-full border-2 border-red-500  rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100 "
-                : "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100"
+                ? "outline-0 h-10  w-full border-2 border-red-500  rounded-lg mb-3 p-[1rem] font-sans  border-box  "
+                : "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg mb-3 p-[1rem] font-sans  border-box "
             }
             type="tel"
             maxLength={10}
@@ -173,15 +175,15 @@ function Login() {
         <div className="flex flex-col w-3/5 ">
           <label
             htmlFor=""
-            className="block leading-6 text-left font-medium font-['Open-Sans'] "
+            className="block leading-6 text-left font-medium font-sans "
           >
             Password
           </label>
           <input
             className={
               loginFailed
-                ? "outline-0 h-10 w-full rounded-lg mb-5 p-[.4rem] sm:p-[1rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100 "
-                : "outline-0 h-10 w-full rounded-lg mb-5 p-[.4rem] sm:p-[1rem] border-2 border-slate-300 font-['Open-Sans'] border-box bg-zinc-100"
+                ? "outline-0 h-10 w-full rounded-lg mb-5 p-[.4rem] sm:p-[1rem] border-2 border-red-500 font-sans border-box  "
+                : "outline-0 h-10 w-full rounded-lg mb-5 p-[.4rem] sm:p-[1rem] border-2 border-slate-300 font-sans border-box "
             }
             type={showPassword ? "text" : "password"}
             minLength={6}
@@ -195,7 +197,7 @@ function Login() {
               className={
                 windowWidth < 640
                   ? "relative ml-[40vw] bottom-[3rem]"
-                  : "relative  sm:ml-[20vw] md:ml-[21vw] lg:ml-[14vw] xl:ml-[15vw] bottom-[3rem] text-zinc-400"
+                  : "relative  sm:ml-[20vw] md:ml-[21vw] lg:ml-[14vw] xl:ml-[16vw] bottom-[3rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
@@ -204,7 +206,7 @@ function Login() {
               className={
                 windowWidth < 640
                   ? "relative ml-[40vw] bottom-[3rem]"
-                  : "relative  sm:ml-[18vw]  md:ml-[21vw] lg:ml-[14vw] xl:ml-[15vw] bottom-[3rem] text-zinc-400"
+                  : "relative  sm:ml-[18vw]  md:ml-[21vw] lg:ml-[14vw] xl:ml-[16vw] bottom-[3rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
@@ -233,7 +235,7 @@ function Login() {
         {}
 
         <button
-          className="w-1/3 bg-gradient-to-b border-0  outline-0 from-black to-green-700 text-white text-center p-[.5rem] font-bold font-['Open_Sans'] h-auto  mt-[.8rem] rounded-full "
+          className="w-1/3  border-0  outline-0 text-white hover:bg-gray-600 bg-gray-800 text-white text-center p-[.5rem] font-bold font-sans h-auto  mt-[.8rem] rounded-md "
           onClick={
             connectionMode === "socket"
               ? loginToDashboardUsingSocket
@@ -243,13 +245,13 @@ function Login() {
           Log in
         </button>
 
-        <p className="text-xs mt-[2rem] sm:mt-[5rem] md:mt-[3rem] underline cursor-pointer ">
+        <p className="text-xs mt-[2rem] text-gray-800 sm:mt-[5rem] md:mt-[3rem] underline cursor-pointer ">
           Forgot Password?
         </p>
-        <p className="font-light text-xs  mt-[.5rem] mb-[2rem]">
+        <p className="font-light text-xs text-gray-800 mt-[.5rem] mb-[2rem]">
           Don't have an account?{" "}
           <strong
-            className="font-bold text-green-700 cursor-pointer"
+            className="font-bold text-gray-800 cursor-pointer"
             onClick={signup}
           >
             Sign up

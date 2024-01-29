@@ -170,184 +170,165 @@ function SignUp() {
 
   return (
     <>
-      <div
+      {/* <div
         className={
           isLogin
-            ? "h-[80vh] lg:h-[80vh] w-1/2 md:w-1/2 bg-gradient-to-b from-black to-green-500 rounded-r-xl  text-white flex flex-col justify-center items-center mr-[4rem]"
-            : " h-[80vh]  w-1/2 bg-white lg:h-[80vh] rounded-r-xl mr-[4rem] text-[4xl]"
+            ? "  w-full bg-gradient-to-b from-black to-green-500 h-[70vh] font-poppins flex flex-col justify-center items-center mr-[4rem]"
+            : "  w-full bg-white h-[70vh]  rounded-xl mr-[4rem]  text-[4xl] font-poppins"
         }
-      >
-        {isLogin ? (
-          <>
-            <h1 className="text-4xl sm:text-[4vh] md:text-4xl lg:text-6xl font-extrabold italic">
-              Easy Transfer
-            </h1>
-            <br />
-            <p className="sm:text-[1.2vh] md:text-[1.2vw]">
-              Allows seamless transaction at ZERO transaction fee.
-            </p>
-            <br />
-            <p className="sm:text-[1.2vh] md:text-[1.2vw]">
+      > */}
+      <>
+        <h1 className=" text-4xl  font-bold text-center mt-[2rem] ">
+          User Register
+        </h1>
+        <form className="flex flex-col items-center  m-auto h-auto text-gray-800 mt-[3rem] mb-[2rem]">
+          <div className="flex flex-col w-3/5">
+            <label htmlFor="" className="font-medium ">
+              Mobile Number
+            </label>
+            <input
+              className={
+                regMobileNumber.length < 10
+                  ? "outline-0 h-10 w-full border-2 border-red-500  rounded-lg mb-4 p-[1rem]   border-box "
+                  : isAlreadyUser
+                  ? "outline-0 h-10 w-full border-2 border-red-500  rounded-lg mb-4 p-[1rem]   border-box "
+                  : "outline-0 h-10 w-full border-2 border-slate-200  rounded-lg mb-4 p-[1rem]   border-box "
+              }
+              type="tel"
+              minLength={10}
+              maxLength={10}
+              value={regMobileNumber}
+              onChange={handleRegMobileNumber}
+              placeholder="Enter Mobile Number"
+            />
+          </div>
+
+          <div className="flex flex-col w-3/5 ">
+            <label
+              htmlFor=""
+              className="block leading-6 text-left font-medium  "
+            >
+              Create Password
+            </label>
+            <input
+              className={
+                passwordError
+                  ? "outline-0 h-10 w-full rounded-lg  p-[1rem] border-2 border-red-500  border-box "
+                  : signUpFailed
+                  ? "outline-0 h-10 w-full rounded-lg  p-[1rem] border-2 border-red-500  border-box "
+                  : "outline-0 h-10 w-full rounded-lg  p-[1rem] border-2 border-slate-200  border-box "
+              }
+              type={showCreatePassword ? "text" : "password"}
+              min={6}
+              max={10}
+              value={createPassword}
+              onChange={handleCreatePassword}
+              onClick={() => setPasswordError(true)}
+              placeholder="Enter Your Password"
+              required
+            />
+            {showCreatePassword ? (
+              <FaRegEye
+                className="relative sm:ml-[20vw] md:ml-[21vw] lg:ml-[17vw] xl:ml-[16.5vw] bottom-[1.7rem] text-zinc-300"
+                onClick={() => handleShowPassword("create")}
+              />
+            ) : (
+              <FaRegEyeSlash
+                className="relative sm:ml-[20vw] md:ml-[21vw] lg:ml-[17vw] xl:ml-[16.5vw] bottom-[1.7rem] text-zinc-300"
+                onClick={() => handleShowPassword("create")}
+              />
+            )}
+          </div>
+          <div className="flex flex-col w-3/5 ">
+            <label
+              htmlFor=""
+              className="block leading-6 text-left font-medium  "
+            >
+              Confirm Password
+            </label>
+            <input
+              className={
+                passwordError
+                  ? "outline-0 h-10 w-full rounded-lg mb-5 p-[1rem] border-2 border-red-500  border-box "
+                  : signUpFailed
+                  ? "outline-0 h-10 w-full rounded-lg mb-5 p-[1rem] border-2 border-red-500  border-box "
+                  : "outline-0 h-10 w-full rounded-lg mb-5 p-[1rem] border-2 border-slate-200  border-box "
+              }
+              type={showConfirmPassword ? "text" : "password"}
+              value={confirmPassword}
+              onChange={handleConfirmPassword}
+              placeholder="Enter Your Password"
+              min={6}
+              max={10}
+              required
+            />
+            {showConfirmPassword ? (
+              <FaRegEye
+                className="relative sm:ml-[20vw] md:ml-[21vw] lg:ml-[17vw] xl:ml-[16.5vw] bottom-[3rem] text-zinc-300"
+                onClick={() => handleShowPassword("confirm")}
+              />
+            ) : (
+              <FaRegEyeSlash
+                className="relative sm:ml-[20vw] md:ml-[21vw] lg:ml-[17vw] xl:ml-[16.5vw] bottom-[3rem] text-zinc-300"
+                onClick={() => handleShowPassword("confirm")}
+              />
+            )}
+          </div>
+          {allInputAlert ? (
+            <div className="w-3/5">
               {" "}
-              Login to your account to make payment.
+              <p className="text-xs text-red-500">*fill all inputs</p>
+            </div>
+          ) : null}
+          {signUpFailed ? (
+            <p className="w-3/5 text-xs text-red-500">
+              *Password do not match.
             </p>
-          </>
-        ) : (
-          <>
-            <h1 className="text-2xl md:text-4xl  font-extrabold text-center mt-[4rem] font-['Open-Sans']">
-              User Register
-            </h1>
-            <form className="flex flex-col items-center  m-auto h-auto w-[98%] sm:w-full md:w-[98%] lg:w-[90%]  mt-[3rem]">
-              <div className="flex flex-col w-3/5">
-                <label htmlFor="" className="font-medium font-['Open-Sans']">
-                  Mobile Number
-                </label>
-                <input
-                  className={
-                    regMobileNumber.length < 10
-                      ? "outline-0 h-10 w-full border-2 border-red-500 mb-1 rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100"
-                      : isAlreadyUser
-                      ? "outline-0 h-10 w-full border-2 border-red-500 mb-1 rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100"
-                      : "outline-0 h-10 w-full border-2 border-slate-200 mb-1 rounded-lg mb-3 p-[1rem] font-['Open-Sans']  border-box bg-zinc-100"
-                  }
-                  type="tel"
-                  minLength={10}
-                  maxLength={10}
-                  value={regMobileNumber}
-                  onChange={handleRegMobileNumber}
-                  placeholder="Enter Mobile Number"
-                />
-              </div>
+          ) : null}
+          {isAlreadyUser ? (
+            <p className="w-3/5 text-red-500 text-xs">
+              *Mobile number already registered!
+            </p>
+          ) : null}
 
-              <div className="flex flex-col w-3/5 ">
-                <label
-                  htmlFor=""
-                  className="block leading-6 text-left font-medium font-['Open-Sans'] "
-                >
-                  Create Password
-                </label>
-                <input
-                  className={
-                    passwordError
-                      ? "outline-0 h-10 w-full rounded-lg mb-1 p-[1rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100"
-                      : signUpFailed
-                      ? "outline-0 h-10 w-full rounded-lg mb-1 p-[1rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100"
-                      : "outline-0 h-10 w-full rounded-lg mb-1 p-[1rem] border-2 border-slate-200 font-['Open-Sans'] border-box bg-zinc-100"
-                  }
-                  type={showCreatePassword ? "text" : "password"}
-                  min={6}
-                  max={10}
-                  value={createPassword}
-                  onChange={handleCreatePassword}
-                  onClick={() => setPasswordError(true)}
-                  placeholder="Enter Your Password"
-                  required
-                />
-                {showCreatePassword ? (
-                  <FaRegEye
-                    className="relative sm:ml-[20vw] md:ml-[21vw] lg:ml-[17vw] xl:ml-[18.5vw] bottom-[2rem] text-zinc-400"
-                    onClick={() => handleShowPassword("create")}
-                  />
-                ) : (
-                  <FaRegEyeSlash
-                    className="relative sm:ml-[20vw] md:ml-[21vw] lg:ml-[17vw] xl:ml-[18.5vw] bottom-[2rem] text-zinc-400"
-                    onClick={() => handleShowPassword("create")}
-                  />
-                )}
-              </div>
-              <div className="flex flex-col w-3/5 ">
-                <label
-                  htmlFor=""
-                  className="block leading-6 text-left font-medium font-['Open-Sans'] "
-                >
-                  Confirm Password
-                </label>
-                <input
-                  className={
-                    passwordError
-                      ? "outline-0 h-10 w-full rounded-lg mb-5 p-[1rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100"
-                      : signUpFailed
-                      ? "outline-0 h-10 w-full rounded-lg mb-5 p-[1rem] border-2 border-red-500 font-['Open-Sans'] border-box bg-zinc-100"
-                      : "outline-0 h-10 w-full rounded-lg mb-5 p-[1rem] border-2 border-slate-200 font-['Open-Sans'] border-box bg-zinc-100"
-                  }
-                  type={showConfirmPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={handleConfirmPassword}
-                  placeholder="Enter Your Password"
-                  min={6}
-                  max={10}
-                  required
-                />
-                {showConfirmPassword ? (
-                  <FaRegEye
-                    className="relative sm:ml-[20vw] md:ml-[21vw] lg:ml-[17vw] xl:ml-[18.5vw] bottom-[3rem] text-zinc-400"
-                    onClick={() => handleShowPassword("confirm")}
-                  />
-                ) : (
-                  <FaRegEyeSlash
-                    className="relative sm:ml-[20vw] md:ml-[21vw] lg:ml-[17vw] xl:ml-[18.5vw] bottom-[3rem] text-zinc-400"
-                    onClick={() => handleShowPassword("confirm")}
-                  />
-                )}
-              </div>
-              {allInputAlert ? (
-                <div className="w-3/5">
-                  {" "}
-                  <p className="text-sm text-red-500">*Fill all the inputs.</p>
-                </div>
-              ) : null}
-              {signUpFailed ? (
-                <p className="w-3/5 text-xs text-red-500">
-                  *Password do not match.
-                </p>
-              ) : null}
-              {isAlreadyUser ? (
-                <p className="w-3/5 text-red-500 text-xs">
-                  *Mobile number already registered!
-                </p>
-              ) : null}
-
-              {passwordError ? (
-                <>
-                  <p className="w-3/5 text-red-500 text-xs">
-                    *password must have 1 upper case
-                  </p>
-                  <p className="w-3/5 text-red-500 text-xs">
-                    *password must have 1 lower case
-                  </p>
-                  <p className="w-3/5 text-red-500 text-xs">
-                    *password must have 1 special character
-                  </p>
-                  <p className="w-3/5 text-red-500 text-xs">
-                    *password must have 8 letters
-                  </p>
-                </>
-              ) : null}
-
-              <button
-                className="w-1/3 bg-gradient-to-b border-0 from-black to-green-700 text-white text-center p-[.5rem] font-bold font-['Open_Sans'] h-auto  mt-[1rem] rounded-full "
-                onClick={
-                  connectionMode === "socket"
-                    ? signUpUserUsingSocket
-                    : signupUser
-                }
-              >
-                Sign up
-              </button>
-
-              <p className="font-light sm:text-[1vw] md:text-xs  mt-[2rem]">
-                Already have an account?{" "}
-                <strong
-                  className="font-bold text-green-700 cursor-pointer"
-                  onClick={login}
-                >
-                  Login
-                </strong>
+          {passwordError ? (
+            <>
+              <p className="w-3/5 text-red-500 text-xs">
+                *password must have 1 upper case
               </p>
-            </form>
-          </>
-        )}
-      </div>
+              <p className="w-3/5 text-red-500 text-xs">
+                *password must have 1 lower case
+              </p>
+              <p className="w-3/5 text-red-500 text-xs">
+                *password must have 1 special character
+              </p>
+              <p className="w-3/5 text-red-500 text-xs">
+                *password must have 8 letters
+              </p>
+            </>
+          ) : null}
+
+          <button
+            className="w-1/3 bg-gray-800 hover:bg-gray-600 border-0  text-white text-center p-[.5rem] font-bold font-sans h-auto  mt-[1rem] rounded-md "
+            onClick={
+              connectionMode === "socket" ? signUpUserUsingSocket : signupUser
+            }
+          >
+            Sign up
+          </button>
+
+          <p className="font-light sm:text-[1vw] md:text-xs  mt-[2rem]">
+            Already have an account?{" "}
+            <strong
+              className="font-bold text-gray-800 cursor-pointer"
+              onClick={login}
+            >
+              Login
+            </strong>
+          </p>
+        </form>
+      </>
+      {/* </div> */}
     </>
   );
 }

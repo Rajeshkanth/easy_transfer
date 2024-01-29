@@ -1,10 +1,15 @@
 import { createContext, useState, useEffect } from "react";
-import { HashRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  HashRouter as Router,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { io } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 import Beneficiaries from "./components/Beneficiaries";
 import HomePage from "./components/HomePage";
-import "./App.css";
+// import "./App.css";
 import PaymentForm from "./components/PaymentForm";
 import Profile from "./components/Profile";
 import Success from "./components/Success";
@@ -48,6 +53,8 @@ function App() {
   const [isLogin, setIsLogin] = useState(true);
   const [passwordError, setPasswordError] = useState(true);
   const [isProfileClicked, setIsProfileClicked] = useState(false);
+  const [sendByBeneficiaries, setSendByBeneficiaries] = useState(false);
+  const [savedAcc, setSavedAcc] = useState([]);
 
   const handleRegMobileNumber = (e) => {
     const value = e.target.value;
@@ -120,6 +127,48 @@ function App() {
       }
     });
   }, [connectionMode]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (connectionMode === "socket") {
+        socket.emit("fetchList", {
+          num: document.cookie,
+        });
+
+        socket.on("allSavedAccounts", (data) => {
+          const savedDetail = {
+            beneficiaryName: data.beneficiaryName,
+            accNum: data.accNum,
+            ifsc: data.ifsc,
+            editable: data.editable,
+          };
+
+          const isAlreadyStored = savedAcc.some((detail) => {
+            return (
+              detail.beneficiaryName === savedDetail.beneficiaryName &&
+              detail.accNum === savedDetail.accNum &&
+              detail.ifsc === savedDetail.ifsc &&
+              detail.editable === savedDetail.editable
+            );
+          });
+
+          if (!isAlreadyStored) {
+            setSavedAcc((prev) => [...prev, savedDetail]);
+            console.log(savedAcc);
+          }
+        });
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      if (connectionMode !== "socket") {
+      } else {
+        socket.off();
+      }
+    };
+  }, [connectionMode, socket, setSavedAcc]);
 
   return (
     <store.Provider
@@ -197,6 +246,10 @@ function App() {
         isProfileClicked,
         setIsProfileClicked,
         setPasswordError,
+        sendByBeneficiaries,
+        setSendByBeneficiaries,
+        savedAcc,
+        setSavedAcc,
       }}
     >
       <Router>
@@ -204,8 +257,8 @@ function App() {
           <Route path="/" element={<HomePage />}></Route>
           <Route path="/transferPage" element={<PaymentForm />}></Route>
           <Route path="/success" element={<Success />}></Route>
-          <Route path="/profile" element={<Profile />}></Route>
-          <Route path="/savedAccounts" element={<Beneficiaries />}></Route>
+          <Route path="/Profile" element={<Profile />}></Route>
+          <Route path="/Beneficiaries" element={<Beneficiaries />}></Route>
         </Routes>
       </Router>
     </store.Provider>

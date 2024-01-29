@@ -6,7 +6,7 @@ import { MdOutlineCancel } from "react-icons/md";
 import { useNavigate } from "react-router";
 
 function Success() {
-  const { socket } = useContext(store);
+  const { socket, connectionMode } = useContext(store);
   const [check, setCheck] = useState(false);
   const [fail, setFail] = useState(false);
   const navigate = useNavigate();
@@ -45,12 +45,15 @@ function Success() {
   }, [socket]);
 
   useEffect(() => {
-    socket.on("paymentConfirmAlert", (data) => {
-      setRoom(data.UniqueId); // Use UniqueId
-      const receivedRoom = data.socketRoom;
-      console.log(receivedRoom);
-      setSocketRoom(receivedRoom);
-    });
+    if (connectionMode !== "socket") {
+    } else {
+      socket.on("paymentConfirmAlert", (data) => {
+        setRoom(data.UniqueId); // Use UniqueId
+        const receivedRoom = data.socketRoom;
+        console.log(receivedRoom);
+        setSocketRoom(receivedRoom);
+      });
+    }
   }, [socket]);
 
   useEffect(() => {
@@ -93,19 +96,19 @@ function Success() {
       {fail ? (
         <>
           {" "}
-          <div className="loading">
+          <div className="loading font-poppins space-y-2">
             <div class="wrapper">
               <MdOutlineCancel className="fail-icon" />{" "}
             </div>
-            <h3>Payment Transaction Failed!</h3>
-            <br />
-            <p>redirecting to the home page....</p>
+            <h3 className="text-white">Payment Transaction Failed!</h3>
+
+            <p className="text-white">Redirecting to the home page....</p>
           </div>
         </>
       ) : (
         <>
           {check ? (
-            <div className="loading">
+            <div className="loading font-poppins">
               <div class="wrapper">
                 {" "}
                 <svg
@@ -129,14 +132,16 @@ function Success() {
                 </svg>
               </div>
 
-              <h3>Payment Transaction Successful !</h3>
+              <h3 className="text-white">Payment Transaction Successful !</h3>
               <br />
             </div>
           ) : (
-            <div className="loading">
+            <div className="loading font-poppins">
               <div className="loader"></div>
               <p>
-                <strong>waiting for the transaction confirmation</strong>{" "}
+                <strong className="text-white">
+                  waiting for the transaction confirmation
+                </strong>{" "}
               </p>
               {/* <p>
                 <strong>Reminder: </strong>Payments need confirmation within 2

@@ -2,7 +2,11 @@
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        poppins: ["Poppins", "sans-serif"],
+      },
+    },
   },
   plugins: [
     function ({ addUtilities }) {
@@ -10,11 +14,12 @@ module.exports = {
         ".loader": {
           width: "60px",
           aspectRatio: "1.154",
-          "--c": "#0000, #25b09b 2deg 59deg, #0000 61deg",
+          "--c": "#0000, #ffffff 2deg 59deg, #0000 61deg",
           "--c1": "conic-gradient(from 149deg at top, var(--c))",
           "--c2": "conic-gradient(from -31deg at bottom, var(--c))",
           background:
             "var(--c1) top, var(--c1) bottom right, var(--c2) bottom, var(--c1) bottom left",
+
           backgroundSize: "50% 50%",
           backgroundRepeat: "no-repeat",
           animation: "l37 1s infinite",
@@ -26,7 +31,7 @@ module.exports = {
           },
         },
         ".loading": {
-          backgroundColor: "rgb(215, 231, 229)",
+          backgroundColor: "rgb(75, 85, 99)",
           height: "100vh",
           width: "100vw",
           display: "flex",
@@ -40,7 +45,7 @@ module.exports = {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "rgb(215, 231, 229)",
+          backgroundColor: "rgb(75, 85, 99)",
         },
         ".checkmark__circle": {
           strokeDasharray: 166,
@@ -90,7 +95,7 @@ module.exports = {
         },
         ".fail-icon": {
           fontSize: "44px",
-          color: "red",
+          color: "white",
         },
         mortar: {
           50: "#f7f6f8",
