@@ -5,9 +5,9 @@ import { MdDeleteOutline, MdEdit } from "react-icons/md";
 import { AiOutlineMenuUnfold } from "react-icons/ai";
 // import { IoIosCheckboxOutline } from "react-icons/io";
 import { CiBookmarkCheck } from "react-icons/ci";
-import { RiMenuFoldFill } from "react-icons/ri";
 import { useLocation, useNavigate } from "react-router";
 import Menu from "./Menu";
+import SideBar from "./SideBar";
 
 function Beneficiaries() {
   const {
@@ -30,9 +30,13 @@ function Beneficiaries() {
     setSendByBeneficiaries,
     savedAcc,
     setSavedAcc,
+    isProfileClicked,
+    setIsProfileClicked,
+    logOut,
+    setLogOut,
   } = useContext(store);
 
-  const [isProfileClicked, setIsProfileClicked] = useState(false);
+  // const [isProfileClicked, setIsProfileClicked] = useState(false);
   const [sessionTiemedOut, setSessionTiemedOut] = useState(false);
   const [savedAccNum, setSavedAccNum] = useState("");
   const [savedBeneficiaryName, setSavedBeneficiaryName] = useState("");
@@ -74,7 +78,9 @@ function Beneficiaries() {
         break;
       case "Log out":
         setSavedAcc([]);
+        setLogOut(true);
         navigate("/");
+
         break;
       default:
         console.log(`Unknown menu item: ${menuItem}`);
@@ -87,7 +93,6 @@ function Beneficiaries() {
         nav: [
           "Back",
           "Profile",
-
           "Rewards",
           "Contact",
           "Transactions",
@@ -97,18 +102,34 @@ function Beneficiaries() {
       };
     } else if (windowWidth > 768) {
       return {
-        nav: ["Profile", "Beneficiaries", "Menu"],
+        nav: [
+          "Back",
+          "Profile",
+          "Rewards",
+          "Contact",
+          "Transactions",
+          "Log out",
+        ],
         onClickHandler: handleMenuClick,
       };
     } else if (windowWidth > 640) {
       return {
-        nav: ["Profile", "Beneficiaries", "Menu"],
+        nav: ["Back", "Profile", "Menu"],
         onClickHandler: handleMenuClick,
       };
     }
   };
 
   const menuProps = getMenuProps();
+
+  const getSideBarProps = () => {
+    return {
+      nav: ["Back", "Profile", "Rewards", "Contact", "Transactions", "Log out"],
+      onClickHandler: handleMenuClick,
+    };
+  };
+
+  const sideBarProps = getSideBarProps();
 
   const profile = () => {
     setIsProfileClicked(true);
@@ -162,35 +183,6 @@ function Beneficiaries() {
     navigate("/transferPage");
   };
 
-  // const edit = (index) => {
-  //   setSavedAcc((prev) =>
-  //     prev.map((item, i) => {
-  //       if (i === index) {
-  //         setIsEdit(true);
-  //         return { ...item, editable: true };
-  //       } else {
-  //         setIsEdit(false);
-  //         return item;
-  //       }
-  //     })
-  //   );
-  // };
-
-  // const save = (index) => {
-  //   // setIsEdit(true);
-  //   setSavedAcc((prev) =>
-  //     prev.map((item, i) => {
-  //       if (i === index) {
-  //         setIsEdit(false);
-  //         return { ...item, editable: false };
-  //       } else {
-  //         setIsEdit(true);
-  //         return item;
-  //       }
-  //     })
-  //   );
-  // };
-
   const saveBeneficiary = () => {
     if (savedBeneficiaryName && savedAccNum && savedIfsc) {
       setNewValueAdded(true);
@@ -230,75 +222,9 @@ function Beneficiaries() {
     }
   };
 
-  // const deleteItem = async (index) => {
-  //   const updatedSavedAcc = [...savedAcc];
-  //   const deletedBeneficiary = updatedSavedAcc.splice(index, 1)[0];
-  //   console.log(deletedBeneficiary);
-
-  //   // Delete the item from the savedAccounts array based on accNum
-  //   const updatedSavedAccounts = savedAcc.filter(
-  //     (account) => account.accNum !== deletedBeneficiary.accNum
-  //   );
-
-  //   setSavedAcc(updatedSavedAccounts);
-
-  //   if (connectionMode === "socket") {
-  //     try {
-  //       socket.emit("deleteItem", {
-  //         accNum: deletedBeneficiary.accNum,
-  //         num: document.cookie,
-  //       });
-  //     } catch (error) {
-  //       console.error("Error emitting socket event:", error);
-  //     }
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (connectionMode === "socket") {
-  //       socket.emit("fetchList", {
-  //         num: document.cookie,
-  //       });
-
-  //       socket.on("allSavedAccounts", (data) => {
-  //         const savedDetail = {
-  //           beneficiaryName: data.beneficiaryName,
-  //           accNum: data.accNum,
-  //           ifsc: data.ifsc,
-  //           editable: data.editable,
-  //         };
-
-  //         const isAlreadyStored = savedAcc.some((detail) => {
-  //           return (
-  //             detail.beneficiaryName === savedDetail.beneficiaryName &&
-  //             detail.accNum === savedDetail.accNum &&
-  //             detail.ifsc === savedDetail.ifsc &&
-  //             detail.editable === savedDetail.editable
-  //           );
-  //         });
-
-  //         if (isAlreadyStored === false) {
-  //           setSavedAcc((prev) => [...prev, savedDetail]);
-  //           console.log(savedAcc);
-  //         }
-  //       });
-  //     }
-  //   };
-
-  //   fetchData();
-
-  //   return () => {
-  //     if (connectionMode !== "socket") {
-  //     } else {
-  //       socket.off();
-  //     }
-  //   };
-  // }, [connectionMode, socket]);
-
   useEffect(() => {
     if (connectionMode !== socket) {
-    } else {
+    } else if (!logOut) {
       socket.on("getSavedBeneficiary", (data) => {
         const savedDetail = {
           beneficiaryName: data.beneficiaryName,
@@ -310,6 +236,13 @@ function Beneficiaries() {
       });
     }
   }, []);
+
+  useEffect(() => {
+    return () => {
+      setSavedAcc([]);
+      setLogOut(false);
+    };
+  }, [logOut]);
 
   useEffect(() => {
     if (connectionMode !== "socket") {
@@ -354,79 +287,87 @@ function Beneficiaries() {
   }, [windowWidth]);
   return (
     <>
-      <div className={" h-screen w-screen fixed bg-gray-800 text-white"}>
-        {windowWidth > 1024 ? null : isProfileClicked ? (
-          <>
-            <div
-              className="w-1/2 z-10 sm:w-1/2 md:w-[33%] lg:w-1/4 bg-gray-800 backdrop-blur-xl h-screen font-sans fixed text-black"
-              // className={
-              // windowWidth < 780
-              // ? "w-1/2 h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
-              // : " sm:w-[33vw]  h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
-              // }
-            >
-              <div className=" pt-2 pb-8 border-box h-[85vh] font-sans">
-                <div className="flex justify-between items-center border-b-2 border-gray-600  text-white box-border pb-[.8rem] cursor-pointer ">
-                  <h1 className="ml-[2rem] text-xl font-bold ">Menu</h1>
-                  <p className=" mr-[1rem]  " onClick={closeProfile}>
-                    <RiMenuFoldFill />
-                  </p>
-                </div>
-                <div className="space-y-2 flex text-white w-[80%] justify-center pl-6 flex-col items-left  pt-5 border-box text-lg    cursor-pointer ">
-                  <h1
-                    className="hover:font-bold hover:border-2   rounded px-4 box-border rounded- px-4 box-border py-1"
-                    onClick={navigateToProfile}
-                  >
-                    Profile
-                  </h1>
-                  <h1 className="hover:font-bold  hover:border-2   rounded px-4 box-border hover:border-b-2  py-1">
-                    Rewards
-                  </h1>
-                  <h1 className="hover:font-bold  hover:border-2   rounded px-4 box-border hover:border-b-2 py-1">
-                    Contact us
-                  </h1>
-                  <h1 className="hover:font-bold  hover:border-2   rounded px-4 box-border hover:border-b-2 py-1">
-                    Transactions
-                  </h1>
-
-                  <h1
-                    className="hover:font-bold hover:border-2   rounded px-4 box-border  px-4 box-border py-1"
-                    onClick={logout}
-                  >
-                    Log out
-                  </h1>
-                </div>
-              </div>
-            </div>
-          </>
-        ) : null}
-        <div className="h-[10vh] items-center  border-white  flex box-border  bg-gray-800 sticky top-0">
+      {isProfileClicked ? (
+        <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
+      ) : null}
+      <div
+        className={
+          " h-auto md:h-screen w-screen pb-[2rem] md:fixed  bg-gray-800 text-white"
+        }
+      >
+        <div className="h-[10vh]  items-center  border-white  flex box-border z-[5] bg-gray-800 sticky top-0">
           <Menu {...menuProps} onClickHandler={handleMenuClick} />
         </div>
 
-        <div
-          className={
-            // savedAcc.length < 11
-            " h-screen  w-screen border-b-0 border-white flex pl-[8rem] box-border"
-            // : "border-2 h-auto  w-screen border-b-0 border-white "
-          }
-        >
-          <div className=" h-[80vh] w-[40%] pt-[2rem] text-gray-800 rounded-md bg-white mt-[2rem] pb-[2rem] box-border overflow-x-auto space-y-4">
+        <div className="h-auto md:h-screen  w-screen border-b-0 border-white block md:flex  md:pl-[2rem] md:pl-[8rem] box-border">
+          {windowWidth > 768 ? null : (
+            <div className="w-3/4 m-auto  h-full pt-[4vh] md:pt-[15vh]  pb-[2rem] box-border">
+              <button className="bg-gray-800 w-1/2  ml-[19vw] mt-[1vh]  border-2 relative border-white rounded-xl  py-2 box-border outline-0 border-0 text-white">
+                Add Beneficiary
+              </button>
+              <form
+                action=""
+                className="w-auto md:w-[60%] h-auto pb-[10vh]  pt-[8vh] border-2 bg-white shadow-lg shadow-ash-800  mt-[-1.4rem] text-gray-600 rounded-lg border-white  box-border"
+              >
+                <div className="w-[80%] m-auto  ">
+                  <input
+                    type="text"
+                    className="block  w-full px-4 py-2 mt-[1.2rem]   border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white  border-2 "
+                    placeholder="Enter Beneficiary Name"
+                    value={savedBeneficiaryName}
+                    onChange={handleSavedBenificiaryName}
+                    required
+                  />
+                  <input
+                    type="tel"
+                    className="block w-full px-4 py-2 mt-[1.2rem]  border-gray-300 focus:border-gray-800 outline-none rounded-lg  border-2 "
+                    placeholder="Enter Account Number"
+                    value={savedAccNum}
+                    onChange={handleSavedAccNum}
+                    required
+                    minLength={16}
+                  />
+                  <input
+                    type="tel"
+                    className="block w-full px-4 py-2 mt-[1.2rem]   border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white border-2 "
+                    placeholder="Enter IFSC Code"
+                    value={savedIfsc}
+                    onChange={handleSavedIfsc}
+                    required
+                  />
+                  {allInputsAlert ? (
+                    <p className="text-sm text-gray-800 pointer-events-none p-2 box-border">
+                      fill all the inputs
+                    </p>
+                  ) : null}
+                  <input
+                    type="button"
+                    value="Save"
+                    onClick={handleSaveButtonClick}
+                    className="w-full py-2  bg-gray-800 mt-[2rem] hover:cursor-pointer text-white rounded-lg"
+                  />
+                </div>
+              </form>
+            </div>
+          )}
+          <div className="m-auto h-[80vh] w-[90vw] md:w-[80%] lg:w-[60%] xl:w-[50%] pt-[.4rem] sm:pt-[1rem] text-gray-800 rounded-md bg-white mt-[2rem] pb-[2rem] box-border overflow-x-auto space-y-2 lg:space-y-4">
             {savedAcc.map((item, index) => (
               <div
                 key={index}
-                className="h-auto w-[80%] flex justify-evenly space-x-4 border-b-2 shadow-sm shadow-white items-center p-4 w-1/2 m-auto  rounded-md"
+                className="h-auto w-[80%] lg:w-[90%] xl:w-[80%] flex justify-evenly space-x-0 md:space-x-10 border-b-2 shadow-sm shadow-white items-center p-0 box-border sm:p-4   w-1/2 m-auto  rounded-md"
               >
-                <div className="space-x-4 w-full  font-light flex">
+                <div className="space-x-10 md:space-x-2 lg:space-x-10 w-full  font-light flex ">
                   <div>
-                    <h1>Name</h1>
-                    <h1>Account Number</h1>
-                    <h1>IFSC</h1>
+                    <h1 className="font-bold md:text-sm xl:text-lg">Name</h1>
+                    <h1 className="font-bold md:text-sm xl:text-lg">Account</h1>
+                    <h1 className="font-bold md:text-sm xl:text-lg">IFSC</h1>
                   </div>
-                  <div className="w-1/2 capitalize">
-                    <h1 className="font-bold">{item.beneficiaryName}</h1>
-                    <h1 className="">{item.accNum}</h1>
-                    <h1> {item.ifsc}</h1>
+                  <div className="w-1/2 capitalize ">
+                    <h1 className="md:text-sm xl:text-lg">
+                      {item.beneficiaryName}
+                    </h1>
+                    <h1 className="md:text-sm xl:text-lg">{item.accNum}</h1>
+                    <h1 className="md:text-sm xl:text-lg"> {item.ifsc}</h1>
                   </div>
                 </div>
                 <div>
@@ -439,129 +380,57 @@ function Beneficiaries() {
                 </div>
               </div>
             ))}
-
-            {/* {savedAcc.map((item, index) => {
-          <div className="h-auto w-1/2 border-2 border-white rounded-md"></div>;
-        })} */}
           </div>
-          <div className="w-1/2  h-full pt-[15vh] ml-[6rem] box-border">
-            <button className="bg-gray-800 ml-[17.5vw] border-2 fixed border-white rounded-xl px-4 py-2 box-border outline-0 border-0 text-white">
-              Add Beneficiary
-            </button>
-            <form
-              action=""
-              className="w-[60%] h-auto pb-[10vh] pt-[8vh] border-2 bg-white shadow-lg shadow-ash-800  m-auto mt-[1rem] text-gray-600 rounded-lg border-white  box-border"
-            >
-              <div className="w-[80%] m-auto  ">
-                <input
-                  type="text"
-                  className="block  w-full px-4 py-2 mt-[1.2rem]   border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white  border-2 "
-                  placeholder="Enter Beneficiary Name"
-                  value={savedBeneficiaryName}
-                  onChange={handleSavedBenificiaryName}
-                  required
-                />
-                <input
-                  type="tel"
-                  className="block w-full px-4 py-2 mt-[1.2rem]  border-gray-300 focus:border-gray-800 outline-none rounded-lg  border-2 "
-                  placeholder="Enter Account Number"
-                  value={savedAccNum}
-                  onChange={handleSavedAccNum}
-                  required
-                  minLength={16}
-                />
-                <input
-                  type="tel"
-                  className="block w-full px-4 py-2 mt-[1.2rem]   border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white border-2 "
-                  placeholder="Enter IFSC Code"
-                  value={savedIfsc}
-                  onChange={handleSavedIfsc}
-                  required
-                />
-                {allInputsAlert ? (
-                  <p className="text-sm text-gray-800 pointer-events-none p-2 box-border">
-                    fill all the inputs
-                  </p>
-                ) : null}
-                <input
-                  type="button"
-                  value="Save"
-                  onClick={handleSaveButtonClick}
-                  className="w-full py-2  bg-gray-800 mt-[2rem] hover:cursor-pointer text-white rounded-lg"
-                />
-              </div>
-            </form>
-          </div>
-
-          {/* <div className="">
-            <li className="flex  pl-[2rem]  border-b-2 pb-[1rem] items-center border-white pt-[1rem]  space-x-2 box-border ">
-              <h1 className="w-[24.3%] font-bold">Name</h1>
-              <h1 className="w-[24.3%] font-bold">Account Number</h1>
-              <h1 className="w-[24.3%] font-bold">IFSC Code</h1>
-            </li>
-            <ul className="  ">
-              {savedAcc.map((item, index) => (
-                <li
-                  
-                  className="flex space-x-2 border-b-2 overflow-auto pl-[2rem] h-[8vh] border-white  box-border items-center "
-                >
-                  <h1
-                    className="w-[30%] capitalize contentEditable:bg-magenta-300 caret:text-white focus:outline-none rounded-lg"
-                    contentEditable={item.editable}
-                  >
-                    {item.beneficiaryName}
-                  </h1>
-                  <h1
-                    className="w-[30%]   contentEditable:bg-magenta-300  focus:outline-none rounded-lg"
-                    contentEditable={item.editable}
-                  >
-                    {item.accNum}
-                  </h1>
-                  <h1
-                    className="w-[30%]  uppercase contentEditable:bg-magenta-300  focus:outline-none rounded-lg"
-                    contentEditable={item.editable}
-                  >
-                    {item.ifsc}
-                  </h1>
-
-                  <div className="w-[30%] items-center flex space-x-3">
-                    <button
-                      className=" px-4 py-2 w-1/2  border border-gray-300 rounded-md focus:outline-none rounded-lg focus:border-blue-500 bg-green-600 text-white hover:bg-green-700 hover:cursor-pointer"
-                      onClick={() => sendMoney(index)}
-                    >
-                      Send
-                    </button>
-                    {/* {isEdit ? (
-                      <CiBookmarkCheck
-                        
-                        className="text-2xl cursor-pointer hover:text-green-600 "
-                        onClick={() => save(index)}
-                      />
-                    ) : (
-                      <MdEdit
-                        
-                        className=" text-2xl hover:text-white cursor-pointer"
-                        onClick={() => edit(index)}
-                      />
-                    )} */}
-          {/* {isEdit ? (
-                      <IoIosCheckboxOutline onClick={save} />
-                    ) : (
-                      <MdEdit
-                        className=" text-2xl "
-                        onClick={() => edit(index)}
-                      />
-                    )} */}
-          {/* <MdDeleteOutline
-                      
-                      onClick={() => deleteItem(index)}
-                      className="w-1/2 text-2xl text-gray-800"
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div> */}
+          {windowWidth > 768 ? (
+            <div className="w-1/2  h-full pt-[15vh] ml-[2rem] lg:w-[60%] lg:ml-[6rem] mr-[2rem]   pb-[2rem] box-border">
+              <button className="bg-gray-800 md:w-[60%] lg:w-auto md:ml-[6vw]  lg:ml-[11vw] xl:ml-[17vw]  border-2 md:relative lg:fixed border-white rounded-xl px-4 py-2 box-border outline-0 border-0 text-white">
+                Add Beneficiary
+              </button>
+              <form
+                action=""
+                className="w-auto md:w-[100%] lg:w-[80%] xl:w-[60%] h-auto pb-[10vh]  pt-[6vh] border-2 bg-white shadow-lg shadow-ash-800  m-auto md:mt-[-1.4rem] lg:mt-[1rem] text-gray-600 rounded-lg border-white  box-border"
+              >
+                <div className="w-[80%] m-auto  ">
+                  <input
+                    type="text"
+                    className="block  w-full px-4 py-2 mt-[1.2rem]   border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white  border-2 "
+                    placeholder="Enter Beneficiary Name"
+                    value={savedBeneficiaryName}
+                    onChange={handleSavedBenificiaryName}
+                    required
+                  />
+                  <input
+                    type="tel"
+                    className="block w-full px-4 py-2 mt-[1.2rem]  border-gray-300 focus:border-gray-800 outline-none rounded-lg  border-2 "
+                    placeholder="Enter Account Number"
+                    value={savedAccNum}
+                    onChange={handleSavedAccNum}
+                    required
+                    minLength={16}
+                  />
+                  <input
+                    type="tel"
+                    className="block w-full px-4 py-2 mt-[1.2rem]   border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white border-2 "
+                    placeholder="Enter IFSC Code"
+                    value={savedIfsc}
+                    onChange={handleSavedIfsc}
+                    required
+                  />
+                  {allInputsAlert ? (
+                    <p className="text-sm text-red-600 pointer-events-none p-2 box-border">
+                      fill all the inputs
+                    </p>
+                  ) : null}
+                  <input
+                    type="button"
+                    value="Save"
+                    onClick={handleSaveButtonClick}
+                    className="w-full py-2  bg-gray-800 mt-[2rem] hover:cursor-pointer text-white rounded-lg"
+                  />
+                </div>
+              </form>
+            </div>
+          ) : null}
         </div>
       </div>
     </>

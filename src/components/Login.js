@@ -143,7 +143,7 @@ function Login() {
   }, [windowWidth]);
   return (
     <>
-      <h1 className="text-center text-[6vw] sm:text-[3vh] md:text-4xl font-bold font-sans sm:mt-[14%] cursor-default ">
+      <h1 className="text-center text-[6vw] sm:text-[4vh] md:text-4xl font-bold font-sans mt-[3vh] sm:mt-[10%] md:mt-[14%] cursor-default ">
         Welcome Back
       </h1>
       <form
@@ -153,7 +153,7 @@ function Login() {
             : "flex flex-col items-center bg-white m-auto rounded-2xl h-auto w-full  mt-[3rem]"
         }
       >
-        <div className="flex flex-col w-3/5">
+        <div className="flex flex-col w-[70%]">
           <label htmlFor="" className="font-medium font-sans">
             Mobile Number
           </label>
@@ -162,8 +162,8 @@ function Login() {
               mobileNumber.length < 10
                 ? "outline-0 h-10  w-full border-2 border-red-500  rounded-lg mb-3 p-[1rem]  font-sans  border-box  "
                 : loginFailed
-                ? "outline-0 h-10  w-full border-2 border-red-500  rounded-lg mb-3 p-[1rem] font-sans  border-box  "
-                : "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg mb-3 p-[1rem] font-sans  border-box "
+                ? "outline-0 h-10  w-full border-2 border-red-500  rounded-lg mb-3   p-[1rem] font-sans  border-box  "
+                : "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg mb-3   p-[1rem] font-sans  border-box "
             }
             type="tel"
             maxLength={10}
@@ -172,7 +172,7 @@ function Login() {
             placeholder="Enter Mobile Number"
           />
         </div>
-        <div className="flex flex-col w-3/5 ">
+        <div className="flex flex-col w-[70%] ">
           <label
             htmlFor=""
             className="block leading-6 text-left font-medium font-sans "
@@ -182,8 +182,8 @@ function Login() {
           <input
             className={
               loginFailed
-                ? "outline-0 h-10 w-full rounded-lg mb-5 p-[.4rem] sm:p-[1rem] border-2 border-red-500 font-sans border-box  "
-                : "outline-0 h-10 w-full rounded-lg mb-5 p-[.4rem] sm:p-[1rem] border-2 border-slate-300 font-sans border-box "
+                ? "outline-0 h-10 w-full rounded-lg mb-5 p-[1rem] sm:p-[1rem] border-2 border-red-500 font-sans border-box  "
+                : "outline-0 h-10 w-full rounded-lg mb-5 p-[1rem] sm:p-[1rem] border-2 border-slate-300 font-sans border-box "
             }
             type={showPassword ? "text" : "password"}
             minLength={6}
@@ -196,8 +196,8 @@ function Login() {
             <FaRegEye
               className={
                 windowWidth < 640
-                  ? "relative ml-[40vw] bottom-[3rem]"
-                  : "relative  sm:ml-[20vw] md:ml-[21vw] lg:ml-[14vw] xl:ml-[16vw] bottom-[3rem] text-zinc-400"
+                  ? "relative ml-[40vw] bottom-[3rem] text-zinc-400"
+                  : "relative  sm:ml-[35vw] md:ml-[30vw] lg:ml-[20vw] xl:ml-[20vw] bottom-[3rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
@@ -205,8 +205,8 @@ function Login() {
             <FaRegEyeSlash
               className={
                 windowWidth < 640
-                  ? "relative ml-[40vw] bottom-[3rem]"
-                  : "relative  sm:ml-[18vw]  md:ml-[21vw] lg:ml-[14vw] xl:ml-[16vw] bottom-[3rem] text-zinc-400"
+                  ? "relative ml-[40vw] bottom-[3rem] text-zinc-400"
+                  : "relative  sm:ml-[35vw]  md:ml-[30vw] lg:ml-[20vw] xl:ml-[20vw] bottom-[3rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
@@ -214,12 +214,12 @@ function Login() {
         </div>
 
         {loginInputAlert ? (
-          <p className="w-3/5 text-red-500 text-xs cursor-default">
+          <p className="w-[70%] text-red-500 text-xs cursor-default">
             *Fill all the inputs
           </p>
         ) : null}
         {loginFailed ? (
-          <div className="w-3/5 mb-2">
+          <div className="w-[70%] mb-2">
             {" "}
             <p className="text-xs  text-red-500">*wrong mobile/password</p>
           </div>
@@ -245,7 +245,7 @@ function Login() {
           Log in
         </button>
 
-        <p className="text-xs mt-[2rem] text-gray-800 sm:mt-[5rem] md:mt-[3rem] underline cursor-pointer ">
+        <p className="text-xs mt-[2rem] text-gray-800 sm:mt-[3rem] md:mt-[3rem] underline cursor-pointer ">
           Forgot Password?
         </p>
         <p className="font-light text-xs text-gray-800 mt-[.5rem] mb-[2rem]">

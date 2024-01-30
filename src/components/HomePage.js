@@ -8,7 +8,7 @@ import Profile from "./Profile";
 import { useNavigate } from "react-router";
 
 function HomePage() {
-  const { registeredUsers, windowWidth, setWindowWidth, isLogin, setIsLogin } =
+  const { registeredUsers, windowWidth, setWindowWidth, isLogin, setSavedAcc } =
     useContext(store);
 
   const navigate = useNavigate();
@@ -36,8 +36,8 @@ function HomePage() {
   };
 
   useEffect(() => {
-    console.log(registeredUsers);
-  }, [registeredUsers]);
+    setSavedAcc([]);
+  }, []);
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -58,51 +58,18 @@ function HomePage() {
         {/* <Menu nav={["Register"]} /> */}
       </div>
       {isLogin ? (
-        <div className=" w-[70%] sm:w-[33vw]  mx-auto   shadow-md shadow-gray-300 h-auto rounded-2xl  mt-[10vh] ">
-          <div className="w-full border-2 border-white bg-white text-gray-800 rounded-2xl ">
+        <div className=" w-[70%] sm:w-[60%] md:w-[50%] lg:w-[33%]  mx-auto   shadow-md shadow-black h-auto rounded-xl  mt-[7vh] ">
+          <div className="w-full border-2 border-white bg-white text-gray-800 rounded-xl ">
             <Login />
           </div>
         </div>
       ) : (
-        <div className="mx-auto w-[70%] sm:w-[33%]  text-gray-800  bg-white  box-border mt-[8vh] rounded-2xl h-auto">
+        <div className="mx-auto w-[70%] sm:w-[60%] md:w-[50%] lg:w-[33%]  text-gray-800  bg-white  box-border mt-[5vh] lg:mt-[7vh] rounded-2xl h-auto">
           <div className="w-full border-2 bg-white text-gray-800 rounded-2xl shadow-md shadow-black">
             <SignUp />
           </div>
         </div>
       )}
-
-      {/* <div className="h-screen w-7/5  block sm:flex p-10 sm:p-4  border-box">
-        <div
-          className={
-            windowWidth < 640
-              ? "w-auto  h-auto bg-white  rounded-xl m-auto pt-[3rem] border-box "
-              : isLogin
-              ? " sm:w-1/2 lg:w-1/2 h-[80vh] bg-white lg:h-[80vh] rounded-l-xl ml-[4rem] "
-              : " sm:w-1/2  lg:w-3/5 h-[80vh] lg:h-[80vh]  bg-gradient-to-b from-green-300 to-green-100 rounded-l-xl ml-[4rem] pt-[4rem] border-box"
-          }
-        >
-          {isLogin ? (
-            <>
-              <Login />
-            </>
-          ) : (
-            <>
-              {windowWidth < 640 ? (
-                <>
-                  <SignUpMobile />
-                </>
-              ) : (
-                <img
-                  className=" transform -scale-x-100 h-full w-full lg:h-auto lg:w-auto"
-                  src="https://cdni.iconscout.com/illustration/premium/thumb/empty-state-concept-3428212-2902554.png"
-                  alt="Waiting"
-                />
-              )}
-            </>
-          )}
-        </div>
-        {windowWidth < 640 ? null : <SignUp />}
-      </div> */}
     </div>
   );
 }

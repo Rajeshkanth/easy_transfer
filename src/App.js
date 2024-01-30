@@ -18,7 +18,7 @@ export const store = createContext();
 
 function App() {
   const [amount, setAmount] = useState("");
-
+  const [logOut, setLogOut] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
   const [password, setPassword] = useState("");
   const [regMobileNumber, setRegMobileNumber] = useState("");
@@ -250,6 +250,8 @@ function App() {
         setSendByBeneficiaries,
         savedAcc,
         setSavedAcc,
+        logOut,
+        setLogOut,
       }}
     >
       <Router>

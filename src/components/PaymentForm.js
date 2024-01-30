@@ -8,9 +8,13 @@ import { IoWarningOutline } from "react-icons/io5";
 import { AiOutlineMenuUnfold } from "react-icons/ai";
 import { RiMenuFoldFill } from "react-icons/ri";
 import Menu from "./Menu";
+import SideBar from "./SideBar";
 
 function PaymentForm() {
   const {
+    setAgeFromDb,
+    setAccFromDb,
+    setDobFromDb,
     userNameFromDb,
     setUserNameFromDb,
     amount,
@@ -63,6 +67,7 @@ function PaymentForm() {
         setIsProfileClicked(true);
         break;
       case "Log out":
+        setSavedAcc([]);
         logout();
         break;
       default:
@@ -184,7 +189,14 @@ function PaymentForm() {
       };
     } else if (windowWidth > 768) {
       return {
-        nav: ["Profile", "Beneficiaries", "Menu"],
+        nav: [
+          "Profile",
+          "Beneficiaries",
+          "Rewards",
+          "Contact",
+          "Transactions",
+          "Log out",
+        ],
         onClickHandler: handleMenuClick,
       };
     } else if (windowWidth > 640) {
@@ -196,6 +208,27 @@ function PaymentForm() {
   };
 
   const menuProps = getMenuProps();
+
+  const getSideBarProps = () => {
+    if (windowWidth > 640) {
+      return {
+        nav: ["Rewards", "Contact", "Transactions", "Log out"],
+      };
+    } else {
+      return {
+        nav: [
+          "Profile",
+          "Beneficiaries",
+          "Rewards",
+          "Contact",
+          "Transactions",
+          "Log out",
+        ],
+      };
+    }
+  };
+
+  const sideBarProps = getSideBarProps();
 
   const cancelTransfer = () => {
     setSendByBeneficiaries(false);
@@ -234,6 +267,45 @@ function PaymentForm() {
   }, [userNameFromDb, connectionMode, socket]);
 
   useEffect(() => {
+    if (connectionMode !== "socket") {
+      axios
+        .post("https://polling-server.onrender.com/checkUserName", {
+          regNumber: document.cookie,
+        })
+        .then((response) => {
+          if (response.status === 200) {
+            setUserNameFromDb(response.data.user);
+            setAgeFromDb(response.data.age);
+            setAgeFromDb(response.data.age);
+            setDobFromDb(response.data.dob);
+            setAccFromDb(response.data.accNum);
+          } else {
+            setUserNameFromDb("");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      socket.emit("checkUserName", {
+        regNumber: document.cookie,
+      });
+      socket.on("userNameAvailable", (data) => {
+        setUserNameFromDb(data.user);
+        setAgeFromDb(data.age);
+        setDobFromDb(data.dob);
+        setAccFromDb(data.accNum);
+        // setCard(data.card);
+        // setCvv()
+      });
+      socket.on("userNotFound", () => {
+        setUserNameFromDb("");
+        setAgeFromDb("");
+      });
+    }
+  }, [socket, connectionMode, setUserNameFromDb]);
+
+  useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
@@ -262,10 +334,9 @@ function PaymentForm() {
                 send & receive money in minutes without paying extra charges.
               </p>
             </div>
-            <form className=" sm:w-5/12  sm:h-[90%] md:w-2/5  lg:w-1/3 relative  px-10 py-10 box-border h-5/6 z-20 bg-white border-2 border-cyan-200   rounded-md  mt-[2rem]   flex flex-col justify-center ">
-              {/* <h1>Enter recepient details</h1> */}
-              <div className=" bg-white h-1/6 text-slate-500 m-auto mt-1  mb-6 w-full text-center flex justify-center  rounded-md rounded-b-none  ">
-                <h1 className=" my-auto  text-4xl font-extrabold text-gray-800 text-[34px]">
+            <form className="w-[60%] sm:w-5/12  h-[80vh] sm:h-[90%] md:w-2/5  lg:w-1/3 relative pt-0  px-10 py-10  box-border  z-20 bg-white border-2 border-cyan-200  space-y-2 sm:space-y-0 rounded-md  mt-[2rem]   flex flex-col justify-center ">
+              <div className=" h-auto sm:h-1/6  mb-2 text-gray-800   w-full text-center flex justify-center  rounded-md rounded-b-none  ">
+                <h1 className="  mt-2 sm:mt-4 md:mt-6 lg:mt-8 sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-extrabold text-gray-800 text-[23px]">
                   Money Transfer
                 </h1>
               </div>
@@ -276,7 +347,7 @@ function PaymentForm() {
                 <input
                   type="text"
                   id="receiver-name"
-                  className="block w-[95%] sm-w-11/12 mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-gray-300  rounded-md focus:outline-none focus:border-gray-800"
+                  className="block w-[95%] sm-w-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-gray-300  rounded-md focus:outline-none focus:border-gray-800"
                   name="receiver-account-holder"
                   placeholder="Account Holder's Name"
                   value={toAccountHolderName}
@@ -292,7 +363,7 @@ function PaymentForm() {
                   Account Number
                 </label>
                 <input
-                  className="block  w-[95%] sm:11/2 mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  className="block  w-[95%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
                   type="tel"
                   id="rec-account-number"
                   name="rec-account-number"
@@ -310,7 +381,7 @@ function PaymentForm() {
                   IFSC code
                 </label>
                 <input
-                  className="block  w-[95%] sm:11/12 mb-[1rem] md:w-4/5 text-gray-800  lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  className="block  w-[95%] sm:11/12 sm:mb-[1rem] md:w-4/5 text-gray-800  lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
                   type="text"
                   id="rec-ifsc-number"
                   name="rec-ifsc-number"
@@ -332,14 +403,14 @@ function PaymentForm() {
                   type="tel"
                   name="amount"
                   id="amount"
-                  className=" block  w-[95%] sm:10/12 mb-[1rem] md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-8  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  className=" block  w-[95%] sm:10/12 sm:mb-[2rem]  md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-4  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
                   value={amount}
                   onChange={(e) => handleAmountToSend(e)}
                   placeholder="Amount"
                 />
 
                 {allInput ? (
-                  <p className="text-left text-sm text-gray-800 mb-2">
+                  <p className="text-left text-sm text-red-600 mb-[1rem]">
                     *fill all input values
                   </p>
                 ) : null}
@@ -360,7 +431,7 @@ function PaymentForm() {
                   type="button"
                   value="CANCEL"
                   onClick={cancelTransfer}
-                  className="block w-1/2  px-4 py-2 m-auto mb-3 border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                  className="block w-1/2  px-4 py-2 m-auto mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                 />
               ) : null}
             </form>
@@ -368,68 +439,9 @@ function PaymentForm() {
         </div>
       </div>
 
-      {windowWidth > 1024 ? null : isProfileClicked ? (
+      {windowWidth > 768 ? null : isProfileClicked ? (
         <>
-          <div
-            className="w-1/2 sm:w-1/2 md:w-[33%] lg:w-1/4 bg-gray-800 backdrop-blur-xl h-screen font-sans fixed text-black"
-            // className={
-            // windowWidth < 780
-            // ? "w-1/2 h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
-            // : " sm:w-[33vw]  h-screen border-box  bg-blue-500  border rounded-2xl rounded-l-none fixed "
-            // }
-          >
-            <div className=" pt-2 pb-8 border-box h-[85vh] font-sans">
-              <div className="flex justify-between items-center border-b-2 border-gray-600  text-white box-border pb-[.8rem] cursor-pointer ">
-                <h1 className="ml-[2rem] text-xl font-bold ">Menu</h1>
-                <p className=" mr-[1rem]  " onClick={closeProfile}>
-                  <RiMenuFoldFill />
-                </p>
-              </div>
-              <div className="space-y-2 flex text-white w-[80%] justify-center pl-6 flex-col items-left  pt-5 border-box text-lg    cursor-pointer ">
-                <h1
-                  className="hover:font-bold hover:border-2   rounded px-4 box-border rounded- px-4 box-border py-1"
-                  onClick={navigateToProfile}
-                >
-                  Profile
-                </h1>
-                <h1 className="hover:font-bold  hover:border-2   rounded px-4 box-border hover:border-b-2  py-1">
-                  Rewards
-                </h1>
-                <h1 className="hover:font-bold  hover:border-2   rounded px-4 box-border hover:border-b-2 py-1">
-                  Contact us
-                </h1>
-                <h1 className="hover:font-bold  hover:border-2   rounded px-4 box-border hover:border-b-2 py-1">
-                  Transactions
-                </h1>
-                <h1
-                  className="hover:font-bold hover:border-2   rounded px-4 box-border  px-4 box-border py-1"
-                  onClick={savedAccounts}
-                >
-                  Beneficiaries
-                </h1>
-                <h1
-                  className="hover:font-bold hover:border-2   rounded px-4 box-border  px-4 box-border py-1"
-                  onClick={logout}
-                >
-                  Log out
-                </h1>
-              </div>
-            </div>
-
-            {/* <div className=" h-[8vh] sm:h-[15vh] flex items-center">
-              <button
-                className={
-                  "block w-1/2  px-4 py-2 m-auto ml-[10vw] mb-5 border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-white text-black hover:bg-gray-600 hover:cursor-pointer"
-                  // windowWidth < 780
-                  //   ? "bg-green-500  rounded-full p-2 pl-8 pr-8 border-box text-black z-[10] left-[19vw] sm:left-[25vw] mt-[1vh]   font-light fixed  sm:w-1/8 hover:bg-blue-500 hover:border"
-                  //   : "bg-green-500  rounded-full p-2 pl-8 pr-8 text-black z-[10]  left-[18vw] mt-[0vh] font-light fixed  w-1/8 hover:bg-blue-500 hover:border"
-                }
-                onClick={logout}
-              >
-                Log out
-              </button>
-            </div> */}
-          </div>
+          <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
         </>
       ) : null}
     </>
