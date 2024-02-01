@@ -4,6 +4,7 @@ import { store } from "../App";
 
 import { MdOutlineCancel } from "react-icons/md";
 import { useNavigate } from "react-router";
+import Loader from "./Loader";
 
 function Success() {
   const { socket, connectionMode } = useContext(store);
@@ -101,7 +102,6 @@ function Success() {
               <MdOutlineCancel className="fail-icon" />{" "}
             </div>
             <h3 className="text-white">Payment Transaction Failed!</h3>
-
             <p className="text-white">Redirecting to the home page....</p>
           </div>
         </>
@@ -136,19 +136,7 @@ function Success() {
               <br />
             </div>
           ) : (
-            <div className="loading font-poppins">
-              <div className="loader"></div>
-              <p>
-                <strong className="text-white">
-                  waiting for the transaction confirmation
-                </strong>{" "}
-              </p>
-              {/* <p>
-                <strong>Reminder: </strong>Payments need confirmation within 2
-                seconds. Unconfirmed transactions will be canceled
-                automatically.{" "}
-              </p> */}
-            </div>
+            <Loader msg={"waiting for the transaction confirmation"} />
           )}
         </>
       )}

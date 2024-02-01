@@ -2,13 +2,10 @@ import React, { memo, useContext, useEffect } from "react";
 import { store } from "../App";
 import SignUp from "./SignUp";
 import Login from "./Login";
-import SignUpMobile from "./SignUpMobile";
-import Menu from "./Menu";
-import Profile from "./Profile";
 import { useNavigate } from "react-router";
 
 function HomePage() {
-  const { registeredUsers, windowWidth, setWindowWidth, isLogin, setSavedAcc } =
+  const { loader, windowWidth, setWindowWidth, isLogin, setSavedAcc } =
     useContext(store);
 
   const navigate = useNavigate();
@@ -52,16 +49,27 @@ function HomePage() {
   return (
     <div className="h-screen fixed w-screen bg-gray-800 text-white font-sans">
       <div className="h-[10%] w-screen  flex items-center pl-[4rem] box-border">
-        <h1 className="font-extrabold text-4xl w-auto font-extrabold ">
+        {/* <h1 className="font-extrabold text-4xl w-auto font-extrabold ">
           Easy Transfer
-        </h1>
+        </h1> */}
         {/* <Menu nav={["Register"]} /> */}
       </div>
       {isLogin ? (
         <div className=" w-[70%] sm:w-[60%] md:w-[50%] lg:w-[33%]  mx-auto   shadow-md shadow-black h-auto rounded-xl  mt-[7vh] ">
-          <div className="w-full border-2 border-white bg-white text-gray-800 rounded-xl ">
-            <Login />
-          </div>
+          {loader ? (
+            <div className="fixed bg-transparent h-screen w-screen top-[0vh] left-[0vw] ">
+              <div className="h-screen w-screen flex flex-col justify-center items-center">
+                <div className="loader "></div>
+                <p>
+                  <strong className="text-white"></strong>{" "}
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full border-2 border-white bg-white space-y-8 text-gray-800 rounded-xl ">
+              <Login />
+            </div>
+          )}
         </div>
       ) : (
         <div className="mx-auto w-[70%] sm:w-[60%] md:w-[50%] lg:w-[33%]  text-gray-800  bg-white  box-border mt-[5vh] lg:mt-[7vh] rounded-2xl h-auto">

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { store } from "../App";
 import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
+import Loader from "./Loader";
 
 function Login() {
   const navigate = useNavigate();
@@ -27,6 +28,8 @@ function Login() {
     connectionMode,
     socket,
     setIsLogin,
+    setLoader,
+    loader,
   } = useContext(store);
 
   const handleMobileNumber = (e) => {
@@ -103,11 +106,13 @@ function Login() {
   const loginToDashboardUsingSocket = async (e) => {
     e.preventDefault();
     if (mobileNumber && password && mobileNumber.length > 8) {
+      setLoader(true);
       await socket.emit("login", {
         Mobile: mobileNumber,
         Password: password,
       });
       socket.on("loginSuccess", () => {
+        setLoader(false);
         navigate("/transferPage");
         document.cookie = mobileNumber;
         setMobileNumber("");
@@ -118,13 +123,15 @@ function Login() {
       });
       socket.on("newUser", () => {
         setNewUser(true);
+        setLoader(false);
       });
       socket.on("loginFailed", () => {
         setLoginFailed(true);
+        setLoader(false);
       });
     } else {
       setLoginInputAlert(true);
-      // alert("Enter Valid Number");
+      setLoader(false);
     }
   };
 
@@ -143,27 +150,33 @@ function Login() {
   }, [windowWidth]);
   return (
     <>
-      <h1 className="text-center text-[6vw] sm:text-[4vh] md:text-4xl font-bold font-sans mt-[3vh] sm:mt-[10%] md:mt-[14%] cursor-default ">
-        Welcome Back
-      </h1>
+      <div className="items-center justify-center pt-[2rem] text-gray-600 flex space-y-6 flex-col">
+        <h1 className="font-extrabold text-4xl text-center text-gray-700 items-center font-poppins">
+          Easy Transfer
+        </h1>
+        <h1 className="text-center m-0 text-[6vw] sm:text-[2vh] md:text-2xl font-bold font-poppins    cursor-default ">
+          Welcome Back
+        </h1>
+      </div>
+
       <form
         className={
           windowWidth < 640
-            ? "flex flex-col items-center bg-white m-auto h-auto w-full rounded-2xl  mt-[3rem] "
-            : "flex flex-col items-center bg-white m-auto rounded-2xl h-auto w-full  mt-[3rem]"
+            ? "flex flex-col items-center bg-white m-auto h-auto w-full rounded-2xl space-y-2 font-poppins "
+            : "flex flex-col items-center bg-white m-auto rounded-2xl h-auto w-full space-y-2 font-poppins "
         }
       >
-        <div className="flex flex-col w-[70%]">
-          <label htmlFor="" className="font-medium font-sans">
+        <div className="flex flex-col space-y-1 w-[80%]">
+          <label htmlFor="" className="text-[14px]  ">
             Mobile Number
           </label>
           <input
             className={
               mobileNumber.length < 10
-                ? "outline-0 h-10  w-full border-2 border-red-500  rounded-lg mb-3 p-[1rem]  font-sans  border-box  "
+                ? "outline-0 h-10  w-full border-2 border-red-300  text-[16px] rounded-lg  p-[1rem]    border-box  "
                 : loginFailed
-                ? "outline-0 h-10  w-full border-2 border-red-500  rounded-lg mb-3   p-[1rem] font-sans  border-box  "
-                : "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg mb-3   p-[1rem] font-sans  border-box "
+                ? "outline-0 h-10  w-full border-2 border-red-300  rounded-lg  text-[16px] p-[1rem]   border-box  "
+                : "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px]  p-[1rem]   border-box "
             }
             type="tel"
             maxLength={10}
@@ -171,19 +184,25 @@ function Login() {
             onChange={handleMobileNumber}
             placeholder="Enter Mobile Number"
           />
+          {isNewUser ? (
+            <div className="w-[80%] mb-2">
+              {" "}
+              <p className="text-xs  text-red-500">wrong mobile number</p>
+            </div>
+          ) : null}
         </div>
-        <div className="flex flex-col w-[70%] ">
+        <div className="flex flex-col space-y-1 w-[80%] ">
           <label
             htmlFor=""
-            className="block leading-6 text-left font-medium font-sans "
+            className="block leading-6 text-left text-[14px]   "
           >
             Password
           </label>
           <input
             className={
               loginFailed
-                ? "outline-0 h-10 w-full rounded-lg mb-5 p-[1rem] sm:p-[1rem] border-2 border-red-500 font-sans border-box  "
-                : "outline-0 h-10 w-full rounded-lg mb-5 p-[1rem] sm:p-[1rem] border-2 border-slate-300 font-sans border-box "
+                ? "outline-0 h-10 w-full rounded-lg  p-[1rem] sm:p-[1rem] border-2 text-[16px] border-red-300  border-box  "
+                : "outline-0 h-10 w-full rounded-lg  p-[1rem] sm:p-[1rem] border-2 text-[16px] border-slate-300  border-box "
             }
             type={showPassword ? "text" : "password"}
             minLength={6}
@@ -192,12 +211,13 @@ function Login() {
             onChange={handlePassword}
             placeholder="Enter Your Password"
           />
+
           {showPassword ? (
             <FaRegEye
               className={
                 windowWidth < 640
                   ? "relative ml-[40vw] bottom-[3rem] text-zinc-400"
-                  : "relative  sm:ml-[35vw] md:ml-[30vw] lg:ml-[20vw] xl:ml-[20vw] bottom-[3rem] text-zinc-400"
+                  : "relative  sm:ml-[35vw] md:ml-[30vw] lg:ml-[20vw] xl:ml-[22vw] bottom-[2rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
@@ -206,57 +226,53 @@ function Login() {
               className={
                 windowWidth < 640
                   ? "relative ml-[40vw] bottom-[3rem] text-zinc-400"
-                  : "relative  sm:ml-[35vw]  md:ml-[30vw] lg:ml-[20vw] xl:ml-[20vw] bottom-[3rem] text-zinc-400"
+                  : "relative  sm:ml-[35vw]  md:ml-[30vw] lg:ml-[20vw] xl:ml-[22vw] bottom-[2rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
           )}
         </div>
 
-        {loginInputAlert ? (
-          <p className="w-[70%] text-red-500 text-xs cursor-default">
-            *Fill all the inputs
-          </p>
-        ) : null}
-        {loginFailed ? (
-          <div className="w-[70%] mb-2">
-            {" "}
-            <p className="text-xs  text-red-500">*wrong mobile/password</p>
-          </div>
-        ) : null}
+        <div className="w-[80%]">
+          {loginInputAlert ? (
+            <p className=" text-red-500 text-xs cursor-default">
+              Fill all the inputs
+            </p>
+          ) : null}
+          {loginFailed ? (
+            <p className="text-xs  text-red-500">Wrong password</p>
+          ) : null}
+        </div>
 
-        {isNewUser ? (
-          <div className="w-3/5 mb-2">
-            {" "}
-            <p className="text-xs  text-red-500">*wrong mobile number</p>
-          </div>
-        ) : null}
-
-        {}
-
-        <button
-          className="w-1/3  border-0  outline-0 text-white hover:bg-gray-600 bg-gray-800 text-white text-center p-[.5rem] font-bold font-sans h-auto  mt-[.8rem] rounded-md "
-          onClick={
-            connectionMode === "socket"
-              ? loginToDashboardUsingSocket
-              : loginToDashboard
-          }
-        >
-          Log in
-        </button>
-
-        <p className="text-xs mt-[2rem] text-gray-800 sm:mt-[3rem] md:mt-[3rem] underline cursor-pointer ">
-          Forgot Password?
-        </p>
-        <p className="font-light text-xs text-gray-800 mt-[.5rem] mb-[2rem]">
-          Don't have an account?{" "}
-          <strong
-            className="font-bold text-gray-800 cursor-pointer"
-            onClick={signup}
+        <div className="w-[80%] items-center flex justify-center">
+          {" "}
+          <button
+            className="w-full  border-0  outline-0 text-white hover:bg-gray-600 bg-gray-800 text-white text-center p-[.5rem] font-bold  h-auto   rounded-md "
+            onClick={
+              connectionMode === "socket"
+                ? loginToDashboardUsingSocket
+                : loginToDashboard
+            }
           >
-            Sign up
-          </strong>
-        </p>
+            Log in
+          </button>
+        </div>
+
+        <div className="flex flex-col justify-center  items-center">
+          {" "}
+          <p className="text-xs mt-[2rem] text-gray-800 sm:mt-[3rem] md:mt-[3rem] mb-[.4rem] underline cursor-pointer ">
+            Forgot Password?
+          </p>
+          <p className="font-light text-xs text-gray-800 mt-[.5rem] mb-[2rem]">
+            Don't have an account?{" "}
+            <strong
+              className="font-bold text-gray-800 cursor-pointer"
+              onClick={signup}
+            >
+              Sign up
+            </strong>
+          </p>
+        </div>
       </form>
     </>
   );

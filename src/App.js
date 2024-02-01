@@ -55,6 +55,9 @@ function App() {
   const [isProfileClicked, setIsProfileClicked] = useState(false);
   const [sendByBeneficiaries, setSendByBeneficiaries] = useState(false);
   const [savedAcc, setSavedAcc] = useState([]);
+  const [loader, setLoader] = useState(false);
+  const [notify, setNotify] = useState(true);
+  const [plusIcon, setPlusIcon] = useState(false);
 
   const handleRegMobileNumber = (e) => {
     const value = e.target.value;
@@ -252,6 +255,12 @@ function App() {
         setSavedAcc,
         logOut,
         setLogOut,
+        loader,
+        setLoader,
+        notify,
+        setNotify,
+        setPlusIcon,
+        plusIcon,
       }}
     >
       <Router>

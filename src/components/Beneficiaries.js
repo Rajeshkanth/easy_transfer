@@ -1,13 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { store } from "../App";
 import axios from "axios";
-import { MdDeleteOutline, MdEdit } from "react-icons/md";
-import { AiOutlineMenuUnfold } from "react-icons/ai";
-// import { IoIosCheckboxOutline } from "react-icons/io";
-import { CiBookmarkCheck } from "react-icons/ci";
+import { IoMdCloseCircle } from "react-icons/io";
 import { useLocation, useNavigate } from "react-router";
 import Menu from "./Menu";
 import SideBar from "./SideBar";
+import img from "./images/plus.png";
 
 function Beneficiaries() {
   const {
@@ -34,10 +32,14 @@ function Beneficiaries() {
     setIsProfileClicked,
     logOut,
     setLogOut,
+    notify,
+    setNotify,
+    setPlusIcon,
+    plusIcon,
   } = useContext(store);
 
   // const [isProfileClicked, setIsProfileClicked] = useState(false);
-  const [sessionTiemedOut, setSessionTiemedOut] = useState(false);
+  const [newBeneficiary, setNewBeneficiary] = useState(false);
   const [savedAccNum, setSavedAccNum] = useState("");
   const [savedBeneficiaryName, setSavedBeneficiaryName] = useState("");
   const [savedIfsc, setSavedIfsc] = useState("");
@@ -57,6 +59,7 @@ function Beneficiaries() {
       case "Menu":
         setIsProfileClicked(true);
         break;
+
       case "Profile":
         navigate("/Profile", { state: { prevPath: location.pathname } });
         break;
@@ -92,6 +95,7 @@ function Beneficiaries() {
       return {
         nav: [
           "Back",
+
           "Profile",
           "Rewards",
           "Contact",
@@ -213,8 +217,13 @@ function Beneficiaries() {
     }
   };
 
+  const addNewBeneficiary = () => {
+    setPlusIcon(true);
+  };
+
   const handleSaveButtonClick = () => {
     if (clickable) {
+      setPlusIcon(false);
       saveBeneficiary();
       setAllInputsAlert(false);
     } else {
@@ -222,20 +231,20 @@ function Beneficiaries() {
     }
   };
 
-  useEffect(() => {
-    if (connectionMode !== socket) {
-    } else if (!logOut) {
-      socket.on("getSavedBeneficiary", (data) => {
-        const savedDetail = {
-          beneficiaryName: data.beneficiaryName,
-          accNum: data.accNum,
-          ifsc: data.ifsc,
-          editable: data.editable,
-        };
-        setSavedAcc((prev) => [...prev, savedDetail]);
-      });
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (connectionMode !== socket) {
+  //   } else if (!logOut) {
+  //     socket.on("getSavedBeneficiary", (data) => {
+  //       const savedDetail = {
+  //         beneficiaryName: data.beneficiaryName,
+  //         accNum: data.accNum,
+  //         ifsc: data.ifsc,
+  //         editable: data.editable,
+  //       };
+  //       setSavedAcc((prev) => [...prev, savedDetail]);
+  //     });
+  //   }
+  // }, []);
 
   useEffect(() => {
     return () => {
@@ -285,6 +294,16 @@ function Beneficiaries() {
       window.removeEventListener("resize", handleResize);
     };
   }, [windowWidth]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setNotify(false);
+    }, 3000);
+
+    return () => {
+      setNotify(true);
+    };
+  }, []);
   return (
     <>
       {isProfileClicked ? (
@@ -295,140 +314,125 @@ function Beneficiaries() {
           " h-auto md:h-screen w-screen pb-[2rem] md:fixed  bg-gray-800 text-white"
         }
       >
-        <div className="h-[10vh]  items-center  border-white  flex box-border z-[5] bg-gray-800 sticky top-0">
+        <div className="h-[10vh]  items-center    flex box-border z-[10] bg-gray-800 sticky top-0">
           <Menu {...menuProps} onClickHandler={handleMenuClick} />
         </div>
 
-        <div className="h-auto md:h-screen  w-screen border-b-0 border-white block md:flex  md:pl-[2rem] md:pl-[8rem] box-border">
-          {windowWidth > 768 ? null : (
-            <div className="w-3/4 m-auto  h-full pt-[4vh] md:pt-[15vh]  pb-[2rem] box-border">
-              <button className="bg-gray-800 w-1/2  ml-[19vw] mt-[1vh]  border-2 relative border-white rounded-xl  py-2 box-border outline-0 border-0 text-white">
-                Add Beneficiary
-              </button>
-              <form
-                action=""
-                className="w-auto md:w-[60%] h-auto pb-[10vh]  pt-[8vh] border-2 bg-white shadow-lg shadow-ash-800  mt-[-1.4rem] text-gray-600 rounded-lg border-white  box-border"
-              >
-                <div className="w-[80%] m-auto  ">
-                  <input
-                    type="text"
-                    className="block  w-full px-4 py-2 mt-[1.2rem]   border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white  border-2 "
-                    placeholder="Enter Beneficiary Name"
-                    value={savedBeneficiaryName}
-                    onChange={handleSavedBenificiaryName}
-                    required
-                  />
-                  <input
-                    type="tel"
-                    className="block w-full px-4 py-2 mt-[1.2rem]  border-gray-300 focus:border-gray-800 outline-none rounded-lg  border-2 "
-                    placeholder="Enter Account Number"
-                    value={savedAccNum}
-                    onChange={handleSavedAccNum}
-                    required
-                    minLength={16}
-                  />
-                  <input
-                    type="tel"
-                    className="block w-full px-4 py-2 mt-[1.2rem]   border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white border-2 "
-                    placeholder="Enter IFSC Code"
-                    value={savedIfsc}
-                    onChange={handleSavedIfsc}
-                    required
-                  />
-                  {allInputsAlert ? (
-                    <p className="text-sm text-gray-800 pointer-events-none p-2 box-border">
-                      fill all the inputs
-                    </p>
-                  ) : null}
-                  <input
-                    type="button"
-                    value="Save"
-                    onClick={handleSaveButtonClick}
-                    className="w-full py-2  bg-gray-800 mt-[2rem] hover:cursor-pointer text-white rounded-lg"
-                  />
-                </div>
-              </form>
+        <div className="h-auto md:h-screen  w-screen  block md:flex  md:pl-[0rem] box-border">
+          <div className="m-auto h-[86vh] w-[90vw] md:w-[80%] lg:w-[60%] xl:w-[100%]   text-gray-800   bg-white mt-[2rem] pb-[1rem] box-border overflow-x-auto space-y-2 lg:space-y-4">
+            <div className="flex  sticky top-[0] h-auto  z-10 border-t-2 pt-2 pb-2 text-white bg-gray-800 w-[100%] pl-[11vw]">
+              <h1 className="font-bold w-1/4 md:text-sm xl:text-xl">Name</h1>
+              <h1 className="font-bold w-1/4  md:text-sm xl:text-xl">
+                Account
+              </h1>
+              <h1 className="font-bold w-1/2 ml-[2rem] md:text-sm xl:text-lg">
+                IFSC
+              </h1>
             </div>
-          )}
-          <div className="m-auto h-[80vh] w-[90vw] md:w-[80%] lg:w-[60%] xl:w-[50%] pt-[.4rem] sm:pt-[1rem] text-gray-800 rounded-md bg-white mt-[2rem] pb-[2rem] box-border overflow-x-auto space-y-2 lg:space-y-4">
             {savedAcc.map((item, index) => (
               <div
                 key={index}
-                className="h-auto w-[80%] lg:w-[90%] xl:w-[80%] flex justify-evenly space-x-0 md:space-x-10 border-b-2 shadow-sm shadow-white items-center p-0 box-border sm:p-4   w-1/2 m-auto  rounded-md"
+                className="h-auto   flex justify-evenly space-x-0 md:space-x-10   items-center p-0 box-border sm:p-4    m-auto  rounded-md"
               >
-                <div className="space-x-10 md:space-x-2 lg:space-x-10 w-full  font-light flex ">
-                  <div>
-                    <h1 className="font-bold md:text-sm xl:text-lg">Name</h1>
-                    <h1 className="font-bold md:text-sm xl:text-lg">Account</h1>
-                    <h1 className="font-bold md:text-sm xl:text-lg">IFSC</h1>
-                  </div>
-                  <div className="w-1/2 capitalize ">
-                    <h1 className="md:text-sm xl:text-lg">
-                      {item.beneficiaryName}
-                    </h1>
-                    <h1 className="md:text-sm xl:text-lg">{item.accNum}</h1>
-                    <h1 className="md:text-sm xl:text-lg"> {item.ifsc}</h1>
-                  </div>
+                <div className=" capitalize flex  w-[80%] pl-[10vw]">
+                  <h1 className="md:text-sm  w-1/2 xl:text-lg">
+                    {item.beneficiaryName}
+                  </h1>
+                  <h1 className="md:text-sm ml-[-4rem]  w-1/2 xl:text-lg">
+                    {item.accNum}
+                  </h1>
+                  <h1 className="md:text-sm w-1/2 pl-[2rem] xl:text-lg">
+                    {" "}
+                    {item.ifsc}
+                  </h1>
                 </div>
-                <div>
+                <div className="w-[20%] pr-[4rem] box-border">
                   <button
                     onClick={() => sendMoney(index)}
-                    className=" px-4 py-2  border border-gray-300 rounded-md focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                    className=" px-4 py-2 w-full border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                   >
-                    send
+                    Send
                   </button>
                 </div>
               </div>
             ))}
           </div>
-          {windowWidth > 768 ? (
-            <div className="w-1/2  h-full pt-[15vh] ml-[2rem] lg:w-[60%] lg:ml-[6rem] mr-[2rem]   pb-[2rem] box-border">
-              <button className="bg-gray-800 md:w-[60%] lg:w-auto md:ml-[6vw]  lg:ml-[11vw] xl:ml-[17vw]  border-2 md:relative lg:fixed border-white rounded-xl px-4 py-2 box-border outline-0 border-0 text-white">
-                Add Beneficiary
-              </button>
-              <form
-                action=""
-                className="w-auto md:w-[100%] lg:w-[80%] xl:w-[60%] h-auto pb-[10vh]  pt-[6vh] border-2 bg-white shadow-lg shadow-ash-800  m-auto md:mt-[-1.4rem] lg:mt-[1rem] text-gray-600 rounded-lg border-white  box-border"
-              >
-                <div className="w-[80%] m-auto  ">
-                  <input
-                    type="text"
-                    className="block  w-full px-4 py-2 mt-[1.2rem]   border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white  border-2 "
-                    placeholder="Enter Beneficiary Name"
-                    value={savedBeneficiaryName}
-                    onChange={handleSavedBenificiaryName}
-                    required
-                  />
-                  <input
-                    type="tel"
-                    className="block w-full px-4 py-2 mt-[1.2rem]  border-gray-300 focus:border-gray-800 outline-none rounded-lg  border-2 "
-                    placeholder="Enter Account Number"
-                    value={savedAccNum}
-                    onChange={handleSavedAccNum}
-                    required
-                    minLength={16}
-                  />
-                  <input
-                    type="tel"
-                    className="block w-full px-4 py-2 mt-[1.2rem]   border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white border-2 "
-                    placeholder="Enter IFSC Code"
-                    value={savedIfsc}
-                    onChange={handleSavedIfsc}
-                    required
-                  />
-                  {allInputsAlert ? (
-                    <p className="text-sm text-red-600 pointer-events-none p-2 box-border">
-                      fill all the inputs
-                    </p>
-                  ) : null}
-                  <input
-                    type="button"
-                    value="Save"
-                    onClick={handleSaveButtonClick}
-                    className="w-full py-2  bg-gray-800 mt-[2rem] hover:cursor-pointer text-white rounded-lg"
-                  />
+          <img
+            src={img}
+            className=" fixed object-cover h-20 z-[100] ml-[85vw] top-[80vh] "
+            alt="add beneficiary"
+            onClick={addNewBeneficiary}
+          />
+
+          {notify ? (
+            <div
+              onClick={() => setNotify(false)}
+              className="fixed top-0 bg-transparent z-[150] backdrop-blur-xl h-screen w-screen"
+            >
+              <div className="fixed h-[20vh] w-[25vw] text-xl z-[100] top-[64.7vh] ml-[62.6vw] items-center text-center flex justify-center bg-gray-800 backdrop-blur-sm rounded-[45px]   rounded-br-none">
+                <h3>Click to add new beneficiary details</h3>
+              </div>
+              <img
+                src={img}
+                className=" fixed object-cover h-20  ml-[85vw] top-[80vh] "
+                alt=""
+              />
+            </div>
+          ) : null}
+
+          {plusIcon ? (
+            <div className=" fixed top-0 box-border z-[200] backdrop-blur-xl h-screen w-screen">
+              <div className="w-3/4 m-auto   h-full pt-[2vh] md:pt-[20vh]  pb-[2vh] box-border">
+                {/* <button className="bg-gray-800 w-1/2  ml-[14vw] mt-[1vh]   relative border-white rounded-xl  py-2 box-border outline-0 border-0 text-white">
+                  Add Beneficiary
+                </button> */}
+                <div className="relative top-[13vh] text-gray-700 text-3xl left-[56vw] h-[10vh] w-[10vw]">
+                  <IoMdCloseCircle onClick={() => setPlusIcon(false)} />
                 </div>
-              </form>
+                <form
+                  action=""
+                  className="w-auto md:w-[60%] h-auto pb-[7vh] m-auto pt-[6vh] border-2 bg-white shadow-lg shadow-ash-800  mt-[0rem] text-gray-600 rounded-lg border-white  box-border"
+                >
+                  <div className="w-[80%] m-auto space-y-5 pt-[2vh] ">
+                    <input
+                      type="text"
+                      className="block  w-full px-4 py-2    border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white  border-2 "
+                      placeholder="Enter Beneficiary Name"
+                      value={savedBeneficiaryName}
+                      onChange={handleSavedBenificiaryName}
+                      required
+                    />
+                    <input
+                      type="tel"
+                      className="block w-full px-4 py-2   border-gray-300 focus:border-gray-800 outline-none rounded-lg  border-2 "
+                      placeholder="Enter Account Number"
+                      value={savedAccNum}
+                      onChange={handleSavedAccNum}
+                      required
+                      minLength={16}
+                    />
+                    <input
+                      type="tel"
+                      className="block w-full px-4 py-2    border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white border-2 "
+                      placeholder="Enter IFSC Code"
+                      value={savedIfsc}
+                      onChange={handleSavedIfsc}
+                      required
+                    />
+                    {allInputsAlert ? (
+                      <p className="text-sm text-gray-800 pointer-events-none p-2 box-border">
+                        fill all the inputs
+                      </p>
+                    ) : null}
+                    <input
+                      type="button"
+                      value="Save"
+                      onClick={handleSaveButtonClick}
+                      className="w-full py-2 hover:bg-gray-600 bg-gray-800 mt-[2rem] hover:cursor-pointer text-white rounded-lg"
+                    />
+                  </div>
+                </form>
+              </div>
             </div>
           ) : null}
         </div>

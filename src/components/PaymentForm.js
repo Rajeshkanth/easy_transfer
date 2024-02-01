@@ -319,35 +319,136 @@ function PaymentForm() {
 
   return (
     <>
-      <div className="paymentFormContainer h-screen w-screen  bg-gray-800 text-white font-sans fixed w-screen ">
+      <div className="paymentFormContainer h-screen   bg-gray-800 text-white font-sans fixed w-screen ">
         <Menu {...menuProps} onClickHandler={handleMenuClick} />
 
-        <div className="flex  w-full fixed top-[10%]  flex justify-center   ">
-          <div className="w-[100vw]  flex justify-evenly h-[90vh]  ">
+        <div className="flex   w-full fixed top-[10%]  justify-center   ">
+          <div className="w-[100vw]  flex  justify-evenly h-[90vh]  ">
             <div className="hidden sm:block sm:w-1/2 md:w-auto">
               {" "}
-              <h1 className="text-4xl font-sans  font-light mt-[11rem] ml-[1rem]   lg:text-6xl ">
+              <h1 className="text-4xl font-sans  font-light mt-[12rem] ml-[1rem]   lg:text-6xl ">
                 The Secure, <br /> easiest and fastest <br /> way to transfer
                 money.{" "}
               </h1>
-              <p className="ml-[1rem] mt-[4rem] text-xs md:text-sm lg:text-xl">
+              <p className="ml-[1rem] mt-[4rem] text-xs md:text-sm text-gray-300 lg:text-xl">
                 send & receive money in minutes without paying extra charges.
               </p>
             </div>
-            <form className="w-[60%] sm:w-5/12  h-[80vh] sm:h-[90%] md:w-2/5  lg:w-1/3 relative pt-0  px-10 py-10  box-border  z-20 bg-white border-2 border-cyan-200  space-y-2 sm:space-y-0 rounded-md  mt-[2rem]   flex flex-col justify-center ">
-              <div className=" h-auto sm:h-1/6  mb-2 text-gray-800   w-full text-center flex justify-center  rounded-md rounded-b-none  ">
+            {/* <form className="w-[60%] sm:w-5/12  h-[80vh] sm:h-[90%] md:w-2/5  lg:w-1/3 relative pt-0  px-10 py-10  box-border  z-20 bg-white border-2 border-cyan-200  space-y-2 sm:space-y-0 rounded-md  mt-[2rem] text-gray-600   flex flex-col justify-center ">
+              <div className=" h-auto sm:h-1/6  mb-2 text-gray-600   w-full text-center flex justify-center  rounded-md rounded-b-none  ">
                 <h1 className="  mt-2 sm:mt-4 md:mt-6 lg:mt-8 sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-extrabold text-gray-800 text-[23px]">
                   Money Transfer
                 </h1>
               </div>
-              <div className="md:ml-8  lg:ml-12 w-full">
+              <div className="md:ml-[1.5vw]  lg:ml-[3.5vw] w-full">
+                <label className="block   text-sm px-1 pointer-events-none leading-6 text-gray-600">
+                  Beneficiary Name
+                </label>
+                <input
+                  type="text"
+                  id="receiver-name"
+                  className="block w-[95%] sm-w-11/12 sm:mb-[1rem] md:w-4/5 text-gray-600 lg:w-9/12  px-4 py-2 border mb-3 border-gray-300  rounded-md focus:outline-none focus:border-gray-800"
+                  name="receiver-account-holder"
+                  placeholder="Account Holder's Name"
+                  value={toAccountHolderName}
+                  onChange={(e) => {
+                    setToAccountHolderName(e.target.value);
+                  }}
+                />
+
+                <label
+                  // className="relative  top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-800"
+                  className="block px-1 pointer-events-none leading-6 text-gray-600 text-sm"
+                >
+                  Account Number
+                </label>
+                <input
+                  className="block  w-[95%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-600 lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  type="tel"
+                  id="rec-account-number"
+                  name="rec-account-number"
+                  placeholder="Account Number"
+                  value={toAccountNumber}
+                  onChange={(e) => {
+                    handleAccNumToSend(e);
+                  }}
+                />
+
+                <label
+                  // className="relative w-25 top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-800"
+                  className="block   text-sm px-1 pointer-events-none leading-6  text-gray-600"
+                >
+                  IFSC code
+                </label>
+                <input
+                  className="block  w-[95%] sm:11/12 sm:mb-[1rem] md:w-4/5 text-gray-600  lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  type="text"
+                  id="rec-ifsc-number"
+                  name="rec-ifsc-number"
+                  placeholder="IFSC Code"
+                  value={toIFSCNumber}
+                  onChange={(e) => {
+                    handleToIfsc(e);
+                  }}
+                />
+
+                <label
+                  //  className="relative w-20 top-3 left-2 transition-all bg-black px-1 box-border pointer-events-none text-gray-800"
+                  className="block  text-sm  px-1 pointer-events-none leading-6 text-gray-600"
+                >
+                  {" "}
+                  Amount{" "}
+                </label>
+                <input
+                  type="tel"
+                  name="amount"
+                  id="amount"
+                  className=" block  w-[95%] sm:10/12 sm:mb-[2rem]  md:w-4/5  lg:w-9/12 text-gray-600 px-4 py-2 mb-4  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  value={amount}
+                  onChange={(e) => handleAmountToSend(e)}
+                  placeholder="Amount"
+                />
+
+                {allInput ? (
+                  <p className="text-left text-sm text-red-600 mb-[1rem]">
+                    *fill all input values
+                  </p>
+                ) : null}
+              </div>
+
+              <input
+                type="submit"
+                value="SEND"
+                className="block w-[75%]  px-4 py-2 m-auto mb-3 border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                onClick={
+                  connectionMode === "socket"
+                    ? sendAmountBySocket
+                    : sendAmountByPolling
+                }
+              />
+              {sendByBeneficiaries ? (
+                <input
+                  type="button"
+                  value="CANCEL"
+                  onClick={cancelTransfer}
+                  className="block w-1/2  px-4 py-2 m-auto mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                />
+              ) : null}
+            </form> */}
+            <form className="w-[60%] sm:w-5/12  h-[80vh] sm:h-[90%] md:w-2/5  lg:w-1/3 relative pt-0  px-10 py-10  box-border  z-20 bg-white border-2 border-cyan-200  space-y-2 sm:space-y-0 rounded-md  mt-[2rem]   flex flex-col justify-center ">
+              <div className=" h-auto sm:h-1/6  mb-2 text-gray-800   w-full text-center flex justify-center  rounded-md rounded-b-none  ">
+                <h1 className="  mt-2 sm:mt-4 md:mt-6 lg:mt-[1.8vh] sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-extrabold text-gray-600 text-[23px]">
+                  Money Transfer
+                </h1>
+              </div>
+              <div className="md:ml-[3vw]  lg:ml-[3vw] w-full">
                 <label className="block   px-1 pointer-events-none leading-6 text-gray-800">
                   Beneficiary Name
                 </label>
                 <input
                   type="text"
                   id="receiver-name"
-                  className="block w-[95%] sm-w-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-gray-300  rounded-md focus:outline-none focus:border-gray-800"
+                  className="block w-[95%] sm-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-gray-300  rounded-md focus:outline-none focus:border-gray-800"
                   name="receiver-account-holder"
                   placeholder="Account Holder's Name"
                   value={toAccountHolderName}
@@ -403,7 +504,7 @@ function PaymentForm() {
                   type="tel"
                   name="amount"
                   id="amount"
-                  className=" block  w-[95%] sm:10/12 sm:mb-[2rem]  md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-4  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  className=" block  w-[95%] sm:w-10/12 sm:mb-[2rem]  md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-4  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
                   value={amount}
                   onChange={(e) => handleAmountToSend(e)}
                   placeholder="Amount"
@@ -415,25 +516,26 @@ function PaymentForm() {
                   </p>
                 ) : null}
               </div>
-
-              <input
-                type="submit"
-                value="SEND"
-                className="block w-1/2  px-4 py-2 m-auto mb-3 border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
-                onClick={
-                  connectionMode === "socket"
-                    ? sendAmountBySocket
-                    : sendAmountByPolling
-                }
-              />
-              {sendByBeneficiaries ? (
+              <div className="w-full">
                 <input
-                  type="button"
-                  value="CANCEL"
-                  onClick={cancelTransfer}
-                  className="block w-1/2  px-4 py-2 m-auto mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                  type="submit"
+                  value="SEND"
+                  className="block w-9/12  px-4 py-2 m-auto mb-3 border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                  onClick={
+                    connectionMode === "socket"
+                      ? sendAmountBySocket
+                      : sendAmountByPolling
+                  }
                 />
-              ) : null}
+                {sendByBeneficiaries ? (
+                  <input
+                    type="button"
+                    value="CANCEL"
+                    onClick={cancelTransfer}
+                    className="block w-9/12  px-4 py-2 m-auto mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                  />
+                ) : null}
+              </div>
             </form>
           </div>
         </div>
