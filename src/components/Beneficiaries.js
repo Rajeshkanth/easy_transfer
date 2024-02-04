@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from "react-router";
 import Menu from "./Menu";
 import SideBar from "./SideBar";
 import img from "./images/plus.png";
+import tag from "./images/tag.png";
 
 function Beneficiaries() {
   const {
@@ -208,7 +209,7 @@ function Beneficiaries() {
           ifsc: savedIfsc,
           editable: false, // Assuming this is the default value
         };
-        setSavedAcc((prevList) => [...prevList, newBeneficiary]);
+        // setSavedAcc((prevList) => [...prevList, newBeneficiary]);
       }
 
       setSavedBeneficiaryName("");
@@ -309,23 +310,19 @@ function Beneficiaries() {
       {isProfileClicked ? (
         <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
       ) : null}
-      <div
-        className={
-          " h-auto md:h-screen w-screen pb-[2rem] md:fixed  bg-gray-800 text-white"
-        }
-      >
+      <div className="h-auto md:h-screen w-screen pb-[2rem] md:fixed  bg-gray-800 text-white">
         <div className="h-[10vh]  items-center    flex box-border z-[10] bg-gray-800 sticky top-0">
           <Menu {...menuProps} onClickHandler={handleMenuClick} />
         </div>
 
         <div className="h-auto md:h-screen  w-screen  block md:flex  md:pl-[0rem] box-border">
-          <div className="m-auto h-[86vh] w-[90vw] md:w-[80%] lg:w-[60%] xl:w-[100%]   text-gray-800   bg-white mt-[2rem] pb-[1rem] box-border overflow-x-auto space-y-2 lg:space-y-4">
-            <div className="flex  sticky top-[0] h-auto  z-10 border-t-2 pt-2 pb-2 text-white bg-gray-800 w-[100%] pl-[11vw]">
-              <h1 className="font-bold w-1/4 md:text-sm xl:text-xl">Name</h1>
-              <h1 className="font-bold w-1/4  md:text-sm xl:text-xl">
+          <div className="m-auto h-screen sm:h-[86vh] w-[100%]   text-gray-800   bg-white mt-[2rem] pb-[1rem] box-border overflow-x-auto space-y-2 lg:space-y-4">
+            <div className="flex  fixed sm:sticky top-[9vh] sm:top-0  h-auto  z-10  pt-3 pb-3 text-white bg-gray-800 w-[100%] pl-[8vw] sm:pl-[11.5vw]">
+              <h1 className="font-bold w-1/4 md:text-sm  xl:text-xl">Name</h1>
+              <h1 className="font-bold w-1/4 ml-[3vw] sm:ml-[-3rem]   md:text-sm xl:text-xl">
                 Account
               </h1>
-              <h1 className="font-bold w-1/2 ml-[2rem] md:text-sm xl:text-lg">
+              <h1 className="font-bold w-1/2 ml-[9vw] sm:ml-[2.8rem] md:text-sm xl:text-lg">
                 IFSC
               </h1>
             </div>
@@ -334,19 +331,19 @@ function Beneficiaries() {
                 key={index}
                 className="h-auto   flex justify-evenly space-x-0 md:space-x-10   items-center p-0 box-border sm:p-4    m-auto  rounded-md"
               >
-                <div className=" capitalize flex  w-[80%] pl-[10vw]">
-                  <h1 className="md:text-sm  w-1/2 xl:text-lg">
+                <div className=" capitalize flex  w-[80%] pl-[10.5vw]">
+                  <h1 className="text-xs md:text-sm ml-[-2vw] sm:ml-[0] w-1/2 xl:text-lg">
                     {item.beneficiaryName}
                   </h1>
-                  <h1 className="md:text-sm ml-[-4rem]  w-1/2 xl:text-lg">
+                  <h1 className="text-xs md:text-sm ml-[-2rem] sm:ml-[-4rem]  w-1/2 xl:text-lg">
                     {item.accNum}
                   </h1>
-                  <h1 className="md:text-sm w-1/2 pl-[2rem] xl:text-lg">
+                  <h1 className="text-xs md:text-sm w-1/2 pl-[2rem] xl:text-lg">
                     {" "}
                     {item.ifsc}
                   </h1>
                 </div>
-                <div className="w-[20%] pr-[4rem] box-border">
+                <div className="w-[20%] pr-[1rem] sm:pr-[2rem] lg:pr-[4rem] box-border">
                   <button
                     onClick={() => sendMoney(index)}
                     className=" px-4 py-2 w-full border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
@@ -359,7 +356,7 @@ function Beneficiaries() {
           </div>
           <img
             src={img}
-            className=" fixed object-cover h-20 z-[100] ml-[85vw] top-[80vh] "
+            className=" fixed object-cover h-20 z-[100] ml-[80vw] sm:ml-[85vw] top-[80vh] "
             alt="add beneficiary"
             onClick={addNewBeneficiary}
           />
@@ -369,12 +366,12 @@ function Beneficiaries() {
               onClick={() => setNotify(false)}
               className="fixed top-0 bg-transparent z-[150] backdrop-blur-xl h-screen w-screen"
             >
-              <div className="fixed h-[20vh] w-[25vw] text-xl z-[100] top-[64.7vh] ml-[62.6vw] items-center text-center flex justify-center bg-gray-800 backdrop-blur-sm rounded-[45px]   rounded-br-none">
+              <div className="fixed bg-gray-700  h-[20vh] w-1/2 sm:w-[25vw] text-xl z-[100]  p-1 top-[65.2vh] sm:top-[64.7vh] ml-[37.5vw] sm:ml-[62.6vw] items-center text-center flex justify-center  backdrop-blur-sm rounded-[15px]   rounded-br-none">
                 <h3>Click to add new beneficiary details</h3>
               </div>
               <img
                 src={img}
-                className=" fixed object-cover h-20  ml-[85vw] top-[80vh] "
+                className=" fixed object-cover h-20  ml-[80vw] sm:ml-[85vw] top-[80vh] "
                 alt=""
               />
             </div>
@@ -382,11 +379,8 @@ function Beneficiaries() {
 
           {plusIcon ? (
             <div className=" fixed top-0 box-border z-[200] backdrop-blur-xl h-screen w-screen">
-              <div className="w-3/4 m-auto   h-full pt-[2vh] md:pt-[20vh]  pb-[2vh] box-border">
-                {/* <button className="bg-gray-800 w-1/2  ml-[14vw] mt-[1vh]   relative border-white rounded-xl  py-2 box-border outline-0 border-0 text-white">
-                  Add Beneficiary
-                </button> */}
-                <div className="relative top-[13vh] text-gray-700 text-3xl left-[56vw] h-[10vh] w-[10vw]">
+              <div className="w-3/4 m-auto   h-full pt-[10vh] md:pt-[20vh]  pb-[2vh] box-border">
+                <div className="relative top-[13vh] text-gray-700 text-3xl left-[67vw] md:left-[56vw] h-[10vh] w-[10vw]">
                   <IoMdCloseCircle onClick={() => setPlusIcon(false)} />
                 </div>
                 <form
@@ -396,7 +390,7 @@ function Beneficiaries() {
                   <div className="w-[80%] m-auto space-y-5 pt-[2vh] ">
                     <input
                       type="text"
-                      className="block  w-full px-4 py-2    border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white  border-2 "
+                      className="block  w-full px-4 py-2    border-gray-500 focus:border-gray-800 outline-none rounded-lg bg-white  border-2 "
                       placeholder="Enter Beneficiary Name"
                       value={savedBeneficiaryName}
                       onChange={handleSavedBenificiaryName}
@@ -404,7 +398,7 @@ function Beneficiaries() {
                     />
                     <input
                       type="tel"
-                      className="block w-full px-4 py-2   border-gray-300 focus:border-gray-800 outline-none rounded-lg  border-2 "
+                      className="block w-full px-4 py-2   border-gray-500 focus:border-gray-800 outline-none rounded-lg  border-2 "
                       placeholder="Enter Account Number"
                       value={savedAccNum}
                       onChange={handleSavedAccNum}
@@ -413,7 +407,7 @@ function Beneficiaries() {
                     />
                     <input
                       type="tel"
-                      className="block w-full px-4 py-2    border-gray-300 focus:border-gray-800 outline-none rounded-lg bg-white border-2 "
+                      className="block w-full px-4 py-2    border-gray-500 focus:border-gray-800 outline-none rounded-lg bg-white border-2 "
                       placeholder="Enter IFSC Code"
                       value={savedIfsc}
                       onChange={handleSavedIfsc}

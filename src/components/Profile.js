@@ -331,8 +331,8 @@ function Profile() {
         {/* ) : null} */}
         {isEditProfile ? null : (
           <div className="w-screen h-auto">
-            <div className="w-screen  h-[20vh]"></div>
-            <div className="h-[150px] w-[150px] md:h-[200px] md:w-[200px] bg-white  fixed top-[21vh] md:top-[17vh] z-5 overflow-hidden shadow-lg left-[33vw] sm:left-[60vw] rounded-full border-2 border-white">
+            <div className="w-screen bg-gray-700 border-b-2 h-[20vh]"></div>
+            <div className="h-[150px] w-[150px] md:h-[200px] md:w-[200px] bg-white  fixed top-[21vh] md:top-[17vh] z-5 overflow-hidden shadow-lg left-[33vw] sm:left-[9vw] rounded-full border-2 border-white">
               {
                 <>
                   <img
@@ -358,25 +358,31 @@ function Profile() {
               className={
                 windowWidth < 640
                   ? "w-screen   box-border h-full   bg-white  sm:border-2 sm:border-r-0 border-white ml-[0] pt-[4rem] p-[2rem] flex   "
-                  : "w-screen  h-full md:h-[70vh]  box-border bg-white rounded border-white m-auto font-poppins pt-[10rem]  sm:pt-[4rem] p-[2rem]  flex   "
+                  : "w-screen   h-full md:h-[69vh]  box-border bg-white  border-white m-auto font-poppins pt-[10rem]  sm:pt-[4rem] p-[2rem]  flex   "
               }
             >
               <div className="h-1/2 w-full   font-poppins  text-gray-800 pl-0 sm:p-5 rounded-md items-center justify-center m-auto mt-[4rem] sm:mt-4 box-border">
-                <div className="flex w-full md:w-1/2  items-center space-x-2  ">
-                  <h1 className="w-1/2 text-xl  font-bold">Name</h1>
-                  <h1 className=" text-xl  w-1/2 text-left">
+                <div className="flex w-full ml-[7vw] md:w-1/2  items-center space-x-2  ">
+                  <h1 className=" text-2xl font-extrabold  w-1/2 text-left">
                     {/* {JSON.parse(sessionStorage.getItem(document.cookie)).UserName} */}
                     {userNameFromDb}
                   </h1>
                 </div>
-                <div className="flex items-center w-full md:w-1/2  space-x-2">
-                  <h1 className="w-1/2 text-xl font-bold">Age</h1>
-                  <h1 className=" text-xl text-left w-1/2 ">
-                    {/* {JSON.parse(sessionStorage.getItem(document.cookie)).Age} */}
-                    {ageFromDb}
+                <div className="flex w-full ml-[7vw] md:w-1/2  items-center space-x-2  ">
+                  <h1 className=" text-md font-light   text-left">
+                    Tamil Nadu, India
                   </h1>
                 </div>
-                <div className="flex items-center w-full md:w-1/2  space-x-2">
+
+                {/* <div className="flex w-full md:w-1/2  items-center space-x-2  "></div> */}
+                {/* <div className="flex items-center w-full md:w-1/2  space-x-2">
+                  <h1 className="w-1/2 text-xl font-bold">Age</h1>
+                  <h1 className=" text-xl text-left w-1/2 ">
+                   
+                    {ageFromDb}
+                  </h1>
+                </div> */}
+                {/* <div className="flex items-center w-full md:w-1/2  space-x-2">
                   <h1 className="w-1/2 text-xl font-bold">Account Number</h1>
                   <h1 className=" text-xl text-left w-1/2 ">{accFromDb}</h1>
                 </div>
@@ -384,14 +390,16 @@ function Profile() {
                 <div className="flex items-center w-full md:w-1/2  space-x-2">
                   <h1 className="w-1/2 text-xl font-bold">Date Birth</h1>
                   <h1 className=" text-xl text-left w-1/2 ">{dobFromDb}</h1>
-                </div>
+                </div> */}
 
-                <button
-                  onClick={editProfile}
-                  className="w-full   outline-none md:w-1/2  p-4 pt-2 pb-2 mt-[1rem] text-white rounded box-border bg-gray-800  hover:bg-gray-600 "
-                >
-                  Edit Profile
-                </button>
+                <div className="md:w-1/2 pl-[7vw]">
+                  <button
+                    onClick={editProfile}
+                    className="w-full   outline-none md:w-1/2  p-4 pt-2 pb-2 mt-[1rem] text-white rounded box-border bg-gray-800  hover:bg-gray-600 "
+                  >
+                    Edit Profile
+                  </button>
+                </div>
               </div>
 
               {/* <div className="w-full w-auto ">

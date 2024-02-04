@@ -167,15 +167,15 @@ function Login() {
         }
       >
         <div className="flex flex-col space-y-1 w-[80%]">
-          <label htmlFor="" className="text-[14px]  ">
+          <label htmlFor="" className="text-[14px] mb-[.2rem] ">
             Mobile Number
           </label>
           <input
             className={
               mobileNumber.length < 10
-                ? "outline-0 h-10  w-full border-2 border-red-300  text-[16px] rounded-lg  p-[1rem]    border-box  "
+                ? "outline-0 h-10  w-full border-2 border-red-600  text-[16px] rounded-lg  p-[1rem]    border-box  "
                 : loginFailed
-                ? "outline-0 h-10  w-full border-2 border-red-300  rounded-lg  text-[16px] p-[1rem]   border-box  "
+                ? "outline-0 h-10  w-full border-2 border-red-600  rounded-lg  text-[16px] p-[1rem]   border-box  "
                 : "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px]  p-[1rem]   border-box "
             }
             type="tel"
@@ -194,7 +194,7 @@ function Login() {
         <div className="flex flex-col space-y-1 w-[80%] ">
           <label
             htmlFor=""
-            className="block leading-6 text-left text-[14px]   "
+            className="block leading-6 text-left text-[14px] mb-[.2rem]  "
           >
             Password
           </label>

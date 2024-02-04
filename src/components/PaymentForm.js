@@ -35,6 +35,14 @@ function PaymentForm() {
     sendByBeneficiaries,
     setSendByBeneficiaries,
     savedAcc,
+    setEnterAccountHolderName,
+    setEnterAccountNumber,
+    setEnterToIfscNumber,
+    setEnterAmount,
+    enterAccountHolderName,
+    enterAccountNumber,
+    enterToIfscNumber,
+    enterAmount,
     setSavedAcc,
   } = useContext(store);
 
@@ -118,6 +126,10 @@ function PaymentForm() {
         Uid: uuid(),
       });
       setAllInput(false);
+      setEnterAccountHolderName(false);
+      setEnterAccountNumber(false);
+      setEnterAmount(false);
+      setEnterToIfscNumber(false);
       handleAllInput();
       navigate("/success");
     } else {
@@ -436,19 +448,23 @@ function PaymentForm() {
               ) : null}
             </form> */}
             <form className="w-[60%] sm:w-5/12  h-[80vh] sm:h-[90%] md:w-2/5  lg:w-1/3 relative pt-0  px-10 py-10  box-border  z-20 bg-white border-2 border-cyan-200  space-y-2 sm:space-y-0 rounded-md  mt-[2rem]   flex flex-col justify-center ">
-              <div className=" h-auto sm:h-1/6  mb-2 text-gray-800   w-full text-center flex justify-center  rounded-md rounded-b-none  ">
+              <div className=" h-auto sm:h-1/6   text-gray-800   w-full text-center flex justify-center  rounded-md rounded-b-none  ">
                 <h1 className="  mt-2 sm:mt-4 md:mt-6 lg:mt-[1.8vh] sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-extrabold text-gray-600 text-[23px]">
                   Money Transfer
                 </h1>
               </div>
-              <div className="md:ml-[3vw]  lg:ml-[3vw] w-full">
-                <label className="block   px-1 pointer-events-none leading-6 text-gray-800">
+              <div className="md:ml-[3vw] lg:ml-[3.5vw]  w-full">
+                <label className="block text-sm mb-[.2rem] px-1 pointer-events-none leading-6 text-gray-800">
                   Beneficiary Name
                 </label>
                 <input
                   type="text"
                   id="receiver-name"
-                  className="block w-[95%] sm-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-gray-300  rounded-md focus:outline-none focus:border-gray-800"
+                  className={
+                    !toAccountHolderName
+                      ? "block w-[95%] sm-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-red-800  rounded-md focus:outline-none focus:border-gray-800"
+                      : "block w-[95%] sm-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-gray-300  rounded-md focus:outline-none focus:border-gray-800"
+                  }
                   name="receiver-account-holder"
                   placeholder="Account Holder's Name"
                   value={toAccountHolderName}
@@ -459,12 +475,16 @@ function PaymentForm() {
 
                 <label
                   // className="relative  top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-800"
-                  className="block px-1 pointer-events-none leading-6 text-gray-800"
+                  className="block px-1 text-sm mb-[.2rem] pointer-events-none leading-6 text-gray-800"
                 >
                   Account Number
                 </label>
                 <input
-                  className="block  w-[95%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  className={
+                    !toAccountNumber
+                      ? "block  w-[95%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 mb-3  border border-red-800 rounded-md focus:outline-none focus:border-gray-800"
+                      : "block  w-[95%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  }
                   type="tel"
                   id="rec-account-number"
                   name="rec-account-number"
@@ -477,12 +497,16 @@ function PaymentForm() {
 
                 <label
                   // className="relative w-25 top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-800"
-                  className="block   px-1 pointer-events-none leading-6 text-gray-800"
+                  className="block text-sm mb-[.2rem] px-1 pointer-events-none leading-6 text-gray-800"
                 >
                   IFSC code
                 </label>
                 <input
-                  className="block  w-[95%] sm:11/12 sm:mb-[1rem] md:w-4/5 text-gray-800  lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  className={
+                    !toIFSCNumber
+                      ? "block  w-[95%] sm:11/12 sm:mb-[1rem] md:w-4/5 text-gray-800  lg:w-9/12  px-4 py-2 mb-3  border border-red-800 rounded-md focus:outline-none focus:border-gray-800"
+                      : "block  w-[95%] sm:11/12 sm:mb-[1rem] md:w-4/5 text-gray-800  lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  }
                   type="text"
                   id="rec-ifsc-number"
                   name="rec-ifsc-number"
@@ -495,7 +519,7 @@ function PaymentForm() {
 
                 <label
                   //  className="relative w-20 top-3 left-2 transition-all bg-black px-1 box-border pointer-events-none text-gray-800"
-                  className="block   px-1 pointer-events-none leading-6 text-gray-800"
+                  className="block text-sm mb-[.2rem] px-1 pointer-events-none leading-6 text-gray-800"
                 >
                   {" "}
                   Amount{" "}
@@ -504,23 +528,31 @@ function PaymentForm() {
                   type="tel"
                   name="amount"
                   id="amount"
-                  className=" block  w-[95%] sm:w-10/12 sm:mb-[2rem]  md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-4  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  className={
+                    !amount
+                      ? " block  w-[95%] sm:w-11/12 sm:mb-[0rem]  md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-4  border border-red-800 rounded-md focus:outline-none focus:border-gray-800"
+                      : " block  w-[95%] sm:w-11/12 sm:mb-[0rem]  md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-4  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                  }
                   value={amount}
                   onChange={(e) => handleAmountToSend(e)}
                   placeholder="Amount"
                 />
 
                 {allInput ? (
-                  <p className="text-left text-sm text-red-600 mb-[1rem]">
+                  <p className="text-left text-sm text-red-600 mt-[.4rem]">
                     *fill all input values
                   </p>
                 ) : null}
               </div>
-              <div className="w-full">
+              <div className="w-full pt-6 box-border">
                 <input
                   type="submit"
                   value="SEND"
-                  className="block w-9/12  px-4 py-2 m-auto mb-3 border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                  className={
+                    sendByBeneficiaries
+                      ? "block w-9/12  px-4 py-2 m-auto mb-3 border-2  border-white rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                      : "block w-9/12  px-4 py-2 m-auto mb-3 mt-2 border-2  border-white rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                  }
                   onClick={
                     connectionMode === "socket"
                       ? sendAmountBySocket
@@ -532,7 +564,7 @@ function PaymentForm() {
                     type="button"
                     value="CANCEL"
                     onClick={cancelTransfer}
-                    className="block w-9/12  px-4 py-2 m-auto mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                    className="block w-9/12  px-4 py-2 m-auto mt-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                   />
                 ) : null}
               </div>

@@ -6,6 +6,16 @@ module.exports = {
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],
       },
+
+      keyframes: {
+        expand: {
+          "0%": { width: "10%" },
+          "100%": { width: "auto" },
+        },
+      },
+      animation: {
+        expand: "expand 1s linear 1",
+      },
     },
   },
   plugins: [

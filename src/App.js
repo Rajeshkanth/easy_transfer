@@ -58,6 +58,10 @@ function App() {
   const [loader, setLoader] = useState(false);
   const [notify, setNotify] = useState(true);
   const [plusIcon, setPlusIcon] = useState(false);
+  const [enterAccountNumber, setEnterAccountNumber] = useState(false);
+  const [enterAccountHolderName, setEnterAccountHolderName] = useState(false);
+  const [enterToIfscNumber, setEnterToIfscNumber] = useState(false);
+  const [enterAmount, setEnterAmount] = useState(false);
 
   const handleRegMobileNumber = (e) => {
     const value = e.target.value;
@@ -261,6 +265,14 @@ function App() {
         setNotify,
         setPlusIcon,
         plusIcon,
+        setEnterAccountHolderName,
+        setEnterAccountNumber,
+        setEnterToIfscNumber,
+        setEnterAmount,
+        enterAccountHolderName,
+        enterAccountNumber,
+        enterToIfscNumber,
+        enterAmount,
       }}
     >
       <Router>
