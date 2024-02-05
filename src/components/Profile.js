@@ -9,7 +9,6 @@ function Profile() {
     userName,
     userNameFromDb,
     setUserNameFromDb,
-    ageFromDb,
     setAgeFromDb,
     setAccFromDb,
     setDobFromDb,
@@ -264,13 +263,6 @@ function Profile() {
     // setExpireDate("");
     // setCvv("");
   };
-  // const navigateToProfile = () => {
-  //   navigate("/profile");
-  // };
-
-  // const closeProfile = () => {
-  //   setIsProfileClicked(false);
-  // };
 
   useEffect(() => {
     if (connectionMode !== "socket") {
@@ -332,7 +324,7 @@ function Profile() {
         {isEditProfile ? null : (
           <div className="w-screen h-auto">
             <div className="w-screen bg-gray-700 border-b-2 h-[20vh]"></div>
-            <div className="h-[150px] w-[150px] md:h-[200px] md:w-[200px] bg-white  fixed top-[21vh] md:top-[17vh] z-5 overflow-hidden shadow-lg left-[33vw] sm:left-[9vw] rounded-full border-2 border-white">
+            <div className="h-[150px] w-[150px] md:h-[200px] md:w-[200px] bg-white  fixed top-[15vh]  md:top-[17vh] z-5 overflow-hidden shadow-lg left-[33vw] sm:left-[12vw] md:left-[9vw] rounded-full border-2 border-white">
               {
                 <>
                   <img
@@ -357,54 +349,32 @@ function Profile() {
             <div
               className={
                 windowWidth < 640
-                  ? "w-screen   box-border h-full   bg-white  sm:border-2 sm:border-r-0 border-white ml-[0] pt-[4rem] p-[2rem] flex   "
-                  : "w-screen   h-full md:h-[69vh]  box-border bg-white  border-white m-auto font-poppins pt-[10rem]  sm:pt-[4rem] p-[2rem]  flex   "
+                  ? "w-screen   box-border h-screen   bg-white  sm:border-2 sm:border-r-0 border-white ml-[0]  pt-[4rem] p-[2rem] flex   "
+                  : "w-screen   h-screen md:h-[69vh]  box-border bg-white  border-white m-auto font-poppins pt-[10rem]  sm:pt-[10vh] p-[2rem]  flex   "
               }
             >
               <div className="h-1/2 w-full   font-poppins  text-gray-800 pl-0 sm:p-5 rounded-md items-center justify-center m-auto mt-[4rem] sm:mt-4 box-border">
                 <div className="flex w-full ml-[7vw] md:w-1/2  items-center space-x-2  ">
-                  <h1 className=" text-2xl font-extrabold  w-1/2 text-left">
+                  <h1 className=" text-2xl font-extrabold  w-[82%] sm:w-1/2 text-center sm:text-left">
                     {/* {JSON.parse(sessionStorage.getItem(document.cookie)).UserName} */}
                     {userNameFromDb}
                   </h1>
                 </div>
-                <div className="flex w-full ml-[7vw] md:w-1/2  items-center space-x-2  ">
-                  <h1 className=" text-md font-light   text-left">
+                <div className="flex w-full ml-[7vw]  md:w-1/2  items-center space-x-2  ">
+                  <h1 className=" text-md font-light w-[82%] sm:w-1/2 text-center sm:text-left">
                     Tamil Nadu, India
                   </h1>
                 </div>
 
-                {/* <div className="flex w-full md:w-1/2  items-center space-x-2  "></div> */}
-                {/* <div className="flex items-center w-full md:w-1/2  space-x-2">
-                  <h1 className="w-1/2 text-xl font-bold">Age</h1>
-                  <h1 className=" text-xl text-left w-1/2 ">
-                   
-                    {ageFromDb}
-                  </h1>
-                </div> */}
-                {/* <div className="flex items-center w-full md:w-1/2  space-x-2">
-                  <h1 className="w-1/2 text-xl font-bold">Account Number</h1>
-                  <h1 className=" text-xl text-left w-1/2 ">{accFromDb}</h1>
-                </div>
-
-                <div className="flex items-center w-full md:w-1/2  space-x-2">
-                  <h1 className="w-1/2 text-xl font-bold">Date Birth</h1>
-                  <h1 className=" text-xl text-left w-1/2 ">{dobFromDb}</h1>
-                </div> */}
-
                 <div className="md:w-1/2 pl-[7vw]">
                   <button
                     onClick={editProfile}
-                    className="w-full   outline-none md:w-1/2  p-4 pt-2 pb-2 mt-[1rem] text-white rounded box-border bg-gray-800  hover:bg-gray-600 "
+                    className="w-full   outline-none sm:w-1/2 md:w-1/2   p-4 pt-2  pb-2 mt-[1rem] text-white rounded-lg box-border bg-gray-800  hover:bg-gray-600 "
                   >
                     Edit Profile
                   </button>
                 </div>
               </div>
-
-              {/* <div className="w-full w-auto ">
-              <div className="h-[30vh] w-1/2 bg-gray-800 rounded-md "></div>
-            </div> */}
             </div>
           </div>
         )}
@@ -414,14 +384,6 @@ function Profile() {
             onSubmit={updateProfile}
             className="w-full lg:w-[60%] h-screen text-gray-800   m-auto bg-blue-650 sm:ml-[10vw] lg:ml-[25vw] p-5 box-border items-center flex flex-col  font-poppins justify-center sm:space-y-2 "
           >
-            {/* {windowWidth < 640 ? null : (
-            <button
-              onClick={cancelEdit}
-              className="fixed  sm:top-[1vh] sm:left-[86vw] w-[46%] sm:w-auto border bg-white p-2 pl-4 pr-4 box-border font-extralight hover: rounded-md sm:rounded-md"
-            >
-              Cancel
-            </button>
-          )} */}
             <div className="sm:flex flex-wrap  sm:space-x-2 w-3/4  sm:w-full md:w-[80%]">
               <input
                 className="block w-full sm:w-1/2  px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
@@ -514,7 +476,7 @@ function Profile() {
           </form>
         ) : null}
       </div>
-      {windowWidth > 1024 ? null : isProfileClicked ? (
+      {windowWidth > 768 ? null : isProfileClicked ? (
         <>
           <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
         </>

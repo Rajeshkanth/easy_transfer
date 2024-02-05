@@ -151,10 +151,10 @@ function Login() {
   return (
     <>
       <div className="items-center justify-center pt-[2rem] text-gray-600 flex space-y-6 flex-col">
-        <h1 className="font-extrabold text-4xl text-center text-gray-700 items-center font-poppins">
+        <h1 className="font-extrabold text-3xl sm:text-4xl text-center text-gray-700 items-center font-poppins">
           Easy Transfer
         </h1>
-        <h1 className="text-center m-0 text-[6vw] sm:text-[2vh] md:text-2xl font-bold font-poppins    cursor-default ">
+        <h1 className="text-center m-0 text-[4vw] sm:text-[3vh] md:text-2xl font-bold font-poppins    cursor-default ">
           Welcome Back
         </h1>
       </div>
@@ -162,8 +162,8 @@ function Login() {
       <form
         className={
           windowWidth < 640
-            ? "flex flex-col items-center bg-white m-auto h-auto w-full rounded-2xl space-y-2 font-poppins "
-            : "flex flex-col items-center bg-white m-auto rounded-2xl h-auto w-full space-y-2 font-poppins "
+            ? "flex flex-col items-center bg-white m-auto h-auto w-full rounded-2xl space-y-3 font-poppins "
+            : "flex flex-col items-center bg-white m-auto rounded-2xl h-auto w-full space-y-3 font-poppins "
         }
       >
         <div className="flex flex-col space-y-1 w-[80%]">
@@ -216,8 +216,8 @@ function Login() {
             <FaRegEye
               className={
                 windowWidth < 640
-                  ? "relative ml-[40vw] bottom-[3rem] text-zinc-400"
-                  : "relative  sm:ml-[35vw] md:ml-[30vw] lg:ml-[20vw] xl:ml-[22vw] bottom-[2rem] text-zinc-400"
+                  ? "relative ml-[45vw] bottom-[2rem] text-zinc-400"
+                  : "relative  sm:ml-[35vw] md:ml-[30vw] lg:ml-[20vw] xl:ml-[22vw] bottom-0 sm:bottom-[2rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
@@ -225,8 +225,8 @@ function Login() {
             <FaRegEyeSlash
               className={
                 windowWidth < 640
-                  ? "relative ml-[40vw] bottom-[3rem] text-zinc-400"
-                  : "relative  sm:ml-[35vw]  md:ml-[30vw] lg:ml-[20vw] xl:ml-[22vw] bottom-[2rem] text-zinc-400"
+                  ? "relative ml-[45vw] bottom-[2rem] text-zinc-400"
+                  : "relative  sm:ml-[35vw]  md:ml-[30vw] lg:ml-[20vw] xl:ml-[22vw] bottom-[1rem] sm:bottom-[2rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
@@ -247,7 +247,7 @@ function Login() {
         <div className="w-[80%] items-center flex justify-center">
           {" "}
           <button
-            className="w-full  border-0  outline-0 text-white hover:bg-gray-600 bg-gray-800 text-white text-center p-[.5rem] font-bold  h-auto   rounded-md "
+            className="w-full  border-0  outline-0  hover:bg-gray-600 bg-gray-800 text-white text-center p-[.5rem] font-bold  h-auto   rounded-md "
             onClick={
               connectionMode === "socket"
                 ? loginToDashboardUsingSocket
@@ -260,7 +260,7 @@ function Login() {
 
         <div className="flex flex-col justify-center  items-center">
           {" "}
-          <p className="text-xs mt-[2rem] text-gray-800 sm:mt-[3rem] md:mt-[3rem] mb-[.4rem] underline cursor-pointer ">
+          <p className="text-xs mt-[2rem] text-gray-800 sm:mt-[3rem]  mb-[.4rem] underline cursor-pointer ">
             Forgot Password?
           </p>
           <p className="font-light text-xs text-gray-800 mt-[.5rem] mb-[2rem]">

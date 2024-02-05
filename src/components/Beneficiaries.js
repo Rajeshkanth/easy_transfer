@@ -319,7 +319,7 @@ function Beneficiaries() {
           <div className="m-auto h-screen sm:h-[86vh] w-[100%]   text-gray-800   bg-white mt-[2rem] pb-[1rem] box-border overflow-x-auto space-y-2 lg:space-y-4">
             <div className="flex  fixed sm:sticky top-[9vh] sm:top-0  h-auto  z-10  pt-3 pb-3 text-white bg-gray-800 w-[100%] pl-[8vw] sm:pl-[11.5vw]">
               <h1 className="font-bold w-1/4 md:text-sm  xl:text-xl">Name</h1>
-              <h1 className="font-bold w-1/4 ml-[3vw] sm:ml-[-3rem]   md:text-sm xl:text-xl">
+              <h1 className="font-bold w-1/4 ml-[3vw] sm:ml-[-2rem] md:ml-[-3rem]  md:text-sm xl:text-xl">
                 Account
               </h1>
               <h1 className="font-bold w-1/2 ml-[9vw] sm:ml-[2.8rem] md:text-sm xl:text-lg">
@@ -332,7 +332,7 @@ function Beneficiaries() {
                 className="h-auto   flex justify-evenly space-x-0 md:space-x-10   items-center p-0 box-border sm:p-4    m-auto  rounded-md"
               >
                 <div className=" capitalize flex  w-[80%] pl-[10.5vw]">
-                  <h1 className="text-xs md:text-sm ml-[-2vw] sm:ml-[0] w-1/2 xl:text-lg">
+                  <h1 className="text-xs md:text-sm ml-[-2vw] sm:ml-[.2rem] w-1/2 xl:text-lg">
                     {item.beneficiaryName}
                   </h1>
                   <h1 className="text-xs md:text-sm ml-[-2rem] sm:ml-[-4rem]  w-1/2 xl:text-lg">

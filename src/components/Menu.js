@@ -30,7 +30,7 @@ function Menu(props) {
   return (
     <div className="h-[10%] w-screen   flex items-center justify-between sm:justify-evenly font-sans ">
       <div className=" items-center ">
-        <h1 className=" items-center font-bold ml-[2rem] text-center  sm:ml-[0] xl:ml-[0rem] text-2xl lg:text-4xl  box-border w-full  ">
+        <h1 className=" items-center font-bold ml-[2rem] text-center  sm:ml-[0rem] xl:ml-[0rem] text-2xl lg:text-4xl  box-border w-full  ">
           Easy Transfer
         </h1>
       </div>
