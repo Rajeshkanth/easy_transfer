@@ -350,7 +350,7 @@ function Profile() {
               className={
                 windowWidth < 640
                   ? "w-screen   box-border h-screen   bg-white  sm:border-2 sm:border-r-0 border-white ml-[0]  pt-[4rem] p-[2rem] flex   "
-                  : "w-screen   h-screen md:h-[69vh]  box-border bg-white  border-white m-auto font-poppins pt-[10rem]  sm:pt-[10vh] p-[2rem]  flex   "
+                  : "w-screen   h-screen md:h-[69vh]  box-border bg-white  border-white m-auto font-poppins pt-[5rem]  sm:pt-[10vh] p-[2rem]  flex   "
               }
             >
               <div className="h-1/2 w-full   font-poppins  text-gray-800 pl-0 sm:p-5 rounded-md items-center justify-center m-auto mt-[4rem] sm:mt-4 box-border">

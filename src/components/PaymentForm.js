@@ -470,7 +470,7 @@ function PaymentForm() {
                     type="button"
                     value="CANCEL"
                     onClick={cancelTransfer}
-                    className="block w-9/12  px-4 py-2 m-auto mt-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                    className="block w-full md:w-4/5 lg:w-9/12  px-4 py-2 m-auto mt-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                   />
                 ) : null}
               </div>

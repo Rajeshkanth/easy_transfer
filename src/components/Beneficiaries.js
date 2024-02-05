@@ -343,7 +343,7 @@ function Beneficiaries() {
                     {item.ifsc}
                   </h1>
                 </div>
-                <div className="w-[20%] pr-[1rem] sm:pr-[2rem] lg:pr-[4rem] box-border">
+                <div className="w-[20%] pr-[.4rem] sm:pr-[2rem] lg:pr-[4rem] box-border">
                   <button
                     onClick={() => sendMoney(index)}
                     className=" px-4 py-2 w-full border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
@@ -366,12 +366,12 @@ function Beneficiaries() {
               onClick={() => setNotify(false)}
               className="fixed top-0 bg-transparent z-[150] backdrop-blur-xl h-screen w-screen"
             >
-              <div className="fixed bg-gray-700  h-[20vh] w-1/2 sm:w-[25vw] text-xl z-[100]  p-1 top-[65.2vh] sm:top-[64.7vh] ml-[37.5vw] sm:ml-[62.6vw] items-center text-center flex justify-center  backdrop-blur-sm rounded-[15px]   rounded-br-none">
+              <div className="fixed bg-gray-700  h-[20vh] w-3/4 sm:w-[25vw] text-xl z-[100]  p-1 top-[65.2vh] sm:top-[64.7vh] ml-[37.5vw] sm:ml-[62.6vw] items-center text-center flex justify-center  backdrop-blur-sm rounded-[15px]   rounded-br-none">
                 <h3>Click to add new beneficiary details</h3>
               </div>
               <img
                 src={img}
-                className=" fixed object-cover h-20  ml-[80vw] sm:ml-[85vw] top-[80vh] "
+                className=" fixed object-cover h-20  ml-[78vw] sm:ml-[85vw] top-[80vh] "
                 alt=""
               />
             </div>
@@ -380,7 +380,7 @@ function Beneficiaries() {
           {plusIcon ? (
             <div className=" fixed top-0 box-border z-[200] backdrop-blur-xl h-screen w-screen">
               <div className="w-3/4 m-auto   h-full pt-[10vh] md:pt-[20vh]  pb-[2vh] box-border">
-                <div className="relative top-[13vh] text-gray-700 text-3xl left-[67vw] md:left-[56vw] h-[10vh] w-[10vw]">
+                <div className="relative top-[13vh] text-gray-700 text-3xl left-[65vw] md:left-[56vw] h-[10vh] w-[10vw]">
                   <IoMdCloseCircle onClick={() => setPlusIcon(false)} />
                 </div>
                 <form
