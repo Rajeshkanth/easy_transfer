@@ -356,7 +356,7 @@ function Beneficiaries() {
           </div>
           <img
             src={img}
-            className=" fixed object-cover h-20 z-[100] ml-[80vw] sm:ml-[85vw] top-[80vh] "
+            className=" fixed object-cover h-20 z-[100] ml-[78vw] sm:ml-[85vw] top-[80vh] "
             alt="add beneficiary"
             onClick={addNewBeneficiary}
           />
@@ -380,7 +380,7 @@ function Beneficiaries() {
           {plusIcon ? (
             <div className=" fixed top-0 box-border z-[200] backdrop-blur-xl h-screen w-screen">
               <div className="w-3/4 m-auto   h-full pt-[10vh] md:pt-[20vh]  pb-[2vh] box-border">
-                <div className="relative top-[13vh] text-gray-700 text-3xl left-[65vw] md:left-[56vw] h-[10vh] w-[10vw]">
+                <div className="relative top-[13vh] text-gray-700 text-3xl left-[63vw] md:left-[56vw] h-[10vh] w-[10vw]">
                   <IoMdCloseCircle onClick={() => setPlusIcon(false)} />
                 </div>
                 <form

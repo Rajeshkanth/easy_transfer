@@ -353,7 +353,7 @@ function PaymentForm() {
               </p>
             </div>
 
-            <form className="w-[80%] sm:w-5/12  h-[80vh] sm:h-[90%] md:w-2/5  lg:w-[40%] xl:w-1/3 relative pt-0  px-10 py-10  box-border  z-20 bg-white border-2 border-cyan-200  space-y-3 sm:space-y-0 rounded-md  mt-[2rem]   flex flex-col justify-center ">
+            <form className="w-[80%] sm:w-5/12  h-[70vh] sm:h-[90%] md:w-2/5  lg:w-[40%] xl:w-1/3 relative pt-0  px-10 py-10  box-border  z-20 bg-white border-2 border-cyan-200  space-y-3 sm:space-y-0 rounded-md  mt-[2rem]   flex flex-col justify-center ">
               <div className=" h-auto sm:h-1/6 pt-[1rem]  text-gray-800   w-full text-center flex justify-center  rounded-md rounded-b-none  ">
                 <h1 className="  mt-2 sm:mt-4 md:mt-6 lg:mt-[1.8vh] sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-extrabold text-gray-600 text-[23px]">
                   Money Transfer
