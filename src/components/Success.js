@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 import Loader from "./Loader";
 
 function Success() {
-  const { socket, connectionMode } = useContext(store);
+  const { socket, connectionMode, setRecentTransactions } = useContext(store);
   const [check, setCheck] = useState(false);
   const [fail, setFail] = useState(false);
   const navigate = useNavigate();
@@ -38,6 +38,11 @@ function Success() {
 
     socket.on("success", handleSuccess);
     socket.on("failed", handleFailure);
+
+    socket.on("transactionDetails", (data) => {
+      const { lastTransaction } = data;
+      setRecentTransactions((prev) => [...prev, lastTransaction]);
+    });
 
     return () => {
       socket.off("success", handleSuccess);

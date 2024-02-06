@@ -17,13 +17,8 @@ function Beneficiaries() {
     setWindowWidth,
     userNameFromDb,
     setUserNameFromDb,
-    amount,
-    setAmount,
-    toAccountNumber,
     setToAccountNumber,
-    toIFSCNumber,
     setToIFSCNumber,
-    toAccountHolderName,
     setToAccountHolderName,
     sendByBeneficiaries,
     setSendByBeneficiaries,
@@ -346,7 +341,7 @@ function Beneficiaries() {
                 <div className="w-[20%] pr-[.4rem] sm:pr-[2rem] lg:pr-[4rem] box-border">
                   <button
                     onClick={() => sendMoney(index)}
-                    className=" px-4 py-2 w-full border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                    className=" px-4 py-2 lg:px-2 w-full border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                   >
                     Send
                   </button>
@@ -366,7 +361,7 @@ function Beneficiaries() {
               onClick={() => setNotify(false)}
               className="fixed top-0 bg-transparent z-[150] backdrop-blur-xl h-screen w-screen"
             >
-              <div className="fixed bg-gray-700  h-[20vh] w-3/4 sm:w-[25vw] text-xl z-[100]  p-1 top-[65.2vh] sm:top-[64.7vh] ml-[37.5vw] sm:ml-[62.6vw] items-center text-center flex justify-center  backdrop-blur-sm rounded-[15px]   rounded-br-none">
+              <div className="fixed bg-gray-700  h-[20vh] w-1/2 sm:w-[25vw] text-xl z-[100]  p-1 top-[65.2vh] sm:top-[64.7vh] ml-[33.5vw] sm:ml-[62.6vw] items-center text-center flex justify-center  backdrop-blur-sm rounded-[15px]   rounded-br-none">
                 <h3>Click to add new beneficiary details</h3>
               </div>
               <img

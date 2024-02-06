@@ -16,7 +16,17 @@ import Success from "./components/Success";
 
 export const store = createContext();
 
+function getDate() {
+  const today = new Date();
+  const month = today.getMonth() + 1;
+  const year = today.getFullYear();
+  const date = today.getDate();
+  return `${month}/${date}/${year}`;
+}
+
 function App() {
+  const [currentDate, setCurrentDate] = useState(getDate());
+  const [recentTransactions, setRecentTransactions] = useState([]);
   const [amount, setAmount] = useState("");
   const [logOut, setLogOut] = useState(false);
   const [mobileNumber, setMobileNumber] = useState("");
@@ -62,6 +72,8 @@ function App() {
   const [enterAccountHolderName, setEnterAccountHolderName] = useState(false);
   const [enterToIfscNumber, setEnterToIfscNumber] = useState(false);
   const [enterAmount, setEnterAmount] = useState(false);
+  const [balance, setBalance] = useState(1000);
+  const [savedAccLength, setSavedAccLength] = useState("");
 
   const handleRegMobileNumber = (e) => {
     const value = e.target.value;
@@ -161,6 +173,7 @@ function App() {
 
           if (!isAlreadyStored) {
             setSavedAcc((prev) => [...prev, savedDetail]);
+
             console.log(savedAcc);
           }
         });
@@ -176,6 +189,11 @@ function App() {
       }
     };
   }, [connectionMode, socket, setSavedAcc]);
+  useEffect(() => {
+    const length = savedAcc.length;
+    sessionStorage.setItem("length", length);
+    setSavedAccLength(sessionStorage.getItem("length"));
+  }, [socket]);
 
   return (
     <store.Provider
@@ -273,6 +291,14 @@ function App() {
         enterAccountNumber,
         enterToIfscNumber,
         enterAmount,
+        balance,
+        setBalance,
+        savedAccLength,
+        setSavedAccLength,
+        recentTransactions,
+        setRecentTransactions,
+        currentDate,
+        setCurrentDate,
       }}
     >
       <Router>
