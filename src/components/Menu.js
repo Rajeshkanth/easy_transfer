@@ -28,7 +28,7 @@ function Menu(props) {
     };
   }, [windowWidth]);
   return (
-    <div className="h-[10%] w-screen   flex items-center justify-between sm:justify-evenly font-sans ">
+    <div className="h-[10%] w-screen  bg-gray-800 pb-2 sm:pb-0 flex items-center justify-between sm:justify-evenly font-sans ">
       <div className=" items-center ">
         <h1 className=" items-center font-bold ml-[2rem] text-center  sm:ml-[0rem] xl:ml-[0rem] text-2xl lg:text-4xl  box-border w-full  ">
           Easy Transfer

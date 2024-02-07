@@ -74,6 +74,7 @@ function App() {
   const [enterAmount, setEnterAmount] = useState(false);
   const [balance, setBalance] = useState(1000);
   const [savedAccLength, setSavedAccLength] = useState("");
+  const [recentTransactionsLength, setRecentTransactionsLength] = useState(0);
 
   const handleRegMobileNumber = (e) => {
     const value = e.target.value;
@@ -189,6 +190,39 @@ function App() {
       }
     };
   }, [connectionMode, socket, setSavedAcc]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (connectionMode !== "socket") {
+      } else {
+        socket.on("transactionDetailsFromDb", (data) => {
+          setRecentTransactions((prev) => [...prev, data]);
+        });
+
+        socket.on("transactionDetailsFromDb", (data) => {
+          const transaction = {
+            Date: data.Date,
+            Name: data.Name,
+            Status: data.Status,
+            Amount: data.Amount,
+          };
+
+          setRecentTransactions((prev) => [...prev, transaction]);
+        });
+        const length = recentTransactions.length;
+        setRecentTransactionsLength(length);
+      }
+    };
+    fetchData();
+
+    return () => {
+      if (connectionMode !== "socket") {
+      } else {
+        socket.off();
+        setRecentTransactions([]);
+      }
+    };
+  }, [connectionMode, socket, setRecentTransactions]);
   useEffect(() => {
     const length = savedAcc.length;
     sessionStorage.setItem("length", length);
@@ -198,6 +232,8 @@ function App() {
   return (
     <store.Provider
       value={{
+        recentTransactionsLength,
+        setRecentTransactionsLength,
         amount,
         setAmount,
         tabId,

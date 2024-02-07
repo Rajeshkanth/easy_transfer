@@ -24,8 +24,14 @@ function Success() {
 
     const handleSuccess = (data) => {
       if (typeof data === "boolean") {
+        socket.on("transactionDetails", (data) => {
+          const { lastTransaction } = data;
+          setRecentTransactions((prev) => [...prev, lastTransaction]);
+        });
         setCheck(data);
         setFail(false);
+
+        console.log("success");
       }
     };
 
@@ -39,16 +45,18 @@ function Success() {
     socket.on("success", handleSuccess);
     socket.on("failed", handleFailure);
 
-    socket.on("transactionDetails", (data) => {
-      const { lastTransaction } = data;
-      setRecentTransactions((prev) => [...prev, lastTransaction]);
-    });
-
     return () => {
       socket.off("success", handleSuccess);
       socket.off("failed", handleFailure);
     };
   }, [socket]);
+
+  // useEffect(() => {
+  //   socket.on("transactionDetails", (data) => {
+  //     const { lastTransaction } = data;
+  //     setRecentTransactions((prev) => [...prev, lastTransaction]);
+  //   });
+  // }, [socket]);
 
   useEffect(() => {
     if (connectionMode !== "socket") {
@@ -58,6 +66,7 @@ function Success() {
         const receivedRoom = data.socketRoom;
         console.log(receivedRoom);
         setSocketRoom(receivedRoom);
+        socket.join(receivedRoom);
       });
     }
   }, [socket]);

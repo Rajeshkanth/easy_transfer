@@ -197,15 +197,15 @@ function Beneficiaries() {
         });
         setNewBeneficiarySended(true);
       }
-      if (savedBeneficiaryName && savedAccNum && savedIfsc) {
-        const newBeneficiary = {
-          beneficiaryName: savedBeneficiaryName,
-          accNum: savedAccNum,
-          ifsc: savedIfsc,
-          editable: false, // Assuming this is the default value
-        };
-        // setSavedAcc((prevList) => [...prevList, newBeneficiary]);
-      }
+      // if (savedBeneficiaryName && savedAccNum && savedIfsc) {
+      //   const newBeneficiary = {
+      //     beneficiaryName: savedBeneficiaryName,
+      //     accNum: savedAccNum,
+      //     ifsc: savedIfsc,
+      //     editable: false, // Assuming this is the default value
+      //   };
+      //   // setSavedAcc((prevList) => [...prevList, newBeneficiary]);
+      // }
 
       setSavedBeneficiaryName("");
       setSavedAccNum("");
@@ -361,7 +361,7 @@ function Beneficiaries() {
               onClick={() => setNotify(false)}
               className="fixed top-0 bg-transparent z-[150] backdrop-blur-xl h-screen w-screen"
             >
-              <div className="fixed bg-gray-700  h-[20vh] w-1/2 sm:w-[25vw] text-xl z-[100]  p-1 top-[65.2vh] sm:top-[64.7vh] ml-[33.5vw] sm:ml-[62.6vw] items-center text-center flex justify-center  backdrop-blur-sm rounded-[15px]   rounded-br-none">
+              <div className="fixed bg-gray-700  h-[20vh] w-1/2 sm:w-[25vw] text-xl z-[100]  p-1 top-[65.2vh] sm:top-[64.7vh] ml-[35.5vw] sm:ml-[62.6vw] items-center text-center flex justify-center  backdrop-blur-sm rounded-[15px]   rounded-br-none">
                 <h3>Click to add new beneficiary details</h3>
               </div>
               <img
