@@ -371,13 +371,13 @@ function Beneficiaries() {
         <div className="h-[80vh] md:h-screen   m-auto  bg-white block md:flex  md:pl-[0rem] box-border">
           <div className="m-auto h-screen sm:h-[88vh] w-[100%]   text-gray-800   bg-white mt-[0rem] pb-[1rem] box-border overflow-x-auto space-y-2 lg:space-y-0">
             <div className="grid grid-cols-4 gap-0 fixed sm:sticky top-[7vh] sm:top-0  h-auto  z-10  pt-3 pb-5  text-white bg-gray-800 w-[100%] pl-[8vw] sm:pl-[11vw]">
-              <h1 className="font-bold w-1/4 md:text-sm  xl:text-xl items-center flex">
+              <h1 className="font-bold w-1/4 text-sm md:text-sm  xl:text-xl items-center flex">
                 Name
               </h1>
-              <h1 className="font-bold w-1/4  md:text-sm xl:text-xl items-center flex ml-[-2vw]">
+              <h1 className="font-bold w-1/4 text-sm  md:text-sm xl:text-xl items-center flex ml-[-2vw]">
                 Account
               </h1>
-              <h1 className="font-bold w-1/4  md:text-sm xl:text-lg items-center flex">
+              <h1 className="font-bold w-1/4 text-sm  md:text-sm xl:text-lg items-center flex">
                 IFSC
               </h1>
               <h1
@@ -390,22 +390,22 @@ function Beneficiaries() {
             {savedAcc.map((item, index) => (
               <div
                 key={index}
-                className="grid grid-cols-4    h-auto  z-10  pt-3 pb-3 text-gray-700  w-[100%] pl-[8vw] sm:pl-[11vw] pr-[9vw]"
+                className="grid grid-cols-4    h-auto  z-10  pt-3 pb-3 text-gray-700  w-[100%] pl-[8vw] sm:pl-[11vw] pr-[4vw] md:pr-[9vw]"
               >
-                <h1 className=" capitalize md:text-sm  xl:text-xl">
+                <h1 className="flex items-center capitalize text-xs md:text-sm  xl:text-xl">
                   {" "}
                   {item.beneficiaryName}
                 </h1>
-                <h1 className="  md:text-sm xl:text-xl ml-[-2vw]">
+                <h1 className="flex items-center  text-xs md:text-sm xl:text-xl ml-[-2vw]">
                   {item.accNum}
                 </h1>
-                <h1 className=" uppercase  md:text-sm xl:text-lg ml-[3vw]">
+                <h1 className="flex items-center  text-xs uppercase  md:text-sm xl:text-lg ml-[3vw]">
                   {" "}
                   {item.ifsc}
                 </h1>
                 <button
                   onClick={() => sendMoney(index)}
-                  className=" px-4 py-2 lg:px-2 w-1/2 ml-[7vw] border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                  className="text-xs px-4 py-2 md:text-lg lg:px-2 w-3/4 md:w-1/2 ml-[7vw] border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                 >
                   Send
                 </button>
