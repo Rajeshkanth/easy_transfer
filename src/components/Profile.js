@@ -8,8 +8,14 @@ import { FaRupeeSign } from "react-icons/fa";
 import { IoIosArrowForward } from "react-icons/io";
 import { IoIosWallet } from "react-icons/io";
 import { MdModeEdit } from "react-icons/md";
+import profileAlternate from "./images/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752-fotor-20240208155618.png";
+import FailedTransactions from "./FailedTransactions";
+// import { MdKeyboardArrowLeft } from "react-icons/fa6";
+import { MdKeyboardArrowLeft } from "react-icons/md";
 function Profile() {
   const {
+    initatedAmountSend,
+    setInitatedAmountSend,
     recentTransactionsLength,
     setRecentTransactionsLength,
     savedAcc,
@@ -48,17 +54,16 @@ function Profile() {
     balance,
     setBalance,
     savedAccLength,
+    setCanceledPaymentsCount,
+    canceledPayments,
+    failedTransaction,
+    setFailedTransaction,
   } = useContext(store);
   const navigate = useNavigate();
   const location = useLocation();
   const prevPath = location.state?.prevPath;
   const [isEditProfile, setIsEditProfile] = useState(false);
   const [img, setImg] = useState(null);
-
-  const logout = () => {
-    setLoggedUser("");
-    navigate("/");
-  };
 
   const handleUserName = (e) => {
     setUserName(e.target.value);
@@ -127,13 +132,13 @@ function Profile() {
         console.log("Navigating to Contact page");
         break;
       case "Transactions":
-        console.log("Navigating to Transactions page");
+        navigate("/Transactions");
         break;
       case "Menu":
         setSavedAcc([]);
         setIsProfileClicked(true);
         break;
-      case "Log out":
+      case "Log Out":
         logout();
         break;
       default:
@@ -145,23 +150,37 @@ function Profile() {
     if (windowWidth > 1024) {
       return {
         nav: [
-          "Back",
+          { icon: <MdKeyboardArrowLeft />, id: "Back" },
           "Beneficiaries",
+          "Transactions",
           "Rewards",
           "Contact",
-          "Transactions",
-          "Log out",
+
+          "Log Out",
         ],
         onClickHandler: handleMenuClick,
       };
     } else if (windowWidth > 768) {
       return {
-        nav: ["Back", "Beneficiaries", "Rewards", "Transactions", "Log Out"],
+        nav: [
+          { icon: <MdKeyboardArrowLeft />, id: "Back" },
+          ,
+          "Beneficiaries",
+          "Transactions",
+          "Rewards",
+
+          "Log Out",
+        ],
         onClickHandler: handleMenuClick,
       };
     } else if (windowWidth > 640) {
       return {
-        nav: ["Back", "Beneficiaries", "Menu"],
+        nav: [
+          { icon: <MdKeyboardArrowLeft />, id: "Back" },
+          ,
+          "Beneficiaries",
+          "Menu",
+        ],
         onClickHandler: handleMenuClick,
       };
     }
@@ -246,6 +265,11 @@ function Profile() {
       }
     }
   };
+  const logout = () => {
+    setLoggedUser("");
+    setSavedAcc([]);
+    navigate("/");
+  };
 
   const editProfile = () => {
     setIsEditProfile(true);
@@ -265,6 +289,7 @@ function Profile() {
   const savedAccounts = () => {
     navigate("/Beneficiaries");
   };
+
   const cancelEdit = () => {
     setIsEditProfile(false);
     setUserName("");
@@ -300,6 +325,7 @@ function Profile() {
       socket.emit("checkUserName", {
         regNumber: document.cookie,
       });
+
       socket.on("userNameAvailable", (data) => {
         setUserNameFromDb(data.user);
         setAgeFromDb(data.age);
@@ -316,6 +342,23 @@ function Profile() {
   }, [socket, connectionMode, setUserNameFromDb]);
 
   useEffect(() => {
+    if (connectionMode !== "socket") {
+    } else {
+      socket.emit("getTransactionDetails", {
+        num: document.cookie,
+      });
+    }
+
+    return () => {
+      if (connectionMode !== "socket") {
+      } else {
+        socket.off();
+        // setRecentTransactions([]);
+      }
+    };
+  }, [socket]);
+
+  useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
@@ -327,47 +370,43 @@ function Profile() {
     };
   }, [windowWidth]);
 
-  useEffect(() => {
-    if (connectionMode !== "socket") {
-    } else {
-      socket.emit("getTransactionDetails", {
-        num: document.cookie,
-      });
-    }
-  }, [socket]);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     if (connectionMode !== "socket") {
+  //     } else {
+  //       socket.on("transactionDetailsFromDb", (data) => {
+  //         const transaction = {
+  //           Date: data.Date,
+  //           Name: data.Name,
+  //           Status: data.Status,
+  //           Amount: data.Amount,
+  //         };
+
+  //         setRecentTransactions((prev) => [...prev, transaction]);
+  //       });
+  //       const length = recentTransactions.length;
+  //       setRecentTransactionsLength(length);
+  //     }
+  //   };
+  //   fetchData();
+
+  //   return () => {
+  //     if (connectionMode !== "socket") {
+  //     } else {
+  //       socket.off();
+  //       setRecentTransactions([]);
+  //     }
+  //   };
+  // }, [socket, connectionMode]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (connectionMode !== "socket") {
-      } else {
-        socket.on("transactionDetailsFromDb", (data) => {
-          setRecentTransactions((prev) => [...prev, data]);
-        });
-
-        socket.on("transactionDetailsFromDb", (data) => {
-          const transaction = {
-            Date: data.Date,
-            Name: data.Name,
-            Status: data.Status,
-            Amount: data.Amount,
-          };
-
-          setRecentTransactions((prev) => [...prev, transaction]);
-        });
-        const length = recentTransactions.length;
-        setRecentTransactionsLength(length);
-      }
-    };
-    fetchData();
-
-    return () => {
-      if (connectionMode !== "socket") {
-      } else {
-        socket.off();
-        setRecentTransactions([]);
-      }
-    };
-  }, []);
+    const canceledPaymentsCount = recentTransactions.filter(
+      (transaction) => transaction.Status === "canceled"
+    ).length;
+    console.log(canceledPaymentsCount);
+    setCanceledPaymentsCount(canceledPaymentsCount);
+    setRecentTransactionsLength(recentTransactions.length);
+  }, [recentTransactions]);
 
   return (
     <>
@@ -383,12 +422,12 @@ function Profile() {
           <div className="bg-slate-100  w-screen text-gray-700 h-auto flex flex-col  md:h-screen box-border md:grid md:grid-cols-4  md:gap-0 lg:gap-4 md:pb-2 md:pl-[3vw] lg:pl-[4vw] xl:pl-[5vw] md:pt-6 ">
             <>
               <div className="h-[50vh] md:h-[35vh] lg:h-[40vh] md:w-[20vw] border-b-2 md:border-b-0  items-center justify-center bg-white md:md:shadow-md shadow-gray-300 rounded-md">
-                <div className=" h-[150px] w-[150px] md:h-[120px] md:w-[120px] lg:w-[120px] lg:h-[w-120px] xl:h-[200px] xl:w-[200px] bg-white  absolute lg:fixed top-[12vh]  md:top-[16vh] lg:top-[17vh] xl:top-[15vh] z-5 overflow-hidden shadow-lg left-[10vw] sm:left-[12vw] md:left-[5vw] lg:left-[8vw] xl:left-[8vw] rounded-full border-2 border-gray-600">
+                <div className=" h-[150px] w-[150px] md:h-[120px] md:w-[120px] lg:w-[120px] lg:h-[w-120px] xl:h-[200px] xl:w-[200px] bg-white  absolute lg:fixed top-[12vh]  md:top-[16vh] lg:top-[17vh] xl:top-[16vh] z-5 overflow-hidden shadow-lg left-[10vw] sm:left-[12vw] md:left-[6vw] lg:left-[8vw] xl:left-[8vw] rounded-full border-2 border-gray-600">
                   {
                     <>
                       <img
                         className="w-full h-full object-cover rounded-full"
-                        src={img}
+                        src={img ? img : profileAlternate}
                         alt=""
                       />
                       <div className="absolute inset-0  opacity-30"></div>
@@ -415,8 +454,12 @@ function Profile() {
                 ) : null}
                 {windowWidth > 640 ? (
                   <div className="grid grid-rows-2 gap-8 md:gap-7 lg:gap-8 h-[10%] w-full mt-[35vh] md:mt-[25vh] lg:mt-[28vh] xl:mt-[30vh] pl-[0vw] md:pl-[4vw] lg:ml-[1vw] xl:ml-[2vw] item-center m-auto text-gray-700">
-                    <h1 className=" text-2xl pl-[12vw] md:pl-1  lg:pl-2 xl:pl-2 grid grid-cols-2 gap-[10px] md:gap-[80px] lg:gap-10 items-center font-extrabold  w-[82%] sm:w-1/2 md:w-[60%]  lg:w-3/4 text-center sm:text-center">
-                      {userNameFromDb} <MdModeEdit onClick={editProfile} />
+                    <h1 className=" text-2xl pl-[12vw] md:pl-1  lg:pl-2 xl:pl-2  grid grid-cols-2 gap-[10px] md:gap-[80px] lg:gap-10 items-center font-extrabold  w-[82%] sm:w-1/2 md:w-[60%]  lg:w-3/4 text-center sm:text-center">
+                      {userNameFromDb}{" "}
+                      <MdModeEdit
+                        onClick={editProfile}
+                        className="cursor-pointer"
+                      />
                     </h1>
                     <h1 className=" text-lg font-lighter   w-[82%] sm:w-[47%] md:w-1/2 text-center sm:text-center">
                       {document.cookie}
@@ -425,16 +468,23 @@ function Profile() {
                 ) : null}
               </div>
               <div className="h-[20vh]  grid md:block  md:w-[20vw] border-b-2 md:border-b-0 pb-2  md:pb-[8rem] xl:pb-0 bg-white space-y-2 box-border pt-[3vh] pl-[15vw] md:pl-[2vw] pr-[2vw] md:items-center md:justify-center md:shadow-md shadow-gray-300 rounded-md grid-rows-3">
-                <h1 className="text-4xl font-bold">124</h1>
+                <h1 className="text-4xl font-bold">
+                  {recentTransactionsLength}
+                </h1>
                 <h1 className="md:border-b-2  md:text-sm lg:text-md pb-[2vh]">
                   Total Transactions
                 </h1>
-                <h1 className="text-md flex items-center justify-between hover:cursor-pointer ">
+                <h1
+                  className="text-md flex items-center justify-between cursor-pointer "
+                  onClick={() => navigate("/Transactions")}
+                >
                   View Details <IoIosArrowForward />
                 </h1>
               </div>
               <div className="h-[20vh]  grid grid-rows-3 md:block md:w-[20vw] border-b-2 md:border-b-0 pb-2  md:pb-[8rem] xl:pb-0 md:pb-0 bg-white box-border md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-[3vh] pl-[15vw] md:pl-[2vw] pr-[2vw] md:items-center md:justify-center ">
-                <h1 className="text-4xl font-bold">{savedAccLength}</h1>
+                <h1 className="text-4xl font-bold">
+                  {savedAccLength ? savedAccLength : 0}
+                </h1>
                 <h1 className="md:border-b-2  md:text-sm lg:text-md pb-[2vh]">
                   Total Recipients
                 </h1>
@@ -446,15 +496,18 @@ function Profile() {
                 </h1>
               </div>
               <div className="h-[20vh] grid grid-rows-3 md:block md:w-[20vw] border-b-2 md:border-b-0 pb-2 md:pb-[8rem]  xl:pb-0 box-border bg-white  md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-[3vh] pl-[15vw] md:pl-[2vw] pr-[2vw] items-left md:items-center md:justify-center">
-                <h1 className="text-4xl font-bold">4</h1>
+                <h1 className="text-4xl font-bold">{canceledPayments}</h1>
                 <h1 className="md:border-b-2 md:text-sm lg:text-md pb-[2vh]">
                   Failed Transactions
                 </h1>
-                <h1 className="text-md flex items-center justify-between  ">
+                <h1
+                  className="text-md flex items-center justify-between cursor-pointer "
+                  onClick={() => setFailedTransaction(true)}
+                >
                   View Details <IoIosArrowForward />
                 </h1>
               </div>
-              <div className="h-[31vh] md:h-[45vh] lg:h-[40vh]  border-b-2 pb-0 md:pb-0 md:w-[20vw] bg-white space-y-4 md:space-y-[5rem] flex flex-col pt-[1rem] md:pt-[4rem] items-center md:shadow-md shadow-gray-300 rounded-md">
+              <div className="h-[31vh] md:h-[40vh] lg:h-[40vh]  border-b-2 pb-0 md:pb-0 md:w-[20vw] bg-white space-y-4 md:space-y-[5rem] flex flex-col pt-[1rem] md:pt-[4rem] items-center md:shadow-md shadow-gray-300 rounded-md">
                 <div className="flex flex-col items-center space-y-2 justify-center">
                   <h1 className="m-0 text-4xl items-center flex justify-center border-2 rounded-full p-2 bg-slate-100">
                     <IoIosWallet />
@@ -464,15 +517,15 @@ function Profile() {
                   </h1>
                   <h1 className=" text-sm">Available Balance</h1>
                 </div>
-                <h1 className=" bg-slate-700 w-full h-[6vh] md:h-[6vh] lg:h-[6vh] text-white text-center flex items-center justify-center rounded-tr-none rounded-tl-none md:rounded-md">
+                <h1 className=" bg-slate-700 cursor-pointer hover:bg-gray-600 w-full md:w-[20%] lg:w-[20%] h-[6vh] md:h-[6vh] lg:h-[6vh] absolute top-[134vh] md:top-[78.5vh] lg:top-[80vh] xl:top-[81vh]  text-white text-center flex items-center justify-center md:rounded-tr-none md:rounded-tl-none md:rounded-md">
                   Customer Support
                 </h1>
               </div>
               <div className="h-[50vh] md:h-[55vh] lg:h-[60vh] xl:h-[60vh] border-b-2 md:border-b-0 md:w-[28vw] lg:w-[30vw] xl:w-[31vw] md:pl-0 md:mt-[-4.5rem] lg:mt-[-7.5rem] xl:mt-[-9.5rem] bg-white space-y-2  md:space-y-1 pt-2 md:pt-4 md:shadow-md shadow-gray-300 rounded-md">
-                <div className="grid grid-cols-2 gap-[10vw] md:gap-0 xl:gap-20  pl-4 md:pl-[2vw] ">
+                <div className="grid grid-cols-2 gap-[35vw] sm:gap-[45vw] md:gap-0 xl:gap-20  pl-4 md:pl-[2vw] ">
                   <h1 className="text-lg md:text-sm lg:text-xl ">Recipients</h1>
                   <h1
-                    className="text-sm md:text-xs lg:text-md ml-[4vw] md:ml-[2vw] lg:ml-[4vw] flex items-center text-gray-900 hover:cursor-pointer"
+                    className="text-sm md:text-xs lg:text-md xl:text-sm ml-[4vw] md:ml-[2vw] lg:ml-[4vw] flex items-center text-gray-900 hover:cursor-pointer"
                     onClick={() => navigate("/Beneficiaries")}
                   >
                     View more <IoIosArrowForward />
@@ -480,7 +533,10 @@ function Profile() {
                 </div>
                 <div className="grid   h-[50%] pt-[1vh]  md:h-[90%] lg:h-[90%] xl:h-full pl-[5vw] md:pl-[2vw] md:pt-[2vh] md:pb-[2vh]">
                   {savedAcc.slice(0, 6).map((item, index) => (
-                    <div className="space-y-0  xl:h-[3vh]    leading-0">
+                    <div
+                      key={index}
+                      className="space-y-0  xl:h-[3vh]    leading-0"
+                    >
                       <h1
                         key={index}
                         className="text-md  md:text-sm lg:text-md   capitalize "
@@ -492,15 +548,18 @@ function Profile() {
                   ))}
                 </div>
               </div>
-              <div className="h-[80vh] md:h-[55vh] lg:h-[60vh]  md:w-[38vw] lg:w-[37vw] xl:w-[33vw] border-b-2 md:border-b-0 overflow-y-auto md:mt-[-4.5rem]  lg:mt-[-7.5rem] xl:mt-[-9.5rem] md:ml-[7vw] lg:ml-[8vw] xl:ml-[11vw] space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
-                <div className="grid grid-cols-3 md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-[6vh] pl-4 border-b-2  items-center">
+              <div className="h-auto md:h-[55vh] lg:h-[60vh]  md:w-[38vw] lg:w-[37vw] xl:w-[33vw] border-b-2 md:border-b-0 overflow-y-auto md:mt-[-4.5rem]  lg:mt-[-7.5rem] xl:mt-[-9.5rem] md:ml-[7vw] lg:ml-[8vw] xl:ml-[11vw] space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
+                <div className="grid grid-cols-3 md:gap-0 sticky top-0 z-5 bg-slate-700 text-white h-[6vh] pl-4 border-b-2  items-center">
                   <h1 className="text-sm  md:text-xs lg:text-md xl:text-xl  md:pr-0 border-r-2">
                     Recent Activity
                   </h1>
                   <h1 className="text-xs  lg:text-xs xl:text-sm pl-2">
                     {recentTransactions.length} Transactions
                   </h1>
-                  <h1 className="text-xs md:text-xs xl:text-sm ml-[2vw] lg:ml-[4vw] flex items-center text-gray-200 hover:cursor-pointer">
+                  <h1
+                    className="text-xs md:text-xs xl:text-sm ml-[2vw] lg:ml-[4vw] flex items-center text-gray-200 hover:cursor-pointer"
+                    onClick={() => navigate("/Transactions")}
+                  >
                     View more <IoIosArrowForward />
                   </h1>
                 </div>
@@ -520,96 +579,39 @@ function Profile() {
                     There is no recent transactions
                   </p>
                 ) : (
-                  recentTransactions.map((item, index) => (
-                    <div
-                      key={index}
-                      className="grid grid-cols-2 gap-5  lg:gap-7 xl:gap-12 p-1 space-y-0 items-center pl-[5vw] md:pl-[1.2vw] pr-[2vw] border-b-2"
-                    >
-                      <div className="grid grid-cols-2 gap-6 lg:gap-2 xl:gap-6 items-center text-xs md:text-sm lg:text-md ">
-                        <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
-                        <h1 className="md:text-xs lg:text-md">{`Sent to ${item.Name}`}</h1>
+                  recentTransactions
+                    .slice(-13)
+                    .reverse()
+                    .map((item, index) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-2 gap-5  lg:gap-7 xl:gap-12 p-1 space-y-0 items-center pl-[5vw] md:pl-[1.2vw] pr-[2vw] border-b-2"
+                      >
+                        <div className="grid grid-cols-2 gap-6 lg:gap-2 xl:gap-6 items-center text-xs md:text-sm lg:text-md ">
+                          <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
+                          <h1 className="md:text-xs lg:text-md">{`Sent to ${item.Name}`}</h1>
+                        </div>
+                        <div className="grid grid-cols-2 md:gap-5 lg:gap-10  text-xs md:text-sm lg:text-md  ">
+                          <h1 className="md:text-xs lg:text-md">
+                            {item.Amount}
+                          </h1>
+                          <h1
+                            className={
+                              item.Status === "completed"
+                                ? "md:text-xs lg:text-md text-green-600 capitalize"
+                                : item.Status === "canceled"
+                                ? "md:text-xs lg:text-md text-red-800 capitalize"
+                                : "md:text-xs lg:text-md text-yellow-400 capitalize"
+                            }
+                          >
+                            {item.Status}
+                          </h1>
+                        </div>
                       </div>
-                      <div className="grid grid-cols-2 md:gap-5 lg:gap-10  text-xs md:text-sm lg:text-md  ">
-                        <h1 className="md:text-xs lg:text-md">{item.Amount}</h1>
-                        <h1
-                          className={
-                            item.Status === "completed"
-                              ? "md:text-xs lg:text-md text-green-600"
-                              : item.Status === "Canceled"
-                              ? "md:text-xs lg:text-md text-gray-800"
-                              : "md:text-xs lg:text-md text-gray-800"
-                          }
-                        >
-                          {item.Status}
-                        </h1>
-                      </div>
-                    </div>
-                  ))
+                    ))
                 )}
               </div>
             </>
-
-            {/* {isEditProfile ? null : (
-            <div className="w-screen h-auto">
-              <div className="w-screen bg-gray-700 border-b-2 h-[20vh]"></div>
-              <div className="h-[150px] w-[150px] md:h-[200px] md:w-[200px] bg-white  fixed top-[15vh]  md:top-[17vh] z-5 overflow-hidden shadow-lg left-[31vw] sm:left-[12vw] md:left-[9vw] rounded-full border-2 border-white">
-                {
-                  <>
-                    <img
-                      className="w-full h-full object-cover rounded-full"
-                      src={img}
-                      alt="Profile"
-                    />
-                    <div className="absolute inset-0  opacity-30"></div>
-                    <p className="absolute inset-0 opacity-0 flex items-center justify-center text-white">
-                      Edit
-                    </p>
-                    <input
-                      id="profilePicInput"
-                      type="file"
-                      accept="image/*"
-                      className="absolute inset-0 opacity-0 cursor-pointer"
-                      onChange={setProfilePic}
-                    />
-                  </>
-                }
-              </div>
-              <div
-                className={
-                  windowWidth < 640
-                    ? "w-screen   box-border h-screen   bg-white  sm:border-2 sm:border-r-0 border-white ml-[0]  pt-[4rem] p-[2rem] flex   "
-                    : "w-screen   h-screen md:h-[69vh]  box-border bg-white  border-white m-auto font-poppins pt-[5rem]  sm:pt-[10vh] p-[2rem]    "
-                }
-              >
-                <div className="h-auto w-full   font-poppins  text-gray-800 pl-0 sm:p-5 rounded-md items-center justify-center m-auto mt-[4rem] sm:mt-4 box-border">
-                  <div className="flex w-full ml-[7vw] md:w-1/2  items-center space-x-2  ">
-                    <h1 className=" text-2xl font-extrabold  w-[82%] sm:w-1/2 text-center sm:text-left">
-                      {userNameFromDb}
-                    </h1>
-                  </div>
-                  <div className="flex w-full ml-[7vw]  md:w-1/2  items-center space-x-2  ">
-                    <h1 className=" text-md font-light w-[82%] sm:w-1/2 text-center sm:text-left">
-                      Tamil Nadu, India
-                    </h1>
-                  </div>
-
-                  <div className="md:w-1/2 pl-[7vw]">
-                    <button
-                      onClick={editProfile}
-                      className="w-full   outline-none sm:w-1/2 md:w-1/2   p-4 pt-2  pb-2 mt-[1rem] text-white rounded-lg box-border bg-gray-800  hover:bg-gray-600 "
-                    >
-                      Edit Profile
-                    </button>
-                  </div>
-                </div>
-                <div className="h-1/2 w-auto   font-poppins  text-gray-800 pl-0 sm:p-5 rounded-md items-center justify-center m-auto ml-[7vw] mt-[0rem] shadow-md shadow-black sm:mt-0 box-border ">
-                  <div className="md:w-[23%] h-[35%] rounded-lg ml-[0vw] bg-gray-700 grid justify-center text-white  items-center">
-                    Linked Accounts
-                  </div>
-                </div>
-              </div>
-            </div>
-          )} */}
           </div>
         )}
         {isEditProfile ? (
@@ -714,6 +716,12 @@ function Profile() {
         <>
           <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
         </>
+      ) : null}
+      {failedTransaction ? (
+        <div className="fixed top-0 grid justify-center h-screen w-screen">
+          {" "}
+          <FailedTransactions />
+        </div>
       ) : null}
     </>
   );

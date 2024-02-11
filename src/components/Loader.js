@@ -1,7 +1,10 @@
-import React, { memo } from "react";
+import React, { memo, useContext, useEffect } from "react";
+import { useNavigate } from "react-router";
+import { store } from "../App";
 
 function Loader(props) {
   const { msg, bg } = props;
+
   return (
     <>
       <div className={`loading font-poppins ${bg}`}>

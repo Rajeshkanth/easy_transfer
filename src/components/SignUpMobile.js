@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { memo, useContext, useEffect, useState } from "react";
 import { store } from "../App";
 import axios from "axios";
 import { FaRegEye } from "react-icons/fa";
@@ -350,4 +350,4 @@ function SignUpMobile() {
   );
 }
 
-export default SignUpMobile;
+export default memo(SignUpMobile);

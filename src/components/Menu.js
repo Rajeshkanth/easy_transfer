@@ -1,5 +1,6 @@
-import React, { useContext, useEffect } from "react";
+import React, { memo, useContext, useEffect } from "react";
 import { store } from "../App";
+import logo from "./images/Greenwhitelogo2.png";
 
 function Menu(props) {
   const { nav, onClickHandler } = props;
@@ -28,21 +29,29 @@ function Menu(props) {
     };
   }, [windowWidth]);
   return (
-    <div className="h-[10%] w-screen  bg-gray-800 pb-2 sm:pb-0 flex items-center justify-between sm:justify-evenly font-sans ">
-      <div className=" items-center ">
-        <h1 className=" items-center font-bold ml-[2rem] text-center  sm:ml-[0rem] xl:ml-[0rem] text-2xl lg:text-4xl  box-border w-full  ">
-          Easy Transfer
-        </h1>
+    <div className="h-[10%] fixed md:relative w-screen  bg-gray-800 pb-2 sm:pb-0 pt-2 md:pt-0 flex items-center justify-between sm:justify-between sm:pr-[4vw] md:pr-[0] md:justify-around font-sans ">
+      <div className=" items-center ml-[2vw] pt-[.3rem] pb-[.2rem]">
+        <img
+          src={logo}
+          className=" items-center object-contain  w-[40vw] md:w-[28vw] lg:w-[24vw] font-bold ml-[2rem] text-center  sm:ml-[0rem] xl:ml-[0rem] text-2xl lg:text-4xl  box-border   "
+        ></img>
+        {/* <div className="logo"></div> */}
       </div>
       {windowWidth > 640 ? (
-        <ul className="flex w-auto  md:ml-[1rem] lg:ml-[6rem]  xl:ml-[8rem] text-center   items-center md:space-x-0 xl:space-x-4 lg:space-x-2  font-bold text-md lg:text-lg">
+        <ul className="flex w-auto  md:ml-[1rem] lg:ml-[6rem]  xl:ml-[14rem] xl:pl-[4vw] text-center   items-center md:space-x-0 xl:space-x-4 lg:space-x-2  font-bold text-md md:text-sm lg:text-lg">
           {nav.map((item, index) => (
             <li
               key={index}
-              className="border-gray-800   hover:text-gray-300  active:border-gray-300 hover:border-white px-2 box-border hover:rounded-full active:font-bold hover:cursor-pointer"
-              onClick={() => handleClick(item)}
+              className={
+                item.icon
+                  ? "border-gray-800 text-2xl hover:text-gray-300  active:border-gray-300 hover:border-white px-2 box-border hover:rounded-full active:font-bold hover:cursor-pointer"
+                  : "border-gray-800   hover:text-gray-300  active:border-gray-300 hover:border-white px-2 box-border hover:rounded-full active:font-bold hover:cursor-pointer"
+              }
+              onClick={
+                item.id ? () => handleClick(item.id) : () => handleClick(item)
+              }
             >
-              {item}
+              {item.icon ? item.icon : item}
             </li>
           ))}
         </ul>
@@ -58,4 +67,4 @@ function Menu(props) {
   );
 }
 
-export default Menu;
+export default memo(Menu);

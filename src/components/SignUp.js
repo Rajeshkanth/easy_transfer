@@ -1,8 +1,9 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, memo } from "react";
 import { store } from "../App";
 import axios from "axios";
 import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
+import logo from "./images/Greenwhitelogo2.png";
 
 function SignUp() {
   const {
@@ -171,23 +172,30 @@ function SignUp() {
   return (
     <>
       <>
-        <div className="space-y-3 sm:space-y-5 lg:space-y-6 items-center justify-center pt-[2rem] text-gray-600">
-          <h1 className="font-extrabold text-3xl sm:text-4xl text-center text-gray-700 items-center font-poppins">
-            Easy Transfer
-          </h1>
+        <div className="space-y-3 sm:space-y-0 lg:space-y-0 flex flex-col items-center justify-center pt-[2rem] text-gray-600">
+          {/* <img
+            className="object-cover h-[10vh] w-[20vw]  text-center text-gray-700 items-center font-poppins"
+            src={logo}
+          ></img> */}
+          <img
+            className="font-extrabold text-3xl sm:text-4xl object-cover h-[10vh] w-[75%] md:w-[65%] lg:w-[25vw] text-center text-gray-700 items-center font-poppins"
+            src={logo}
+          >
+            {/* Easy Transfer */}
+          </img>
           <h1 className="text-center m-0 text-[4vw]   sm:text-2xl font-bold font-poppins    cursor-default ">
             User Register
           </h1>
         </div>
 
         <form className="flex flex-col items-center w-full m-auto  sh-auto  rounded-xl text-gray-800  ">
-          <div className="flex flex-col w-[80%]">
+          <div className="flex flex-col w-[80%] ">
             <label htmlFor="" className="mb-[.2rem] text-[14px]">
               Mobile Number
             </label>
             <input
               className={
-                regMobileNumber.length < 10
+                regMobileNumber.length < 10 && regMobileNumber
                   ? "outline-0 h-10 w-full border-2 border-red-500  rounded-lg  p-[1rem] text-[16px]  border-box "
                   : isAlreadyUser
                   ? "outline-0 h-10 w-full border-2 border-red-500  rounded-lg  p-[1rem]  text-[16px] border-box "
@@ -199,10 +207,16 @@ function SignUp() {
               value={regMobileNumber}
               onChange={handleRegMobileNumber}
               placeholder="Enter Mobile Number"
+              required={true}
             />
+            {regMobileNumber.length < 10 && regMobileNumber ? (
+              <p className="text-xs w-[80%] mt-[.4rem] text-red-500">
+                Mobile number must have 10 letters
+              </p>
+            ) : null}
           </div>
 
-          <div className="flex flex-col w-[80%] mt-[1rem]  ">
+          <div className="flex flex-col w-[80%] mt-[.4rem]  ">
             <label
               htmlFor=""
               className="block leading-6 text-left text-[14px] mb-[.2rem]  "
@@ -228,18 +242,18 @@ function SignUp() {
             />
             {showCreatePassword ? (
               <FaRegEye
-                className="relative ml-[45vw] sm:ml-[40vw] md:ml-[30vw] lg:ml-[20vw] xl:ml-[22vw] bottom-[1.7rem] text-zinc-400"
+                className="relative ml-[49vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
                 onClick={() => handleShowPassword("create")}
               />
             ) : (
               <FaRegEyeSlash
-                className="relative ml-[45vw] sm:ml-[40vw] md:ml-[30vw] lg:ml-[20vw] xl:ml-[22vw] bottom-[1.7rem] text-zinc-400"
+                className="relative ml-[49vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
                 onClick={() => handleShowPassword("create")}
               />
             )}
           </div>
 
-          <div className="flex flex-col  w-[80%] ">
+          <div className="flex flex-col  w-[80%] mt-[-.4rem]">
             <label
               htmlFor=""
               className="block leading-6 text-left text-[14px] mb-[.2rem]  "
@@ -264,12 +278,12 @@ function SignUp() {
             />
             {showConfirmPassword ? (
               <FaRegEye
-                className="relative ml-[45vw] sm:ml-[40vw] md:ml-[30vw] lg:ml-[20vw] xl:ml-[22vw] bottom-[1.8rem] text-zinc-400"
+                className="relative ml-[49vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
                 onClick={() => handleShowPassword("confirm")}
               />
             ) : (
               <FaRegEyeSlash
-                className="relative ml-[45vw] sm:ml-[40vw] md:ml-[30vw] lg:ml-[20vw] xl:ml-[22vw] bottom-[1.8rem] text-zinc-400"
+                className="relative ml-[49vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
                 onClick={() => handleShowPassword("confirm")}
               />
             )}
@@ -277,33 +291,33 @@ function SignUp() {
           {allInputAlert ? (
             <div className="w-[80%]">
               {" "}
-              <p className="text-xs text-red-500">*fill all inputs</p>
+              <p className="text-xs text-red-500">Fill all inputs</p>
             </div>
           ) : null}
           {signUpFailed ? (
             <p className="w-[80%] text-xs text-red-500">
-              *Password does not match.
+              Password does not match.
             </p>
           ) : null}
           {isAlreadyUser ? (
             <p className="w-[80%] text-red-500 text-xs">
-              *Mobile number already registered!
+              Mobile number already registered!
             </p>
           ) : null}
 
           {passwordError ? (
             <div className="w-[80%]">
               <p className="w-full text-red-500 text-xs">
-                *password must have 1 upper case
+                Password must have 1 upper case
               </p>
               <p className="w-full text-red-500 text-xs">
-                *password must have 1 lower case
+                Password must have 1 lower case
               </p>
               <p className="w-full text-red-500 text-xs">
-                *password must have 1 special character
+                Password must have 1 special character
               </p>
               <p className="w-full text-red-500 text-xs">
-                *password must have 8 letters
+                Password must have 8 letters
               </p>
             </div>
           ) : null}
@@ -343,4 +357,4 @@ function SignUp() {
   );
 }
 
-export default SignUp;
+export default memo(SignUp);

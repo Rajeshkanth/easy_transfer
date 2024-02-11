@@ -249,4 +249,4 @@ function ReceiverAccountForm() {
   );
 }
 
-export default ReceiverAccountForm;
+export default memo(ReceiverAccountForm);

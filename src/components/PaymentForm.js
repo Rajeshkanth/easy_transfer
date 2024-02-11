@@ -12,6 +12,8 @@ import SideBar from "./SideBar";
 
 function PaymentForm() {
   const {
+    initatedAmountSend,
+    setInitatedAmountSend,
     currentDate,
     setCurrentDate,
     setAgeFromDb,
@@ -50,12 +52,20 @@ function PaymentForm() {
     setBalance,
     recentTransactions,
     setRecentTransactions,
+    setTabId,
+    uuidv4,
+    setConnectionMode,
+    setRecentTransactionsLength,
+    setSavedAccLength,
   } = useContext(store);
 
   const navigate = useNavigate();
   const location = useLocation();
   const [allInput, setAllInput] = useState(false);
   const [sessionTiemedOut, setSessionTiemedOut] = useState(false);
+  const clickable = toAccountNumber.length > 15;
+  const [accNumAlert, setAccNumAlert] = useState(false);
+  const [sendButton, setSendButton] = useState(false);
 
   const handleMenuClick = (menuItem) => {
     switch (menuItem) {
@@ -75,12 +85,13 @@ function PaymentForm() {
         console.log("Navigating to Contact page");
         break;
       case "Transactions":
-        console.log("Navigating to Transactions page");
+        navigate("/Transactions");
         break;
       case "Menu":
         setIsProfileClicked(true);
         break;
       case "Log out":
+        handleSocket();
         setSavedAcc([]);
         logout();
         break;
@@ -97,8 +108,8 @@ function PaymentForm() {
 
   const handleAccNumToSend = (e) => {
     const value = e.target.value;
-    if (value.length <= 16) {
-      const sanitizedValue = value.replace(/[^0-9]/g, "");
+    const sanitizedValue = value.replace(/[^0-9]/g, "");
+    if (sanitizedValue.length <= 16) {
       setToAccountNumber(sanitizedValue);
     }
   };
@@ -115,9 +126,23 @@ function PaymentForm() {
     navigate("/");
   };
 
+  const handleSocket = () => {
+    if (connectionMode === "socket") {
+      socket.off();
+    }
+  };
+
   const sendAmountBySocket = (e) => {
     e.preventDefault();
-    if (amount && toAccountNumber && toAccountHolderName && toIFSCNumber) {
+    if (
+      amount &&
+      toAccountNumber &&
+      toAccountHolderName &&
+      toIFSCNumber &&
+      clickable
+    ) {
+      setSendButton(true);
+      setInitatedAmountSend(true);
       const newReceiver = {
         Amount: amount,
         AccNum: toAccountNumber,
@@ -126,7 +151,7 @@ function PaymentForm() {
         tabId: sessionStorage.getItem("tabId"),
         type: "socket",
       };
-      setBalance((prev) => prev - amount);
+
       const newTransactions = {
         Amount: amount,
         Date: currentDate,
@@ -136,7 +161,7 @@ function PaymentForm() {
         Uid: uuid(),
       };
       console.log(newTransactions);
-      setRecentTransactions((prev) => [...prev, newTransactions]);
+      // setRecentTransactions((prev) => [...prev, newTransactions]);
       socket.emit("paymentPageConnected", {
         num: document.cookie,
         connected: true,
@@ -149,12 +174,42 @@ function PaymentForm() {
       setEnterAccountNumber(false);
       setEnterAmount(false);
       setEnterToIfscNumber(false);
+      setAccNumAlert(false);
       handleAllInput();
       navigate("/success");
+    } else if (
+      !clickable &&
+      amount &&
+      toAccountNumber &&
+      toAccountHolderName &&
+      toIFSCNumber
+    ) {
+      setAccNumAlert(true);
+      // setAllInput(true);
+    } else if (
+      !amount &&
+      toAccountNumber &&
+      toAccountHolderName &&
+      toIFSCNumber &&
+      !clickable
+    ) {
+      // setAccNumAlert(true);
+      setAllInput(true);
     } else {
       setAllInput(true);
     }
   };
+
+  // const sendAmountViaSocket = (e) => {
+  //   e.preventDefault();
+  //   if (clickable) {
+  //     sendAmountBySocket();
+  //   } else if (!clickable) {
+  //     setAccNumAlert(true);
+  //   } else {
+  //     setAllInput(true);
+  //   }
+  // };
 
   const sendAmountByPolling = async (e) => {
     try {
@@ -209,11 +264,11 @@ function PaymentForm() {
     if (windowWidth > 1024) {
       return {
         nav: [
-          "Profile",
           "Beneficiaries",
+          "Profile",
+          "Transactions",
           "Rewards",
           "Contact",
-          "Transactions",
           "Log out",
         ],
         onClickHandler: handleMenuClick,
@@ -221,18 +276,19 @@ function PaymentForm() {
     } else if (windowWidth > 768) {
       return {
         nav: [
-          "Profile",
           "Beneficiaries",
+          "Profile",
+          "Transactions",
           "Rewards",
           "Contact",
-          "Transactions",
+
           "Log out",
         ],
         onClickHandler: handleMenuClick,
       };
     } else if (windowWidth > 640) {
       return {
-        nav: ["Profile", "Beneficiaries", "Menu"],
+        nav: ["Beneficiaries", "Profile", "Menu"],
         onClickHandler: handleMenuClick,
       };
     }
@@ -353,6 +409,7 @@ function PaymentForm() {
   }, [windowWidth]);
 
   useEffect(() => {
+    setAllInput(false);
     return () => {
       handleAllInput();
       if (connectionMode === "socket") {
@@ -360,26 +417,140 @@ function PaymentForm() {
       }
     };
   }, []);
+  useEffect(() => {
+    const storedTabId = sessionStorage.getItem("tabId");
+    if (storedTabId) {
+      setTabId(storedTabId);
+    } else {
+      const newTabId = uuidv4();
+      sessionStorage.setItem("tabId", newTabId);
+      setTabId(newTabId);
+    }
+
+    // const socket = io.connect("https://polling-server.onrender.com", {
+    //   query: {
+    //     tabId: sessionStorage.getItem("tabId"),
+    //   },
+    // });
+
+    socket.on("connection_type", (data) => {
+      if (data.type === "socket") {
+        setConnectionMode("socket");
+        console.log("socket");
+      } else {
+        setConnectionMode("polling");
+        console.log("polling");
+      }
+    });
+
+    // return () => {
+    //   socket.disconnect();
+    // };
+  }, []);
+
+  useEffect(() => {
+    socket.emit("fetchList", {
+      num: document.cookie,
+    });
+    console.log("event emitted");
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (connectionMode !== "socket") {
+      } else {
+        await socket.on("allSavedAccounts", (data) => {
+          const savedDetail = {
+            beneficiaryName: data.beneficiaryName,
+            accNum: data.accNum,
+            ifsc: data.ifsc,
+            editable: data.editable,
+          };
+
+          const isAlreadyStored = savedAcc.some((detail) => {
+            return (
+              detail.beneficiaryName === savedDetail.beneficiaryName &&
+              detail.accNum === savedDetail.accNum &&
+              detail.ifsc === savedDetail.ifsc &&
+              detail.editable === savedDetail.editable
+            );
+          });
+
+          if (!isAlreadyStored) {
+            setSavedAcc((prev) => [...prev, savedDetail]);
+          }
+          console.log("event received");
+        });
+      }
+    };
+
+    fetchData();
+    console.log("from effect");
+  }, []);
+  useEffect(() => {
+    const length = savedAcc.length;
+    sessionStorage.setItem("length", length);
+    setSavedAccLength(sessionStorage.getItem("length"));
+  }, [savedAcc]);
+
+  useEffect(() => {
+    if (connectionMode !== "socket") {
+    } else {
+      socket.emit("getTransactionDetails", {
+        num: document.cookie,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (connectionMode !== "socket") {
+      } else {
+        socket.on("transactionDetailsFromDb", (data) => {
+          const transaction = {
+            Date: data.Date,
+            Name: data.Name,
+            Status: data.Status,
+            Amount: data.Amount,
+          };
+
+          const isAlreadyStored = recentTransactions.some((detail) => {
+            return (
+              detail.Date === transaction.Date &&
+              detail.Name === transaction.Name &&
+              detail.Status === transaction.Status &&
+              detail.Amount === transaction.Amount
+            );
+          });
+          if (!isAlreadyStored)
+            setRecentTransactions((prev) => [...prev, transaction]);
+        });
+        const length = recentTransactions.length;
+        setRecentTransactionsLength(length);
+      }
+    };
+    fetchData();
+  }, [socket]);
 
   return (
     <>
-      <div className="paymentFormContainer h-screen   bg-gray-800 text-white font-sans fixed w-screen ">
+      <div className=" h-screen   bg-gray-800 text-white font-sans fixed w-screen ">
         <Menu {...menuProps} onClickHandler={handleMenuClick} />
 
         <div className="flex   w-full fixed top-[10%]  justify-center   ">
           <div className="w-[100vw]  flex  justify-evenly h-[90vh]  ">
-            <div className="hidden sm:block sm:w-1/2 md:w-auto">
+            <div className="hidden sm:block sm:w-1/2 md:w-auto xl:w-[58%] xl:pl-[6vw]">
               {" "}
-              <h1 className="text-4xl font-sans  font-light mt-[12rem] ml-[1rem]   lg:text-6xl ">
+              <h1 className="text-4xl font-sans  font-light mt-[12rem] ml-[0rem]   lg:text-6xl ">
                 The Secure, <br /> easiest and fastest <br /> way to transfer
                 money.{" "}
               </h1>
-              <p className="ml-[1rem] mt-[4rem] text-xs md:text-sm text-gray-300 lg:text-xl">
+              <p className="ml-[0rem] mt-[4rem] text-xs md:text-sm text-gray-300 lg:text-xl">
                 send & receive money in minutes without paying extra charges.
               </p>
             </div>
 
-            <form className="w-[80%] sm:w-5/12  h-[80vh] sm:h-[90%] md:w-2/5  lg:w-[40%] xl:w-1/3 relative pt-[2rem]  px-10 py-10  box-border  z-20 bg-white border-2 border-cyan-200  space-y-3 sm:space-y-0 rounded-md  mt-[2rem]   flex flex-col justify-center ">
+            <form className="w-[80%] sm:w-5/12  h-[80vh] sm:h-[90%] md:w-2/5  lg:w-[40%] xl:w-1/3 relative pt-[0rem]  px-10 py-10  box-border  z-20 bg-white border-2 border-cyan-200  space-y-3 sm:space-y-0 rounded-md  mt-[2rem]   flex flex-col justify-center ">
               <div className=" h-auto sm:h-1/6 pt-[1rem]  text-gray-800   w-full text-center flex justify-center  rounded-md rounded-b-none  ">
                 <h1 className="  mt-2 sm:mt-4 md:mt-6 lg:mt-[1.8vh] sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-extrabold text-gray-600 text-[27px]">
                   Money Transfer
@@ -393,9 +564,9 @@ function PaymentForm() {
                   type="text"
                   id="receiver-name"
                   className={
-                    !toAccountHolderName
-                      ? "block w-[100%] sm-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-red-800  rounded-md focus:outline-none focus:border-gray-800"
-                      : "block w-[100%] sm-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-gray-300  rounded-md focus:outline-none focus:border-gray-800"
+                    allInput && !toAccountHolderName
+                      ? "block w-[100%] sm-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-red-800  rounded-md focus:outline-none "
+                      : "block w-[100%] sm-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-gray-300  rounded-md focus:outline-none "
                   }
                   name="receiver-account-holder"
                   placeholder="Account Holder's Name"
@@ -404,6 +575,13 @@ function PaymentForm() {
                     setToAccountHolderName(e.target.value);
                   }}
                 />
+                {!toAccountHolderName && allInput ? (
+                  <>
+                    <p className="text-left text-xs text-red-600 mt-[-.8rem] mb-[0rem]">
+                      Enter Name
+                    </p>
+                  </>
+                ) : null}
 
                 <label
                   // className="relative  top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-800"
@@ -413,19 +591,31 @@ function PaymentForm() {
                 </label>
                 <input
                   className={
-                    !toAccountNumber
-                      ? "block  w-[100%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 mb-3  border border-red-800 rounded-md focus:outline-none focus:border-gray-800"
-                      : "block  w-[100%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                    !clickable && allInput && !toAccountNumber
+                      ? "block  w-[100%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 mb-3  border border-red-800 rounded-md focus:outline-none "
+                      : "block  w-[100%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none "
                   }
                   type="tel"
+                  minLength={16}
                   id="rec-account-number"
                   name="rec-account-number"
                   placeholder="Account Number"
                   value={toAccountNumber}
-                  onChange={(e) => {
-                    handleAccNumToSend(e);
-                  }}
+                  onChange={handleAccNumToSend}
                 />
+                {toAccountNumber.length < 15 && toAccountNumber ? (
+                  <>
+                    <p className="text-left text-xs text-red-600 mt-[-.8rem] mb-[.2rem]">
+                      Account number should have 16 letters
+                    </p>
+                  </>
+                ) : !toAccountNumber && allInput ? (
+                  <>
+                    <p className="text-left text-xs text-red-600 mt-[-.8rem] mb-[.2rem]">
+                      Enter Account Number
+                    </p>
+                  </>
+                ) : null}
 
                 <label
                   // className="relative w-25 top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-800"
@@ -435,9 +625,9 @@ function PaymentForm() {
                 </label>
                 <input
                   className={
-                    !toIFSCNumber
-                      ? "block  w-[100%] sm:11/12 sm:mb-[1rem] md:w-4/5 text-gray-800  lg:w-9/12  px-4 py-2 mb-3  border border-red-800 rounded-md focus:outline-none focus:border-gray-800"
-                      : "block  w-[100%] sm:11/12 sm:mb-[1rem] md:w-4/5 text-gray-800  lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                    allInput && !toIFSCNumber
+                      ? "block  w-[100%] sm:11/12 sm:mb-[1rem] md:w-4/5 text-gray-800  lg:w-9/12  px-4 py-2 mb-3  border border-red-800 rounded-md focus:outline-none "
+                      : "block  w-[100%] sm:11/12 sm:mb-[1rem] md:w-4/5 text-gray-800  lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none "
                   }
                   type="text"
                   id="rec-ifsc-number"
@@ -448,6 +638,13 @@ function PaymentForm() {
                     handleToIfsc(e);
                   }}
                 />
+                {!toIFSCNumber && allInput ? (
+                  <>
+                    <p className="text-left text-xs text-red-600 mt-[-.8rem] mb-[0rem]">
+                      Enter IFSC
+                    </p>
+                  </>
+                ) : null}
 
                 <label
                   //  className="relative w-20 top-3 left-2 transition-all bg-black px-1 box-border pointer-events-none text-gray-800"
@@ -461,29 +658,36 @@ function PaymentForm() {
                   name="amount"
                   id="amount"
                   className={
-                    !amount
-                      ? " block  w-[100%]  sm:mb-[0rem]  md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-4  border border-red-800 rounded-md focus:outline-none focus:border-gray-800"
-                      : " block  w-[100%]  sm:mb-[0rem]  md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-4  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800"
+                    !amount && allInput
+                      ? " block  w-[100%]  sm:mb-[0rem]  md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-4  border border-red-800 rounded-md focus:outline-none "
+                      : " block  w-[100%]  sm:mb-[0rem]  md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-4  border border-gray-300 rounded-md focus:outline-none "
                   }
                   value={amount}
                   onChange={(e) => handleAmountToSend(e)}
                   placeholder="Amount"
                 />
-
-                {allInput ? (
-                  <p className="text-left text-sm text-red-600 mt-[.4rem]">
-                    *fill all input values
-                  </p>
+                {!amount && allInput ? (
+                  <>
+                    <p className="text-left text-xs text-red-600 mt-[0rem] mb-[.2rem]">
+                      Enter Amount
+                    </p>
+                  </>
                 ) : null}
+                {/* {allInput ? (
+                  <p className="text-left text-sm text-red-600 mt-[.4rem]">
+                    Fill all input values
+                  </p>
+                ) : null} */}
               </div>
               <div className="w-full pt-0 sm:pt-6 box-border">
                 <input
                   type="submit"
                   value="SEND"
+                  // disabled={sendButton ? false : true}
                   className={
                     sendByBeneficiaries
-                      ? "block w-full sm:w-11/12 md:w-4/5 lg:w-9/12  px-4 py-2 m-auto mb-3 border-2  border-white rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
-                      : "block w-full sm:w-11/12 md:w-4/5 lg:w-9/12  px-4 py-2 m-auto mb-3 mt-2 border-2  border-white rounded-lg focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                      ? "block w-full sm:w-11/12 md:w-4/5 lg:w-9/12  px-4 py-2 m-auto mb-3 border-2  border-white rounded-md focus:outline-none  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                      : "block w-full sm:w-11/12 md:w-4/5 lg:w-9/12  px-4 py-2 m-auto mb-3 mt-2 border-2  border-white rounded-lg focus:outline-none  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                   }
                   onClick={
                     connectionMode === "socket"
@@ -496,7 +700,7 @@ function PaymentForm() {
                     type="button"
                     value="CANCEL"
                     onClick={cancelTransfer}
-                    className="block w-full sm:w-11/12 md:w-4/5 lg:w-9/12  px-4 py-2 m-auto mt-3  border border-gray-300 rounded-md focus:outline-none focus:border-gray-800 bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                    className="block w-full sm:w-11/12 md:w-4/5 lg:w-9/12  px-4 py-2 m-auto mt-3  border border-gray-300 rounded-md focus:outline-none  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                   />
                 ) : null}
               </div>

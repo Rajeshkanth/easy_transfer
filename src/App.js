@@ -9,12 +9,18 @@ import { io } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 import Beneficiaries from "./components/Beneficiaries";
 import HomePage from "./components/HomePage";
-// import "./App.css";
+import "./App.css";
 import PaymentForm from "./components/PaymentForm";
 import Profile from "./components/Profile";
 import Success from "./components/Success";
+import Transactions from "./components/Transactions";
 
 export const store = createContext();
+const socket = io.connect("https://polling-server.onrender.com", {
+  query: {
+    tabId: sessionStorage.getItem("tabId"),
+  },
+});
 
 function getDate() {
   const today = new Date();
@@ -75,6 +81,12 @@ function App() {
   const [balance, setBalance] = useState(1000);
   const [savedAccLength, setSavedAccLength] = useState("");
   const [recentTransactionsLength, setRecentTransactionsLength] = useState(0);
+  const [canceledPayments, setCanceledPaymentsCount] = useState(0);
+  const [isNewUser, setNewUser] = useState(false);
+  const [loginFailed, setLoginFailed] = useState(false);
+  const [loginInputAlert, setLoginInputAlert] = useState(false);
+  const [failedTransaction, setFailedTransaction] = useState(false);
+  const [initatedAmountSend, setInitatedAmountSend] = useState(false);
 
   const handleRegMobileNumber = (e) => {
     const value = e.target.value;
@@ -122,11 +134,6 @@ function App() {
   const closeProfile = () => {
     setIsProfileClicked(false);
   };
-  const socket =
-    connectionMode === "socket"
-      ? io.connect("https://polling-server.onrender.com")
-      : null;
-
   useEffect(() => {
     const storedTabId = sessionStorage.getItem("tabId");
     if (storedTabId) {
@@ -137,101 +144,60 @@ function App() {
       setTabId(newTabId);
     }
 
-    const socket = io.connect("https://polling-server.onrender.com");
+    // const socket = io.connect("https://polling-server.onrender.com", {
+    //   query: {
+    //     tabId: sessionStorage.getItem("tabId"),
+    //   },
+    // });
 
     socket.on("connection_type", (data) => {
       if (data.type === "socket") {
         setConnectionMode("socket");
+        console.log("socket");
       } else {
         setConnectionMode("polling");
+        console.log("polling");
       }
     });
-  }, [connectionMode]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (connectionMode === "socket") {
-        socket.emit("fetchList", {
-          num: document.cookie,
-        });
-
-        socket.on("allSavedAccounts", (data) => {
-          const savedDetail = {
-            beneficiaryName: data.beneficiaryName,
-            accNum: data.accNum,
-            ifsc: data.ifsc,
-            editable: data.editable,
-          };
-
-          const isAlreadyStored = savedAcc.some((detail) => {
-            return (
-              detail.beneficiaryName === savedDetail.beneficiaryName &&
-              detail.accNum === savedDetail.accNum &&
-              detail.ifsc === savedDetail.ifsc &&
-              detail.editable === savedDetail.editable
-            );
-          });
-
-          if (!isAlreadyStored) {
-            setSavedAcc((prev) => [...prev, savedDetail]);
-
-            console.log(savedAcc);
-          }
-        });
-      }
-    };
-
-    fetchData();
 
     return () => {
-      if (connectionMode !== "socket") {
-      } else {
-        socket.off();
-      }
+      // socket.disconnect();
+      setSavedAcc([]);
+      setRecentTransactions([]);
     };
-  }, [connectionMode, socket, setSavedAcc]);
+  }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (connectionMode !== "socket") {
-      } else {
-        socket.on("transactionDetailsFromDb", (data) => {
-          setRecentTransactions((prev) => [...prev, data]);
-        });
-
-        socket.on("transactionDetailsFromDb", (data) => {
-          const transaction = {
-            Date: data.Date,
-            Name: data.Name,
-            Status: data.Status,
-            Amount: data.Amount,
-          };
-
-          setRecentTransactions((prev) => [...prev, transaction]);
-        });
-        const length = recentTransactions.length;
-        setRecentTransactionsLength(length);
-      }
-    };
-    fetchData();
-
-    return () => {
-      if (connectionMode !== "socket") {
-      } else {
-        socket.off();
-        setRecentTransactions([]);
-      }
-    };
-  }, [connectionMode, socket, setRecentTransactions]);
-  useEffect(() => {
-    const length = savedAcc.length;
-    sessionStorage.setItem("length", length);
-    setSavedAccLength(sessionStorage.getItem("length"));
-  }, [socket]);
+  // useEffect(() => {
+  //   if (connectionMode !== socket) {
+  //   } else if (!logOut) {
+  //     socket.on("getSavedBeneficiary", (data) => {
+  //       const savedDetail = {
+  //         beneficiaryName: data.beneficiaryName,
+  //         accNum: data.accNum,
+  //         ifsc: data.ifsc,
+  //         editable: data.editable,
+  //       };
+  //       setSavedAcc((prev) => [...prev, savedDetail]);
+  //     });
+  //   }
+  // }, [socket]);
 
   return (
     <store.Provider
       value={{
+        setSavedAccLength,
+        setTabId,
+        setConnectionMode,
+        initatedAmountSend,
+        setInitatedAmountSend,
+        loginFailed,
+        setLoginFailed,
+        loginInputAlert,
+        setLoginInputAlert,
+        isNewUser,
+        setNewUser,
+        setCanceledPaymentsCount,
+        canceledPayments,
         recentTransactionsLength,
         setRecentTransactionsLength,
         amount,
@@ -335,6 +301,8 @@ function App() {
         setRecentTransactions,
         currentDate,
         setCurrentDate,
+        failedTransaction,
+        setFailedTransaction,
       }}
     >
       <Router>
@@ -344,6 +312,7 @@ function App() {
           <Route path="/success" element={<Success />}></Route>
           <Route path="/Profile" element={<Profile />}></Route>
           <Route path="/Beneficiaries" element={<Beneficiaries />}></Route>
+          <Route path="/Transactions" element={<Transactions />}></Route>
         </Routes>
       </Router>
     </store.Provider>
