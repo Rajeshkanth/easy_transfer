@@ -1,14 +1,17 @@
 {
   "files": {
-    "main.css": "/paymentpage/static/css/main.56b1f23b.css",
-    "main.js": "/paymentpage/static/js/main.26eed15b.js",
+    "main.css": "/paymentpage/static/css/main.9f10a587.css",
+    "main.js": "/paymentpage/static/js/main.991a4464.js",
+    "static/media/Greenwhitelogo2.png": "/paymentpage/static/media/Greenwhitelogo2.148eadd5dc19015ba8fc.png",
+    "static/media/plus-icon-plus-sign-vectors-photos-and-psd-files-download-3.png": "/paymentpage/static/media/plus-icon-plus-sign-vectors-photos-and-psd-files-download-3.5a8c94a89337fc3734e5.png",
+    "static/media/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752-fotor-20240208155618.png": "/paymentpage/static/media/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752-fotor-20240208155618.42544f00eefe5364cfc2.png",
     "static/media/plus.png": "/paymentpage/static/media/plus.b3120687d3118e5ed136.png",
     "index.html": "/paymentpage/index.html",
-    "main.56b1f23b.css.map": "/paymentpage/static/css/main.56b1f23b.css.map",
-    "main.26eed15b.js.map": "/paymentpage/static/js/main.26eed15b.js.map"
+    "main.9f10a587.css.map": "/paymentpage/static/css/main.9f10a587.css.map",
+    "main.991a4464.js.map": "/paymentpage/static/js/main.991a4464.js.map"
   },
   "entrypoints": [
-    "static/css/main.56b1f23b.css",
-    "static/js/main.26eed15b.js"
+    "static/css/main.9f10a587.css",
+    "static/js/main.991a4464.js"
   ]
 }
