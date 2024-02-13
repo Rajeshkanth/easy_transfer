@@ -6,6 +6,7 @@ import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import Loader from "./Loader";
 import logo from "./images/Greenwhitelogo2.png";
+import PhoneInput from "react-phone-input-2";
 
 function Login() {
   const navigate = useNavigate();
@@ -158,7 +159,7 @@ function Login() {
     <>
       <div className="items-center justify-center pt-[2rem] text-gray-600 flex space-y-0 flex-col">
         <img
-          className="font-extrabold text-3xl sm:text-4xl object-cover h-[10vh] w-[80%] lg:w-[20vw] text-center text-gray-700 items-center font-poppins"
+          className="font-extrabold text-xl sm:text-4xl object-cover h-[8vh] md:h-[10vh] w-[80%] md:w-[80%] lg:w-[20vw] text-center text-gray-700 items-center font-poppins"
           src={logo}
         >
           {/* Easy Transfer */}
@@ -175,15 +176,15 @@ function Login() {
             : "flex flex-col items-center bg-white m-auto rounded-2xl h-auto w-full space-y-2 font-poppins "
         }
       >
-        <div className="flex flex-col space-y-1 w-[80%]">
+        <div className="flex flex-col space-y-[2px] w-[80%]">
           <label htmlFor="" className="text-[14px] mb-[.1rem] ">
             Mobile Number
           </label>
           <input
             className={
-              mobileNumber.length < 10 && loginInputAlert
+              mobileNumber.length < 10 && mobileNumber
                 ? "outline-0 h-10  w-full border-2 border-red-600  text-[16px] rounded-lg  p-[1rem]    border-box  "
-                : loginFailed
+                : isNewUser || (loginInputAlert && !mobileNumber)
                 ? "outline-0 h-10  w-full border-2 border-red-600  rounded-lg  text-[16px] p-[1rem]   border-box  "
                 : "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px]  p-[1rem]   border-box "
             }
@@ -195,15 +196,19 @@ function Login() {
           />
 
           {mobileNumber.length < 10 && mobileNumber ? (
-            <p className="text-xs w-[80%]  text-red-500">
-              Mobile number must have 10 letters
+            <p className="text-xs w-[80%] mt-[.4rem]  text-red-500">
+              Mobile number must have 10 digits
             </p>
           ) : !mobileNumber && loginInputAlert ? (
-            <p className="text-xs w-[80%]  text-red-500">Enter Mobile Number</p>
+            <p className="text-xs w-[80%] mt-[.2rem] text-red-500">
+              Enter Mobile Number
+            </p>
           ) : null}
           {isNewUser ? (
             <div className="w-[80%] mb-2">
-              <p className="text-xs  text-red-500">Wrong Mobile Number</p>
+              <p className="text-xs mt-[.2rem] text-red-500">
+                Wrong Mobile Number
+              </p>
             </div>
           ) : null}
         </div>
@@ -234,7 +239,7 @@ function Login() {
             <FaRegEye
               className={
                 windowWidth < 640
-                  ? "relative ml-[49vw] bottom-[2rem] text-zinc-400"
+                  ? "relative ml-[56.5vw] bottom-[2rem] text-zinc-400"
                   : "relative  sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-0 sm:bottom-[2rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
@@ -243,7 +248,7 @@ function Login() {
             <FaRegEyeSlash
               className={
                 windowWidth < 640
-                  ? "relative ml-[49vw] bottom-[2rem] text-zinc-400"
+                  ? "relative ml-[56.5vw] bottom-[2rem] text-zinc-400"
                   : "relative  sm:ml-[42vw]  md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1rem] sm:bottom-[2rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
@@ -258,7 +263,7 @@ function Login() {
             </p>
           ) : null} */}
           {loginInputAlert ? (
-            <p className="relative top-[-4vh] text-red-500 text-xs cursor-default mt-[.5rem] ">
+            <p className="relative top-[-4vh] text-red-500 text-xs cursor-default mt-[.4rem] ">
               Enter Password
             </p>
           ) : null}

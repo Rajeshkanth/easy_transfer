@@ -152,7 +152,7 @@ function Success() {
               <br />
             </div>
           ) : (
-            <Loader msg={"waiting for the transaction confirmation"} />
+            <Loader msg={"Your Transaction is processing"} />
           )}
         </>
       )}

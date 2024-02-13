@@ -87,6 +87,10 @@ function App() {
   const [loginInputAlert, setLoginInputAlert] = useState(false);
   const [failedTransaction, setFailedTransaction] = useState(false);
   const [initatedAmountSend, setInitatedAmountSend] = useState(false);
+  const [hasLowerCase, setHasLowerCase] = useState(false);
+  const [hasUpperCase, setHasUpperCase] = useState(false);
+  const [hasSpecialChar, setHasSpecialChar] = useState(false);
+  const [hasMinLength, setHasMinLength] = useState(false);
 
   const handleRegMobileNumber = (e) => {
     const value = e.target.value;
@@ -102,6 +106,14 @@ function App() {
     const allowedPattern =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()-_+={}[\]:;'"<>,./?]).{8,}$/;
     const testedValue = allowedPattern.test(value);
+    const hasUpperCase = /[A-Z]/.test(testedValue);
+
+    const hasLowerCase = /[a-z]/.test(testedValue);
+
+    const hasSpecialChar = /[!@#$%^&*()-_+={}[\]:;'"<>,./?]/.test(testedValue);
+
+    const hasMinLength = testedValue.length >= 8;
+
     setCreatePassword(value);
     if (testedValue) {
       setPasswordError(false);
@@ -161,10 +173,53 @@ function App() {
     });
 
     return () => {
-      // socket.disconnect();
+      socket.disconnect();
       setSavedAcc([]);
       setRecentTransactions([]);
     };
+  }, []);
+
+  useEffect(() => {
+    socket.emit("fetchList", {
+      num: document.cookie,
+    });
+    console.log("event emitted");
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (connectionMode !== "socket") {
+      } else {
+        await socket.on("allSavedAccounts", (data) => {
+          const savedDetail = {
+            beneficiaryName: data.beneficiaryName,
+            accNum: data.accNum,
+            ifsc: data.ifsc,
+            editable: data.editable,
+          };
+
+          // Check if accNum is greater than 15 digits
+          if (String(savedDetail.accNum).length > 15) {
+            const isAlreadyStored = savedAcc.some((detail) => {
+              return (
+                detail.beneficiaryName === savedDetail.beneficiaryName &&
+                detail.accNum === savedDetail.accNum &&
+                detail.ifsc === savedDetail.ifsc &&
+                detail.editable === savedDetail.editable
+              );
+            });
+
+            if (!isAlreadyStored) {
+              setSavedAcc((prev) => [...prev, savedDetail]);
+            }
+          }
+          console.log("event received");
+        });
+      }
+    };
+
+    fetchData();
+    console.log("from effect");
   }, []);
 
   // useEffect(() => {
@@ -303,6 +358,14 @@ function App() {
         setCurrentDate,
         failedTransaction,
         setFailedTransaction,
+        setHasLowerCase,
+        setHasMinLength,
+        setHasSpecialChar,
+        setHasUpperCase,
+        hasLowerCase,
+        hasUpperCase,
+        hasSpecialChar,
+        hasMinLength,
       }}
     >
       <Router>

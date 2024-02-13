@@ -89,10 +89,24 @@ function HomePage() {
     };
   }, [windowWidth]);
 
+  useEffect(() => {
+    const sessionCleared = sessionStorage.getItem("userName") ? true : false;
+    if (!sessionCleared) {
+      disableBackButton();
+    }
+  }, []);
+
+  const disableBackButton = () => {
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = function () {
+      window.history.pushState(null, "", window.location.href);
+    };
+  };
+
   return (
     <div className="h-screen fixed w-screen bg-gray-800 text-white font-sans">
       {isLogin ? (
-        <div className=" w-[70%] sm:w-[60%] md:w-[50%] lg:w-[33%]  mx-auto    shadow-md shadow-black h-auto rounded-xl  mt-[15vh] ">
+        <div className=" w-[80%] sm:w-[60%] md:w-[50%] lg:w-[33%]  mx-auto    shadow-md shadow-black h-auto rounded-xl  mt-[15vh] ">
           {loader ? (
             <div className="fixed bg-transparent h-screen w-screen top-[0vh] left-[0vw] ">
               <div className="h-screen w-screen flex flex-col justify-center items-center">
@@ -109,7 +123,7 @@ function HomePage() {
           )}
         </div>
       ) : (
-        <div className="mx-auto w-[70%] sm:w-[60%] md:w-[50%] lg:w-[33%]  text-gray-800  bg-white  box-border  mt-[15vh] rounded-xl h-auto">
+        <div className="mx-auto w-[80%] sm:w-[60%] md:w-[50%] lg:w-[33%]  text-gray-800  bg-white  box-border  mt-[15vh] rounded-xl h-auto">
           <div className="w-full border-2 bg-white text-gray-800 space-y-4 sm:space-y-5 lg:space-y-7 rounded-2xl  shadow-md shadow-black">
             <SignUp />
           </div>

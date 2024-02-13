@@ -2,7 +2,7 @@ import React, { memo, useContext, useEffect, useState } from "react";
 import { store } from "../App";
 import axios from "axios";
 import { CgClose } from "react-icons/cg";
-import { useLocation, useNavigate } from "react-router";
+import { json, useLocation, useNavigate } from "react-router";
 import Menu from "./Menu";
 import SideBar from "./SideBar";
 import img from "./images/plus.png";
@@ -34,6 +34,7 @@ function Beneficiaries() {
     setNotify,
     setPlusIcon,
     plusIcon,
+    setRecentTransactions,
   } = useContext(store);
 
   // const [isProfileClicked, setIsProfileClicked] = useState(false);
@@ -78,7 +79,8 @@ function Beneficiaries() {
         navigate("/Transactions");
         break;
       case "Log out":
-        // setSavedAcc([]);
+        setSavedAcc([]);
+        setRecentTransactions([]);
         setLogOut(true);
         navigate("/");
 
@@ -206,7 +208,7 @@ function Beneficiaries() {
       //     ifsc: savedIfsc,
       //     editable: false, // Assuming this is the default value
       //   };
-      //   // setSavedAcc((prevList) => [...prevList, newBeneficiary]);
+      //   setSavedAcc((prevList) => [...prevList, newBeneficiary]);
       // }
 
       clearAllInputs();
@@ -229,7 +231,7 @@ function Beneficiaries() {
   };
 
   const handleSaveButtonClick = () => {
-    if (clickable && allInputsAlert) {
+    if (clickable) {
       setPlusIcon(false);
       saveBeneficiary();
       setAllInputsAlert(false);
@@ -240,8 +242,8 @@ function Beneficiaries() {
 
   useEffect(() => {
     if (connectionMode !== "socket") {
-    } else if (!logOut) {
-      socket.on("getSavedBeneficiary", (data) => {
+    } else {
+      socket.on("getLastTransactions", (data) => {
         const savedDetail = {
           beneficiaryName: data.beneficiaryName,
           accNum: data.accNum,
@@ -251,14 +253,14 @@ function Beneficiaries() {
         setSavedAcc((prev) => [...prev, savedDetail]);
       });
     }
-  }, [socket, connectionMode]);
+  }, [socket]);
 
   useEffect(() => {
     return () => {
       // setSavedAcc([]);
       setLogOut(false);
     };
-  }, [logOut]);
+  }, []);
 
   useEffect(() => {
     if (connectionMode !== "socket") {
@@ -289,6 +291,21 @@ function Beneficiaries() {
     }
     // console.log(savedAcc);
   }, [userNameFromDb, connectionMode, socket]);
+
+  // useEffect(() => {
+  //   if (connectionMode !== socket) {
+  //   } else if (!logOut) {
+  //     socket.on("getSavedBeneficiary", (data) => {
+  //       const savedDetail = {
+  //         beneficiaryName: data.beneficiaryName,
+  //         accNum: data.accNum,
+  //         ifsc: data.ifsc,
+  //         editable: data.editable,
+  //       };
+  //       setSavedAcc((prev) => [...prev, savedDetail]);
+  //     });
+  //   }
+  // }, [socket, logOut]);
 
   // useEffect(() => {
   //   if (connectionMode !== "socket") {
@@ -337,6 +354,11 @@ function Beneficiaries() {
   // }, [socket, connectionMode]);
 
   useEffect(() => {
+    const savedAcc = sessionStorage.getItem("savedAcc");
+    setSavedAcc(JSON.parse(savedAcc));
+  }, []);
+
+  useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
@@ -369,48 +391,50 @@ function Beneficiaries() {
         {/* </div> */}
 
         <div className="h-[80vh] md:h-screen   m-auto  bg-white block md:flex  md:pl-[0rem] box-border">
-          <div className="m-auto h-screen sm:h-[88vh] w-[100%]   text-gray-800   bg-white mt-[0rem] pb-[1rem] box-border overflow-x-auto space-y-2 lg:space-y-0">
-            <div className="grid grid-cols-4 gap-0 fixed sm:sticky top-[7vh] sm:top-0  h-auto  z-10  pt-3 pb-5  text-white bg-gray-800 w-[100%] pl-[8vw] sm:pl-[11vw]">
+          <div className="m-auto h-screen sm:h-[90vh] w-[100%]   text-gray-800   bg-white mt-[0rem] pb-[1rem] box-border overflow-x-auto space-y-2 lg:space-y-0">
+            <div className="grid grid-cols-4 gap-0 fixed sm:sticky top-[7vh] sm:top-0  h-auto  z-10 pt-[4vh] sm:pt-[12vh] md:pt-3 pb-5  text-white bg-gray-800 w-[100%] pl-[8vw] sm:pl-[10vw]">
               <h1 className="font-bold w-1/4 text-sm md:text-sm  xl:text-xl items-center flex">
                 Name
               </h1>
-              <h1 className="font-bold w-1/4 text-sm  md:text-sm xl:text-xl items-center flex ml-[-2vw]">
+              <h1 className="font-bold w-1/4 text-sm  md:text-sm xl:text-xl items-center flex ml-[-4vw] md:ml-[-3vw]">
                 Account
               </h1>
               <h1 className="font-bold w-1/4 text-sm  md:text-sm xl:text-lg items-center flex">
                 IFSC
               </h1>
               <h1
-                className="font-bold w-full md:w-[80%] py-2 text-sm lg:w-[60%] ml-[-6vw] md:ml-[-1.4vw] border-2 rounded-md cursor-pointer hover:bg-gray-100 hover:text-gray-800 text-center  md:text-sm xl:text-lg  bg-white text-gray-700"
+                className="font-bold w-full md:w-[80%] py-2  lg:w-[60%] ml-[-3vw] md:ml-[-1.4vw] border-2 rounded-md cursor-pointer hover:bg-gray-100 hover:text-gray-800 text-center  text-xs md:text-sm xl:text-lg  bg-white text-gray-700"
                 onClick={addNewBeneficiary}
               >
-                + Add Beneficiary
+                Add Beneficiary
               </h1>
             </div>
-            {savedAcc.map((item, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-4    h-auto  z-10  pt-3 pb-3 text-gray-700  w-[100%] pl-[8vw] sm:pl-[11vw] pr-[4vw] md:pr-[9vw]"
-              >
-                <h1 className="flex items-center capitalize text-xs md:text-sm  xl:text-xl">
-                  {" "}
-                  {item.beneficiaryName}
-                </h1>
-                <h1 className="flex items-center  text-xs md:text-sm xl:text-xl ml-[-2vw]">
-                  {item.accNum}
-                </h1>
-                <h1 className="flex items-center  text-xs uppercase  md:text-sm xl:text-lg ml-[3vw]">
-                  {" "}
-                  {item.ifsc}
-                </h1>
-                <button
-                  onClick={() => sendMoney(index)}
-                  className="text-xs px-4 py-2 md:text-lg lg:px-2 w-3/4 md:w-1/2 ml-[7vw] border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+            {savedAcc
+              .filter((item) => String(item.accNum).length > 15)
+              .map((item, index) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-4    h-auto  z-10  pt-3 pb-3 text-gray-700  w-[100%] pl-[8vw] sm:pl-[10vw] pr-[4vw] md:pr-[9vw]"
                 >
-                  Send
-                </button>
-              </div>
-            ))}
+                  <h1 className="flex items-center capitalize text-xs md:text-sm  xl:text-[16px]">
+                    {" "}
+                    {item.beneficiaryName}
+                  </h1>
+                  <h1 className="flex items-center  text-xs md:text-sm xl:text-[16px] ml-[-6vw] md:ml-[-2vw]">
+                    {item.accNum}
+                  </h1>
+                  <h1 className="flex items-center  text-xs uppercase  md:text-sm xl:text-[16px]  md:ml-[3vw]">
+                    {" "}
+                    {item.ifsc}
+                  </h1>
+                  <button
+                    onClick={() => sendMoney(index)}
+                    className="text-xs px-4 py-2 md:text-lg lg:px-2 w-3/4 md:w-3/4 lg:w-1/2  ml-[4vw] md:ml-[7vw] border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                  >
+                    Send
+                  </button>
+                </div>
+              ))}
             {/* <div className="w-[80%] h-auto space-y-2">
               {savedAcc.map((item, index) => (
                 <ul

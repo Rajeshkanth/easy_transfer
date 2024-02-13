@@ -58,11 +58,14 @@ function Profile() {
     canceledPayments,
     failedTransaction,
     setFailedTransaction,
+    setSavedAccLength,
   } = useContext(store);
   const navigate = useNavigate();
   const location = useLocation();
   const prevPath = location.state?.prevPath;
   const [isEditProfile, setIsEditProfile] = useState(false);
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [beneficiaries, setBeneficiaries] = useState([]);
   const [img, setImg] = useState(null);
 
   const handleUserName = (e) => {
@@ -81,7 +84,7 @@ function Profile() {
   };
   const handleAccNumber = (e) => {
     const value = e.target.value;
-    if (value.length <= 15) {
+    if (value.length <= 16) {
       const sanitizedValue = value.replace(/[^0-9]/g, "");
       setAccNumber(sanitizedValue);
     }
@@ -140,6 +143,8 @@ function Profile() {
         break;
       case "Log Out":
         logout();
+        setRecentTransactions([]);
+        setSavedAcc([]);
         break;
       default:
         console.log(`Unknown menu item: ${menuItem}`);
@@ -369,6 +374,9 @@ function Profile() {
       window.removeEventListener("resize", handleResize);
     };
   }, [windowWidth]);
+  useEffect(() => {
+    setSavedAccLength(sessionStorage.getItem("length"));
+  }, []);
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -400,13 +408,19 @@ function Profile() {
   // }, [socket, connectionMode]);
 
   useEffect(() => {
+    const transactions = sessionStorage.getItem("savedTransactions");
+    const beneficiary = sessionStorage.getItem("savedAcc");
+    const recentTransactions = JSON.parse(transactions);
+    const beneficiaries = JSON.parse(beneficiary);
     const canceledPaymentsCount = recentTransactions.filter(
       (transaction) => transaction.Status === "canceled"
     ).length;
     console.log(canceledPaymentsCount);
     setCanceledPaymentsCount(canceledPaymentsCount);
     setRecentTransactionsLength(recentTransactions.length);
-  }, [recentTransactions]);
+    setBeneficiaries(beneficiaries);
+    setRecentActivity(recentTransactions);
+  }, []);
 
   return (
     <>
@@ -419,10 +433,10 @@ function Profile() {
           <Menu {...menuProps} onClickHandler={handleMenuClick} />
         )}
         {isEditProfile ? null : (
-          <div className="bg-slate-100  w-screen text-gray-700 h-auto flex flex-col  md:h-screen box-border md:grid md:grid-cols-4  md:gap-0 lg:gap-4 md:pb-2 md:pl-[3vw] lg:pl-[4vw] xl:pl-[5vw] md:pt-6 ">
+          <div className="bg-slate-100  w-screen text-gray-700 h-auto flex flex-col  md:h-screen box-border md:grid md:grid-cols-4  md:gap-0 lg:gap-2 md:pb-2 md:pl-[3vw] lg:pl-[2vw] xl:pl-[3vw] md:pt-6 ">
             <>
               <div className="h-[50vh] md:h-[35vh] lg:h-[40vh] md:w-[20vw] border-b-2 md:border-b-0  items-center justify-center bg-white md:md:shadow-md shadow-gray-300 rounded-md">
-                <div className=" h-[150px] w-[150px] md:h-[120px] md:w-[120px] lg:w-[120px] lg:h-[w-120px] xl:h-[200px] xl:w-[200px] bg-white  absolute lg:fixed top-[12vh]  md:top-[16vh] lg:top-[17vh] xl:top-[16vh] z-5 overflow-hidden shadow-lg left-[10vw] sm:left-[12vw] md:left-[6vw] lg:left-[8vw] xl:left-[8vw] rounded-full border-2 border-gray-600">
+                <div className=" h-[150px] w-[150px] md:h-[120px] md:w-[120px] lg:w-[120px] lg:h-[w-120px] xl:h-[200px] xl:w-[200px] bg-white  absolute lg:fixed top-[12vh]  md:top-[16vh] lg:top-[17vh] xl:top-[16vh] z-5 overflow-hidden shadow-lg left-[10vw] sm:left-[12vw] md:left-[6vw] lg:left-[6vw] xl:left-[6vw] rounded-full border-2 border-gray-600">
                   {
                     <>
                       <img
@@ -445,9 +459,12 @@ function Profile() {
                   }
                 </div>
                 {windowWidth < 640 ? (
-                  <div className="w-1/2 absolute h-[10vh]  top-[40vh] grid grid-rows-2  left-[15vw]">
+                  <div className="w-1/2 absolute h-[10vh]  top-[36vh] grid grid-rows-2  left-[15vw]">
                     <h1 className="flex items-center   font-bold text-2xl">
-                      {userNameFromDb} <MdModeEdit onClick={editProfile} />
+                      {userNameFromDb
+                        ? userNameFromDb
+                        : sessionStorage.getItem("userName")}{" "}
+                      <MdModeEdit onClick={editProfile} />
                     </h1>
                     <h1>{document.cookie}</h1>
                   </div>
@@ -455,7 +472,9 @@ function Profile() {
                 {windowWidth > 640 ? (
                   <div className="grid grid-rows-2 gap-8 md:gap-7 lg:gap-8 h-[10%] w-full mt-[35vh] md:mt-[25vh] lg:mt-[28vh] xl:mt-[30vh] pl-[0vw] md:pl-[4vw] lg:ml-[1vw] xl:ml-[2vw] item-center m-auto text-gray-700">
                     <h1 className=" text-2xl pl-[12vw] md:pl-1  lg:pl-2 xl:pl-2  grid grid-cols-2 gap-[10px] md:gap-[80px] lg:gap-10 items-center font-extrabold  w-[82%] sm:w-1/2 md:w-[60%]  lg:w-3/4 text-center sm:text-center">
-                      {userNameFromDb}{" "}
+                      {userNameFromDb
+                        ? userNameFromDb
+                        : sessionStorage.getItem("userName")}{" "}
                       <MdModeEdit
                         onClick={editProfile}
                         className="cursor-pointer"
@@ -483,7 +502,7 @@ function Profile() {
               </div>
               <div className="h-[20vh]  grid grid-rows-3 md:block md:w-[20vw] border-b-2 md:border-b-0 pb-2  md:pb-[8rem] xl:pb-0 md:pb-0 bg-white box-border md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-[3vh] pl-[15vw] md:pl-[2vw] pr-[2vw] md:items-center md:justify-center ">
                 <h1 className="text-4xl font-bold">
-                  {savedAccLength ? savedAccLength : 0}
+                  {beneficiaries ? beneficiaries.length : 0}
                 </h1>
                 <h1 className="md:border-b-2  md:text-sm lg:text-md pb-[2vh]">
                   Total Recipients
@@ -532,7 +551,7 @@ function Profile() {
                   </h1>
                 </div>
                 <div className="grid   h-[50%] pt-[1vh]  md:h-[90%] lg:h-[90%] xl:h-full pl-[5vw] md:pl-[2vw] md:pt-[2vh] md:pb-[2vh]">
-                  {savedAcc.slice(0, 6).map((item, index) => (
+                  {beneficiaries.slice(0, 6).map((item, index) => (
                     <div
                       key={index}
                       className="space-y-0  xl:h-[3vh]    leading-0"
@@ -574,12 +593,12 @@ function Profile() {
                     <h1>Status</h1>
                   </div>
                 </div>
-                {recentTransactions.length < 1 ? (
+                {recentActivity.length < 1 ? (
                   <p className="flex items-center justify-center pt-[5rem]">
                     There is no recent transactions
                   </p>
                 ) : (
-                  recentTransactions
+                  recentActivity
                     .slice(-13)
                     .reverse()
                     .map((item, index) => (

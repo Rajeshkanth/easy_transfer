@@ -29,8 +29,8 @@ function Menu(props) {
     };
   }, [windowWidth]);
   return (
-    <div className="h-[10%] fixed md:relative w-screen  bg-gray-800 pb-2 sm:pb-0 pt-2 md:pt-0 flex items-center justify-between sm:justify-between sm:pr-[4vw] md:pr-[0] md:justify-around font-sans ">
-      <div className=" items-center ml-[2vw] pt-[.3rem] pb-[.2rem]">
+    <div className="h-[10%] fixed md:relative w-screen z-[20] bg-gray-800 pb-2 sm:pb-0 pt-2 md:pt-0 flex items-center justify-between sm:justify-between sm:pr-[4vw] md:pr-[2vw] md:justify-around font-sans ">
+      <div className=" items-center ml-[1vw] pt-[.3rem] pb-[.2rem]">
         <img
           src={logo}
           className=" items-center object-contain  w-[40vw] md:w-[28vw] lg:w-[24vw] font-bold ml-[2rem] text-center  sm:ml-[0rem] xl:ml-[0rem] text-2xl lg:text-4xl  box-border   "

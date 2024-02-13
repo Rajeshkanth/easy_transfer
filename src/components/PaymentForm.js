@@ -1,6 +1,6 @@
 import React, { memo, useContext, useEffect } from "react";
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import axios from "axios";
 import { store } from "../App";
@@ -61,9 +61,10 @@ function PaymentForm() {
 
   const navigate = useNavigate();
   const location = useLocation();
+
   const [allInput, setAllInput] = useState(false);
   const [sessionTiemedOut, setSessionTiemedOut] = useState(false);
-  const clickable = toAccountNumber.length > 15;
+  // const clickable = toAccountNumber.length > 15;
   const [accNumAlert, setAccNumAlert] = useState(false);
   const [sendButton, setSendButton] = useState(false);
 
@@ -90,9 +91,16 @@ function PaymentForm() {
       case "Menu":
         setIsProfileClicked(true);
         break;
-      case "Log out":
+      case "Log Out":
         handleSocket();
         setSavedAcc([]);
+        setRecentTransactions([]);
+        const tabId = sessionStorage.getItem("tabId");
+        sessionStorage.clear();
+        if (tabId) {
+          sessionStorage.setItem("tabId", tabId);
+        }
+
         logout();
         break;
       default:
@@ -134,14 +142,16 @@ function PaymentForm() {
 
   const sendAmountBySocket = (e) => {
     e.preventDefault();
+    console.log("clicked");
     if (
       amount &&
       toAccountNumber &&
       toAccountHolderName &&
       toIFSCNumber &&
-      clickable
+      String(toAccountNumber).length > 15
     ) {
-      setSendButton(true);
+      // setSendButton(true);
+      setSendByBeneficiaries(false);
       setInitatedAmountSend(true);
       const newReceiver = {
         Amount: amount,
@@ -178,11 +188,11 @@ function PaymentForm() {
       handleAllInput();
       navigate("/success");
     } else if (
-      !clickable &&
       amount &&
       toAccountNumber &&
       toAccountHolderName &&
-      toIFSCNumber
+      toIFSCNumber &&
+      toAccountNumber.length < 15
     ) {
       setAccNumAlert(true);
       // setAllInput(true);
@@ -190,13 +200,13 @@ function PaymentForm() {
       !amount &&
       toAccountNumber &&
       toAccountHolderName &&
-      toIFSCNumber &&
-      !clickable
+      toIFSCNumber
     ) {
       // setAccNumAlert(true);
       setAllInput(true);
     } else {
       setAllInput(true);
+      console.log("else part");
     }
   };
 
@@ -269,7 +279,7 @@ function PaymentForm() {
           "Transactions",
           "Rewards",
           "Contact",
-          "Log out",
+          "Log Out",
         ],
         onClickHandler: handleMenuClick,
       };
@@ -282,7 +292,7 @@ function PaymentForm() {
           "Rewards",
           "Contact",
 
-          "Log out",
+          "Log Out",
         ],
         onClickHandler: handleMenuClick,
       };
@@ -309,7 +319,7 @@ function PaymentForm() {
           "Rewards",
           "Contact",
           "Transactions",
-          "Log out",
+          "Log Out",
         ],
       };
     }
@@ -345,7 +355,9 @@ function PaymentForm() {
         regNumber: document.cookie,
       });
       socket.on("userNameAvailable", async (data) => {
-        await setUserNameFromDb(data.user);
+        sessionStorage.setItem("userName", data.user);
+        const userName = sessionStorage.getItem("userName");
+        await setUserNameFromDb(userName);
       });
       socket.on("userNotFound", async () => {
         await setUserNameFromDb("");
@@ -437,17 +449,34 @@ function PaymentForm() {
             editable: data.editable,
           };
 
-          const isAlreadyStored = savedAcc.some((detail) => {
-            return (
-              detail.beneficiaryName === savedDetail.beneficiaryName &&
-              detail.accNum === savedDetail.accNum &&
-              detail.ifsc === savedDetail.ifsc &&
-              detail.editable === savedDetail.editable
-            );
-          });
+          // Check if accNum is greater than 15 digits
+          if (String(savedDetail.accNum).length > 15) {
+            const isAlreadyStored = savedAcc.some((detail) => {
+              return (
+                detail.beneficiaryName === savedDetail.beneficiaryName &&
+                detail.accNum === savedDetail.accNum &&
+                detail.ifsc === savedDetail.ifsc &&
+                detail.editable === savedDetail.editable
+              );
+            });
 
-          if (!isAlreadyStored) {
-            setSavedAcc((prev) => [...prev, savedDetail]);
+            if (!isAlreadyStored) {
+              // sessionStorage.setItem(
+              //   "savedAcc",
+              //   JSON.stringify([...prev, savedDetail])
+              // );
+
+              // setSavedAcc((prev) => [...prev, savedDetail]);
+
+              setSavedAcc((prevSavedAcc) => {
+                const updatedSavedAcc = [...prevSavedAcc, savedDetail];
+                sessionStorage.setItem(
+                  "savedAcc",
+                  JSON.stringify(updatedSavedAcc)
+                );
+                return updatedSavedAcc;
+              });
+            }
           }
           console.log("event received");
         });
@@ -457,6 +486,7 @@ function PaymentForm() {
     fetchData();
     console.log("from effect");
   }, []);
+
   useEffect(() => {
     const length = savedAcc.length;
     sessionStorage.setItem("length", length);
@@ -493,7 +523,15 @@ function PaymentForm() {
             );
           });
           if (!isAlreadyStored)
-            setRecentTransactions((prev) => [...prev, transaction]);
+            // setRecentTransactions((prev) => [...prev, transaction]);
+            setRecentTransactions((prevTransact) => {
+              const updatedTransact = [...prevTransact, transaction];
+              sessionStorage.setItem(
+                "savedTransactions",
+                JSON.stringify(updatedTransact)
+              );
+              return updatedTransact;
+            });
         });
         const length = recentTransactions.length;
         setRecentTransactionsLength(length);
@@ -508,10 +546,10 @@ function PaymentForm() {
         <Menu {...menuProps} onClickHandler={handleMenuClick} />
 
         <div className="flex   w-full fixed top-[10%]  justify-center   ">
-          <div className="w-[100vw]  flex  justify-evenly h-[90vh]  ">
-            <div className="hidden sm:block sm:w-1/2 md:w-auto xl:w-[58%] xl:pl-[6vw]">
+          <div className="w-[96vw]  flex  justify-evenly h-[90vh]  ">
+            <div className="hidden sm:block sm:w-1/2 md:w-auto xl:w-[58%] xl:pl-[0vw]">
               {" "}
-              <h1 className="text-4xl font-sans  font-light mt-[12rem] ml-[0rem]   lg:text-6xl ">
+              <h1 className="text-4xl font-sans  font-light mt-[12rem] ml-[0rem]  md:text-5xl lg:text-6xl ">
                 The Secure, <br /> easiest and fastest <br /> way to transfer
                 money.{" "}
               </h1>
@@ -520,14 +558,14 @@ function PaymentForm() {
               </p>
             </div>
 
-            <form className="w-[80%] sm:w-5/12  h-[75vh] sm:h-[90%] md:w-2/5  lg:w-[40%] xl:w-1/3 relative pt-[0rem]  px-10 py-10  box-border  z-20 bg-white border-2 border-cyan-200  space-y-3 sm:space-y-0 rounded-md  mt-[2rem]   flex flex-col justify-center ">
+            <form className="w-[80%] sm:w-5/12  h-[75vh] sm:h-[90%]  lg:h-[82%] md:w-2/5  lg:w-[40%] xl:w-1/3 relative pt-[0rem]  px-10 py-10  box-border  z-20 bg-white border-2 border-cyan-200  space-y-3 sm:space-y-0 rounded-md  mt-[3rem]   flex flex-col justify-center ">
               <div className=" h-auto sm:h-1/6 pt-[1rem]  text-gray-800   w-full text-center flex justify-center  rounded-md rounded-b-none  ">
-                <h1 className="  mt-2 sm:mt-4 md:mt-6 lg:mt-[1.8vh] sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-extrabold text-gray-600 text-[27px]">
+                <h1 className="  mt-2 sm:mt-4 md:mt-3 lg:mt-[1vh] sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-extrabold text-gray-600 text-[27px]">
                   Money Transfer
                 </h1>
               </div>
-              <div className="md:ml-[3vw] lg:ml-[3.5vw] pt-[1rem] box-border  w-full">
-                <label className="block text-sm mb-[.2rem] px-1 pointer-events-none leading-6 text-gray-800">
+              <div className="md:ml-[0vw] lg:ml-[0vw] min-h-[30%] top-[1rem] box-border  w-full ">
+                <label className="block text-sm mb-[.2rem] md:ml-[2.4vw] lg:ml-[1vw] px-1 pointer-events-none leading-6 text-gray-800">
                   Beneficiary Name
                 </label>
                 <input
@@ -535,8 +573,8 @@ function PaymentForm() {
                   id="receiver-name"
                   className={
                     allInput && !toAccountHolderName
-                      ? "block w-[100%] sm-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-red-800  rounded-md focus:outline-none "
-                      : "block w-[100%] sm-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 border mb-3 border-gray-300  rounded-md focus:outline-none "
+                      ? "block w-[100%] sm-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-[90%] m-auto  px-4 py-2 border mb-3 border-red-800  rounded-md focus:outline-none "
+                      : "block w-[100%] sm-11/12 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-[90%] m-auto  px-4 py-2 border mb-3 border-gray-300  rounded-md focus:outline-none "
                   }
                   name="receiver-account-holder"
                   placeholder="Account Holder's Name"
@@ -547,7 +585,7 @@ function PaymentForm() {
                 />
                 {!toAccountHolderName && allInput ? (
                   <>
-                    <p className="text-left text-xs text-red-600 mt-[-.8rem] mb-[0rem]">
+                    <p className="text-left text-xs text-red-600 mt-[-.4rem] md:mt-[-.8rem]  md:ml-[3vw] lg:ml-[1.4vw] mb-[0rem]">
                       Enter Name
                     </p>
                   </>
@@ -555,15 +593,17 @@ function PaymentForm() {
 
                 <label
                   // className="relative  top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-800"
-                  className="block px-1 text-sm mb-[.2rem] pointer-events-none leading-6 text-gray-800"
+                  className="block px-1 text-sm mb-[.2rem] pointer-events-none md:ml-[2.4vw] lg:ml-[1vw] leading-6 text-gray-800"
                 >
                   Account Number
                 </label>
                 <input
                   className={
-                    !clickable && allInput && !toAccountNumber
-                      ? "block  w-[100%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 mb-3  border border-red-800 rounded-md focus:outline-none "
-                      : "block  w-[100%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none "
+                    allInput && toAccountNumber.length < 16
+                      ? "block  w-[100%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-[90%] m-auto  px-4 py-2 mb-3  border border-red-800 rounded-md focus:outline-none "
+                      : toAccountNumber.length < 16 && toAccountNumber
+                      ? "block  w-[100%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-[90%] m-auto  px-4 py-2 mb-3  border border-red-800 rounded-md focus:outline-none "
+                      : "block  w-[100%] sm:11/2 sm:mb-[1rem] md:w-4/5 text-gray-800 lg:w-[90%] m-auto  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none "
                   }
                   type="tel"
                   minLength={16}
@@ -573,15 +613,16 @@ function PaymentForm() {
                   value={toAccountNumber}
                   onChange={handleAccNumToSend}
                 />
-                {toAccountNumber.length < 15 && toAccountNumber ? (
+                {String(toAccountNumber).length < 16 && toAccountNumber ? (
                   <>
-                    <p className="text-left text-xs text-red-600 mt-[-.8rem] mb-[.2rem]">
-                      Account number should have 16 letters
+                    <p className="text-left text-xs text-red-600 mt-[-.6rem] md:mt-[-.8rem] md:ml-[3vw]  lg:ml-[1.4vw] mb-[.2rem]">
+                      Account number should have 16 digits
                     </p>
                   </>
-                ) : !toAccountNumber && allInput ? (
+                ) : null}
+                {!toAccountNumber && allInput ? (
                   <>
-                    <p className="text-left text-xs text-red-600 mt-[-.8rem] mb-[.2rem]">
+                    <p className="text-left text-xs text-red-600 mt-[-.6rem] md:mt-[-.8rem] md:ml-[3vw]  lg:ml-[1.4vw] mb-[.2rem]">
                       Enter Account Number
                     </p>
                   </>
@@ -589,15 +630,15 @@ function PaymentForm() {
 
                 <label
                   // className="relative w-25 top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-800"
-                  className="block text-sm mb-[.2rem] px-1 pointer-events-none leading-6 text-gray-800"
+                  className="block text-sm mb-[.2rem] px-1 pointer-events-none md:ml-[2.4vw] lg:ml-[1vw] leading-6 text-gray-800"
                 >
                   IFSC code
                 </label>
                 <input
                   className={
                     allInput && !toIFSCNumber
-                      ? "block  w-[100%] sm:11/12 sm:mb-[1rem] md:w-4/5 text-gray-800  lg:w-9/12  px-4 py-2 mb-3  border border-red-800 rounded-md focus:outline-none "
-                      : "block  w-[100%] sm:11/12 sm:mb-[1rem] md:w-4/5 text-gray-800  lg:w-9/12  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none "
+                      ? "block  w-[100%] sm:11/12 sm:mb-[1rem] md:w-4/5 text-gray-800  lg:w-[90%] m-auto  px-4 py-2 mb-3  border border-red-800 rounded-md focus:outline-none "
+                      : "block  w-[100%] sm:11/12 sm:mb-[1rem] md:w-4/5 text-gray-800  lg:w-[90%] m-auto  px-4 py-2 mb-3  border border-gray-300 rounded-md focus:outline-none "
                   }
                   type="text"
                   id="rec-ifsc-number"
@@ -610,7 +651,7 @@ function PaymentForm() {
                 />
                 {!toIFSCNumber && allInput ? (
                   <>
-                    <p className="text-left text-xs text-red-600 mt-[-.8rem] mb-[0rem]">
+                    <p className="text-left text-xs text-red-600 ml-0 sm:ml-0 md:ml-[3vw] lg:ml-[1.4vw] mt-[-.4rem] md:mt-[-.8rem] mb-[0rem]">
                       Enter IFSC
                     </p>
                   </>
@@ -618,7 +659,7 @@ function PaymentForm() {
 
                 <label
                   //  className="relative w-20 top-3 left-2 transition-all bg-black px-1 box-border pointer-events-none text-gray-800"
-                  className="block text-sm mb-[.2rem] px-1 pointer-events-none leading-6 text-gray-800"
+                  className="block text-sm mb-[.2rem] px-1 pointer-events-none md:ml-[2.4vw] lg:ml-[1vw] leading-6 text-gray-800"
                 >
                   {" "}
                   Amount{" "}
@@ -629,8 +670,8 @@ function PaymentForm() {
                   id="amount"
                   className={
                     !amount && allInput
-                      ? " block  w-[100%]  sm:mb-[0rem]  md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-4  border border-red-800 rounded-md focus:outline-none "
-                      : " block  w-[100%]  sm:mb-[0rem]  md:w-4/5  lg:w-9/12 text-gray-800 px-4 py-2 mb-4  border border-gray-300 rounded-md focus:outline-none "
+                      ? " block  w-[100%]  sm:mb-[0rem]  md:w-4/5  lg:w-[90%] m-auto text-gray-800 px-4 py-2 bottom-2  border border-red-800 rounded-md focus:outline-none "
+                      : " block  w-[100%]  sm:mb-[0rem]  md:w-4/5  lg:w-[90%] m-auto text-gray-800 px-4 py-2 bottom-2  border border-gray-300 rounded-md focus:outline-none "
                   }
                   value={amount}
                   onChange={(e) => handleAmountToSend(e)}
@@ -638,7 +679,7 @@ function PaymentForm() {
                 />
                 {!amount && allInput ? (
                   <>
-                    <p className="text-left text-xs text-red-600 mt-[0rem] mb-[.2rem]">
+                    <p className="text-left text-xs text-red-600 mt-[.2rem] md:mt-[0rem] md:ml-[3vw]  lg:ml-[1.4vw] mb-[.4rem]">
                       Enter Amount
                     </p>
                   </>
@@ -649,15 +690,14 @@ function PaymentForm() {
                   </p>
                 ) : null} */}
               </div>
-              <div className="w-full pt-0 sm:pt-6 box-border">
+              <div className="w-full pt-0 sm:pt-[2rem]   min-h-[10%] box-border">
                 <input
                   type="submit"
                   value="SEND"
-                  // disabled={sendButton ? false : true}
                   className={
                     sendByBeneficiaries
-                      ? "block w-full sm:w-11/12 md:w-4/5 lg:w-9/12  px-4 py-2 m-auto mb-3 border-2  border-white rounded-md focus:outline-none  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
-                      : "block w-full sm:w-11/12 md:w-4/5 lg:w-9/12  px-4 py-2 m-auto mb-3 mt-2 border-2  border-white rounded-lg focus:outline-none  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                      ? "block w-full sm:w-11/12 md:w-4/5 lg:w-[90%]   px-4 py-2 m-auto mb-3 border-2  border-white rounded-md focus:outline-none  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                      : "block w-full sm:w-11/12 md:w-4/5 lg:w-[90%]   px-4 py-2 m-auto mb-3 top-2 border-2  border-white rounded-lg focus:outline-none  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                   }
                   onClick={
                     connectionMode === "socket"
@@ -670,7 +710,7 @@ function PaymentForm() {
                     type="button"
                     value="CANCEL"
                     onClick={cancelTransfer}
-                    className="block w-full sm:w-11/12 md:w-4/5 lg:w-9/12  px-4 py-2 m-auto mt-3  border border-gray-300 rounded-md focus:outline-none  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                    className="block w-full sm:w-11/12 md:w-4/5 lg:w-[90%] m-auto  px-4 py-2  mt-3  border border-gray-300 rounded-md focus:outline-none  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                   />
                 ) : null}
               </div>

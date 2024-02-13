@@ -27,6 +27,14 @@ function SignUp() {
     setIsLogin,
     passwordError,
     setPasswordError,
+    setHasLowerCase,
+    setHasMinLength,
+    setHasSpecialChar,
+    setHasUpperCase,
+    hasLowerCase,
+    hasUpperCase,
+    hasSpecialChar,
+    hasMinLength,
   } = useContext(store);
 
   //   const [isLogin, setIsLogin] = useState(true);
@@ -64,6 +72,19 @@ function SignUp() {
     setCreatePassword("");
     setConfirmPassword("");
   };
+
+  // const handlePasswordError = () => {
+  //   if (hasLowerCase && hasUpperCase && hasSpecialChar && hasMinLength) {
+  //     setPasswordError(false);
+  //   } else if (
+  //     !hasLowerCase &&
+  //     hasUpperCase &&
+  //     hasSpecialChar &&
+  //     hasMinLength
+  //   ) {
+  //     setHasLowerCase(false);
+  //   }else if(!hasUpperCase &&)
+  // };
 
   const signupUser = async (e) => {
     e.preventDefault();
@@ -178,7 +199,7 @@ function SignUp() {
             src={logo}
           ></img> */}
           <img
-            className="font-extrabold text-3xl sm:text-4xl object-cover h-[10vh] w-[75%] md:w-[65%] lg:w-[25vw] text-center text-gray-700 items-center font-poppins"
+            className="font-extrabold text-xl sm:text-4xl object-cover h-[8vh] md:h-[10vh] w-[80%] md:w-[65%] lg:w-[25vw] text-center text-gray-700 items-center font-poppins"
             src={logo}
           >
             {/* Easy Transfer */}
@@ -188,7 +209,7 @@ function SignUp() {
           </h1>
         </div>
 
-        <form className="flex flex-col items-center w-full m-auto  sh-auto  rounded-xl text-gray-800  ">
+        <form className="flex flex-col items-center w-full m-auto    rounded-xl text-gray-800  ">
           <div className="flex flex-col w-[80%] ">
             <label htmlFor="" className="mb-[.2rem] text-[14px]">
               Mobile Number
@@ -197,7 +218,7 @@ function SignUp() {
               className={
                 regMobileNumber.length < 10 && regMobileNumber
                   ? "outline-0 h-10 w-full border-2 border-red-500  rounded-lg  p-[1rem] text-[16px]  border-box "
-                  : isAlreadyUser
+                  : isAlreadyUser || (allInputAlert && !regMobileNumber)
                   ? "outline-0 h-10 w-full border-2 border-red-500  rounded-lg  p-[1rem]  text-[16px] border-box "
                   : "outline-0 h-10 w-full border-2 border-slate-200  rounded-lg  p-[1rem] text-[16px]  border-box "
               }
@@ -211,12 +232,25 @@ function SignUp() {
             />
             {regMobileNumber.length < 10 && regMobileNumber ? (
               <p className="text-xs w-[80%] mt-[.4rem] text-red-500">
-                Mobile number must have 10 letters
+                Mobile number must have 10 digits
+              </p>
+            ) : null}
+            {allInputAlert && !regMobileNumber ? (
+              <div className="w-[80%]">
+                {" "}
+                <p className="text-xs mt-[.2rem] text-red-500">
+                  Enter Mobile Number
+                </p>
+              </div>
+            ) : null}
+            {isAlreadyUser ? (
+              <p className="w-[80%] text-red-500 mt-[.2rem] text-xs">
+                Mobile number already registered!
               </p>
             ) : null}
           </div>
 
-          <div className="flex flex-col w-[80%] mt-[.4rem]  ">
+          <div className="flex flex-col w-[80%] mt-[.2rem]  ">
             <label
               htmlFor=""
               className="block leading-6 text-left text-[14px] mb-[.2rem]  "
@@ -227,7 +261,7 @@ function SignUp() {
               className={
                 passwordError
                   ? "outline-0 h-10 w-full rounded-lg text-[16px] p-[1rem] border-2 border-red-500  border-box "
-                  : signUpFailed
+                  : signUpFailed || (allInputAlert && !createPassword)
                   ? "outline-0 h-10 w-full rounded-lg text-[16px] p-[1rem] border-2 border-red-500  border-box "
                   : "outline-0 h-10 w-full rounded-lg text-[16px] p-[1rem] border-2 border-slate-200  border-box "
               }
@@ -242,15 +276,39 @@ function SignUp() {
             />
             {showCreatePassword ? (
               <FaRegEye
-                className="relative ml-[49vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
+                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
                 onClick={() => handleShowPassword("create")}
               />
             ) : (
               <FaRegEyeSlash
-                className="relative ml-[49vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
+                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
                 onClick={() => handleShowPassword("create")}
               />
             )}
+
+            {passwordError ? (
+              !/[A-Z]/.test(createPassword) ? (
+                <p className="w-full text-red-500 text-xs mt-[-.8rem] mb-[.4rem] ">
+                  Password must have 1 upper case
+                </p>
+              ) : !/[a-z]/.test(createPassword) ? (
+                <p className="w-full text-red-500 text-xs mt-[-.8rem] mb-[.4rem]">
+                  Password must have 1 lower case
+                </p>
+              ) : !/[!@#$%^&*()-_+={}[\]:;'"<>,./?0-9]/.test(createPassword) ? (
+                <p className="w-full text-red-500 text-xs mt-[-.8rem] mb-[.4rem]">
+                  Password must have 1 special character
+                </p>
+              ) : createPassword.length < 8 ? (
+                <p className="w-full text-red-500 text-xs mt-[-.8rem] mb-[.4rem]">
+                  Password must have 8 letters
+                </p>
+              ) : null
+            ) : allInputAlert && !createPassword ? (
+              <p className="text-xs text-red-500 mt-[-.8rem] mb-[.4rem]">
+                Enter Password
+              </p>
+            ) : null}
           </div>
 
           <div className="flex flex-col  w-[80%] mt-[-.4rem]">
@@ -262,9 +320,7 @@ function SignUp() {
             </label>
             <input
               className={
-                passwordError
-                  ? "outline-0 h-10 w-full rounded-lg  p-[1rem] text-[16px] border-2 border-red-500  border-box "
-                  : signUpFailed
+                signUpFailed || (allInputAlert && !confirmPassword)
                   ? "outline-0 h-10 w-full rounded-lg  p-[1rem] text-[16px] border-2 border-red-500  border-box "
                   : "outline-0 h-10 w-full rounded-lg  p-[1rem] text-[16px] border-2 border-slate-200  border-box "
               }
@@ -278,48 +334,26 @@ function SignUp() {
             />
             {showConfirmPassword ? (
               <FaRegEye
-                className="relative ml-[49vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
+                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
                 onClick={() => handleShowPassword("confirm")}
               />
             ) : (
               <FaRegEyeSlash
-                className="relative ml-[49vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
+                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
                 onClick={() => handleShowPassword("confirm")}
               />
             )}
           </div>
-          {allInputAlert ? (
-            <div className="w-[80%]">
-              {" "}
-              <p className="text-xs text-red-500">Fill all inputs</p>
-            </div>
-          ) : null}
-          {signUpFailed ? (
-            <p className="w-[80%] text-xs text-red-500">
-              Password does not match.
-            </p>
-          ) : null}
-          {isAlreadyUser ? (
-            <p className="w-[80%] text-red-500 text-xs">
-              Mobile number already registered!
-            </p>
-          ) : null}
 
-          {passwordError ? (
-            <div className="w-[80%]">
-              <p className="w-full text-red-500 text-xs">
-                Password must have 1 upper case
-              </p>
-              <p className="w-full text-red-500 text-xs">
-                Password must have 1 lower case
-              </p>
-              <p className="w-full text-red-500 text-xs">
-                Password must have 1 special character
-              </p>
-              <p className="w-full text-red-500 text-xs">
-                Password must have 8 letters
-              </p>
-            </div>
+          {signUpFailed ||
+          (createPassword !== confirmPassword && confirmPassword) ? (
+            <p className="w-[80%] text-xs mt-[-.8rem] text-red-500">
+              Password does not match
+            </p>
+          ) : allInputAlert && !confirmPassword ? (
+            <p className="text-xs w-[80%] text-red-500 mt-[-.8rem] mb-[.4rem]">
+              Enter Password
+            </p>
           ) : null}
 
           <div className="w-[80%] items-center flex justify-center">
