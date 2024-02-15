@@ -57,6 +57,11 @@ function Transactions() {
       case "Log out":
         setSavedAcc([]);
         setRecentTransactions([]);
+        const tabId = sessionStorage.getItem("tabId");
+        sessionStorage.clear();
+        if (tabId) {
+          sessionStorage.setItem("tabId", tabId);
+        }
         setLogOut(true);
 
         navigate("/");
@@ -173,6 +178,7 @@ function Transactions() {
 
   useEffect(() => {
     const transactions = sessionStorage.getItem("savedTransactions");
+    console.log(transactions);
     setRecentTransactions(JSON.parse(transactions));
   }, []);
   useEffect(() => {
@@ -222,9 +228,9 @@ function Transactions() {
             ))}
           </div>
         </div> */}
-        <div className=" grid grid-rows-3 pt-[10vh] md:pt-0 md:grid-cols-2 gap-0 lg:gap-10 md:pl-[7vw] lg:pl-[6vw] md:mt-[4vh] box-border">
-          <div className="h-auto md:h-[30vh] lg:h-[30vh]  md:w-[35vw] lg:w-[35vw] xl:w-[40vw] border-b-2 md:border-b-0 overflow-y-auto    space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
-            <div className="grid  md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-[6vh] pl-2 lg:pl-12 border-b-2 pt-2 items-center">
+        <div className=" grid  pt-[10vh] md:pt-0 md:grid-cols-2 gap-0 lg:gap-10 md:pl-[7vw] lg:pl-[6vw] md:mt-[4vh] box-border">
+          <div className="h-[30vh] md:h-[30vh] lg:h-[30vh]  md:w-[35vw] lg:w-[35vw] xl:w-[40vw] border-b-2 md:border-b-0 overflow-y-auto    space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
+            <div className="grid  md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-[6vh] pl-2 lg:pl-9 xl:pl-12 border-b-2 pt-2 items-center">
               <h1 className="text-sm  md:text-xs lg:text-md xl:text-xl  md:pr-0 ">
                 Pending Transactions
               </h1>
@@ -240,8 +246,8 @@ function Transactions() {
                 <h1>Status</h1>
               </div>
             </div>
-            {recentTransactions.length < 1 ? (
-              <p className="flex items-center justify-center pt-[5rem]">
+            {recentTransactions === null ? (
+              <p className="flex items-center text-gray-700 justify-center pt-[5rem]">
                 There is no recent transactions
               </p>
             ) : (
@@ -274,8 +280,8 @@ function Transactions() {
                 ))
             )}
           </div>
-          <div className="h-auto md:h-[80vh] lg:h-[80vh]  md:w-[40vw] lg:w-[40vw] xl:w-[40vw] border-b-2 md:border-b-0 overflow-y-auto    space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
-            <div className="grid  md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-[6vh] pl-2 lg:pl-12 border-b-2 pt-2 items-center">
+          <div className="h-[50vh] md:h-[80vh] lg:h-[80vh]  md:w-[40vw] lg:w-[40vw] xl:w-[40vw] border-b-2 md:border-b-0 overflow-y-auto    space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
+            <div className="grid  md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-[6vh] pl-2 lg:pl-9 xl:pl-12 border-b-2 pt-2 items-center">
               <h1 className="text-sm  md:text-xs lg:text-md xl:text-xl  md:pr-0">
                 Completed Transactions
               </h1>
@@ -291,8 +297,8 @@ function Transactions() {
                 <h1>Status</h1>
               </div>
             </div>
-            {recentTransactions.length < 1 ? (
-              <p className="flex items-center justify-center pt-[5rem]">
+            {!recentTransactions ? (
+              <p className="flex items-center text-gray-700 justify-center pt-[5rem]">
                 There is no recent transactions
               </p>
             ) : (
@@ -327,8 +333,8 @@ function Transactions() {
                 ))
             )}
           </div>
-          <div className="h-auto md:h-[43vh] lg:h-[40vh]  md:w-[35vw] lg:w-[35vw] xl:w-[40vw] border-b-2 md:border-b-0 overflow-y-auto md:mt-[-43vh] lg:mt-[-43vh] xl:mt-[-25.5vw] space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
-            <div className="grid  md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-[6vh] pl-2 lg:pl-12 border-b-2 pt-2 items-center">
+          <div className="h-[50vh] md:h-[43vh] lg:h-[40vh]  md:w-[35vw] lg:w-[35vw] xl:w-[40vw] border-b-2 md:border-b-0 overflow-y-auto md:mt-[-43vh] lg:mt-[-47vh] xl:mt-[-25.5vw] space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
+            <div className="grid  md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-[6vh] pl-2 lg:pl-9 xl:pl-12 border-b-2 pt-2 items-center">
               <h1 className="text-sm  md:text-xs lg:text-md xl:text-xl  md:pr-0 ">
                 Canceled Transactions
               </h1>
@@ -344,8 +350,8 @@ function Transactions() {
                 <h1>Status</h1>
               </div>
             </div>
-            {recentTransactions.length < 1 ? (
-              <p className="flex items-center justify-center pt-[5rem]">
+            {!recentTransactions ? (
+              <p className="flex items-center text-gray-700 justify-center pt-[5rem]">
                 There is no recent transactions
               </p>
             ) : (

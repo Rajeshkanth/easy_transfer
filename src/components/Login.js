@@ -6,7 +6,11 @@ import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import Loader from "./Loader";
 import logo from "./images/Greenwhitelogo2.png";
+// import PhoneInput2 from "react-phone-number-input";
 import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import input from "react-international-phone";
+import "react-international-phone/style.css";
 
 function Login() {
   const navigate = useNavigate();
@@ -15,6 +19,9 @@ function Login() {
   // const [isNewUser, setNewUser] = useState(false);
   const [showCreatePassword, setShowCreatePassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [indiaCode, setIndiaCode] = useState(false);
+  const [singaporeCode, setSingaporeCode] = useState(false);
+  const [usRussiaCode, setUsRussiaCode] = useState(false);
 
   const {
     password,
@@ -38,13 +45,38 @@ function Login() {
     setLoginInputAlert,
   } = useContext(store);
 
-  const handleMobileNumber = (e) => {
-    const value = e.target.value;
+  // const handleMobileNumber = (e) => {
+  //   const value = e.target.value;
+  //   const sanitizedValue = value.replace(/[^0-9]/g, "");
+  //   if (value.length <= 10) {
+  //     setMobileNumber(sanitizedValue);
+  //   }
+  // };
+  const handleMobileNumber = (value, country) => {
+    // if (e && e.target && e.target.value) {
+    // const value = e.target.value;
+    // const sanitizedValue = value.replace(/[^0-9]/g, "");
+    // if (value.length <= 10) {
+    // setMobileNumber(sanitizedValue);
+    const countryCode = country.dialCode; //continue here
+    console.log(countryCode);
 
-    if (value.length <= 10) {
-      const sanitizedValue = value.replace(/[^0-9]/g, "");
-      setMobileNumber(sanitizedValue);
+    if (countryCode === "91") {
+      setIndiaCode(true);
+      setSingaporeCode(false);
+      setUsRussiaCode(false);
+    } else if (countryCode === "1" || countryCode === "7") {
+      setUsRussiaCode(true);
+      setIndiaCode(false);
+      setSingaporeCode(false);
+    } else if (countryCode === "65") {
+      setSingaporeCode(true);
+      setIndiaCode(false);
+      setUsRussiaCode(false);
     }
+    setMobileNumber(value);
+    // }
+    // }
   };
 
   const handlePassword = (e) => {
@@ -111,17 +143,18 @@ function Login() {
 
   const loginToDashboardUsingSocket = async (e) => {
     e.preventDefault();
-    if (mobileNumber && password && mobileNumber.length > 9) {
+    console.log(mobileNumber);
+    if (mobileNumber && password && mobileNumber.length > 7) {
       setLoader(true);
       await socket.emit("login", {
-        Mobile: mobileNumber,
+        Mobile: mobileNumber.slice(2),
         Password: password,
       });
 
       socket.on("loginSuccess", () => {
         setLoader(false);
         navigate("/transferPage");
-        document.cookie = mobileNumber;
+        document.cookie = mobileNumber.slice(2);
         setMobileNumber("");
         setPassword("");
         setKey(document.cookie);
@@ -180,7 +213,7 @@ function Login() {
           <label htmlFor="" className="text-[14px] mb-[.1rem] ">
             Mobile Number
           </label>
-          <input
+          {/* <input
             className={
               mobileNumber.length < 10 && mobileNumber
                 ? "outline-0 h-10  w-full border-2 border-red-600  text-[16px] rounded-lg  p-[1rem]    border-box  "
@@ -193,13 +226,67 @@ function Login() {
             value={mobileNumber}
             onChange={handleMobileNumber}
             placeholder="Enter Mobile Number"
+          /> */}
+          {/* <PhoneInput
+            country={"in"}
+            placeholder="Enter Mobile Number"
+            value={mobileNumber}
+            onChange={handleMobileNumber}
+            inputClass={
+              mobileNumber.length < 10 && mobileNumber
+                ? "outline-0 h-10  w-full border-2 border-red-600  text-[16px] rounded-lg  p-[1rem]    border-box  "
+                : isNewUser || (loginInputAlert && !mobileNumber)
+                ? "outline-0 h-10  w-full border-2 border-red-600  rounded-lg  text-[16px] p-[1rem]   border-box  "
+                : "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px]  p-[1rem]   border-box "
+            }
+            inputProps={{
+              className:
+                "outline-0 h-10  w-[100%] border-2 border-slate-300 rounded-lg text-[16px] pl-[3vw]  p-[1rem]   border-box ",
+            }}
+            // inputStyle={{
+            //   width: "100%",
+            //   outline: 0,
+            //   border: "2px solid gray",
+            //   borderColor: "gray",
+            // }}
+          /> */}
+
+          <PhoneInput
+            country={"in"}
+            placeholder="Enter Mobile Number"
+            value={mobileNumber}
+            onChange={handleMobileNumber}
+            inputProps={{
+              required: true,
+              className:
+                "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw]  p-[1rem]   border-box ",
+            }}
+            countryCodeEditable={false}
+            onlyCountries={["in", "us", "ru", "sg"]}
+            buttonStyle={{
+              width: "14% ",
+              paddingLeft: "2px",
+              backgroundColor: "white",
+              border: "2px  solid rgb(203 213 225)",
+              borderColor: "rgb(203 213 225)",
+              borderRadius: " 0.5rem 0 0 0.5rem ",
+            }}
           />
 
-          {mobileNumber.length < 10 && mobileNumber ? (
+          {mobileNumber && indiaCode && mobileNumber.length < 12 ? (
             <p className="text-xs w-[80%] mt-[.4rem]  text-red-500">
               Mobile number must have 10 digits
             </p>
-          ) : !mobileNumber && loginInputAlert ? (
+          ) : singaporeCode && mobileNumber && mobileNumber.length < 10 ? (
+            <p className="text-xs w-[80%] mt-[.4rem]  text-red-500">
+              Mobile number must have 8 digits
+            </p>
+          ) : usRussiaCode && mobileNumber && mobileNumber.length < 11 ? (
+            <p className="text-xs w-[80%] mt-[.4rem]  text-red-500">
+              Mobile number must have 10 digits
+            </p>
+          ) : null}
+          {!mobileNumber && loginInputAlert ? (
             <p className="text-xs w-[80%] mt-[.2rem] text-red-500">
               Enter Mobile Number
             </p>
@@ -229,7 +316,6 @@ function Login() {
             }
             type={showPassword ? "text" : "password"}
             minLength={6}
-            maxLength={10}
             value={password}
             onChange={handlePassword}
             placeholder="Enter Your Password"
@@ -262,12 +348,12 @@ function Login() {
               Fill all the inputs
             </p>
           ) : null} */}
-          {loginInputAlert ? (
+          {loginInputAlert && !password ? (
             <p className="relative top-[-4vh] text-red-500 text-xs cursor-default mt-[.4rem] ">
               Enter Password
             </p>
           ) : null}
-          {loginFailed ? (
+          {loginFailed && !isNewUser ? (
             <p className="relative top-[-3vh] text-xs  text-red-500">
               Wrong password
             </p>

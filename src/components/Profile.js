@@ -124,27 +124,38 @@ function Profile() {
         {
           prevPath ? navigate(prevPath) : navigate("/transferPage");
         }
+        setIsProfileClicked(false);
         break;
       case "Beneficiaries":
         navigate("/Beneficiaries", { state: { prevPath: location.pathname } });
+        setIsProfileClicked(false);
         break;
       case "Rewards":
         console.log("Navigating to Rewards page");
+        setIsProfileClicked(false);
         break;
       case "Contact":
         console.log("Navigating to Contact page");
+        setIsProfileClicked(false);
         break;
       case "Transactions":
         navigate("/Transactions");
+        setIsProfileClicked(false);
         break;
       case "Menu":
         setSavedAcc([]);
         setIsProfileClicked(true);
         break;
       case "Log Out":
-        logout();
-        setRecentTransactions([]);
         setSavedAcc([]);
+        setRecentTransactions([]);
+        const tabId = sessionStorage.getItem("tabId");
+        sessionStorage.clear();
+        if (tabId) {
+          sessionStorage.setItem("tabId", tabId);
+        }
+        setIsProfileClicked(false);
+        logout();
         break;
       default:
         console.log(`Unknown menu item: ${menuItem}`);
@@ -160,7 +171,6 @@ function Profile() {
           "Transactions",
           "Rewards",
           "Contact",
-
           "Log Out",
         ],
         onClickHandler: handleMenuClick,
@@ -173,7 +183,6 @@ function Profile() {
           "Beneficiaries",
           "Transactions",
           "Rewards",
-
           "Log Out",
         ],
         onClickHandler: handleMenuClick,
@@ -182,7 +191,7 @@ function Profile() {
       return {
         nav: [
           { icon: <MdKeyboardArrowLeft />, id: "Back" },
-          ,
+
           "Beneficiaries",
           "Menu",
         ],
@@ -198,9 +207,9 @@ function Profile() {
       nav: [
         "Back",
         "Beneficiaries",
+        "Transactions",
         "Rewards",
         "Contact",
-        "Transactions",
         "Log out",
       ],
       onClickHandler: handleMenuClick,
@@ -263,6 +272,7 @@ function Profile() {
           setAccFromDb(data.accNum);
           setUserName("");
           setAge("");
+          sessionStorage.setItem("userName", userName ? userName : "");
         });
         setIsEditProfile(false);
       } else {
@@ -412,12 +422,16 @@ function Profile() {
     const beneficiary = sessionStorage.getItem("savedAcc");
     const recentTransactions = JSON.parse(transactions);
     const beneficiaries = JSON.parse(beneficiary);
-    const canceledPaymentsCount = recentTransactions.filter(
-      (transaction) => transaction.Status === "canceled"
-    ).length;
+    const canceledPaymentsCount = recentTransactions
+      ? recentTransactions.filter(
+          (transaction) => transaction.Status === "canceled"
+        ).length
+      : null;
     console.log(canceledPaymentsCount);
     setCanceledPaymentsCount(canceledPaymentsCount);
-    setRecentTransactionsLength(recentTransactions.length);
+    setRecentTransactionsLength(
+      recentTransactions ? recentTransactions.length : 0
+    );
     setBeneficiaries(beneficiaries);
     setRecentActivity(recentTransactions);
   }, []);
@@ -488,7 +502,7 @@ function Profile() {
               </div>
               <div className="h-[20vh]  grid md:block  md:w-[20vw] border-b-2 md:border-b-0 pb-2  md:pb-[8rem] xl:pb-0 bg-white space-y-2 box-border pt-[3vh] pl-[15vw] md:pl-[2vw] pr-[2vw] md:items-center md:justify-center md:shadow-md shadow-gray-300 rounded-md grid-rows-3">
                 <h1 className="text-4xl font-bold">
-                  {recentTransactionsLength}
+                  {recentTransactionsLength ? recentTransactionsLength : 0}
                 </h1>
                 <h1 className="md:border-b-2  md:text-sm lg:text-md pb-[2vh]">
                   Total Transactions
@@ -515,7 +529,9 @@ function Profile() {
                 </h1>
               </div>
               <div className="h-[20vh] grid grid-rows-3 md:block md:w-[20vw] border-b-2 md:border-b-0 pb-2 md:pb-[8rem]  xl:pb-0 box-border bg-white  md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-[3vh] pl-[15vw] md:pl-[2vw] pr-[2vw] items-left md:items-center md:justify-center">
-                <h1 className="text-4xl font-bold">{canceledPayments}</h1>
+                <h1 className="text-4xl font-bold">
+                  {canceledPayments ? canceledPayments : 0}
+                </h1>
                 <h1 className="md:border-b-2 md:text-sm lg:text-md pb-[2vh]">
                   Failed Transactions
                 </h1>
@@ -551,20 +567,26 @@ function Profile() {
                   </h1>
                 </div>
                 <div className="grid   h-[50%] pt-[1vh]  md:h-[90%] lg:h-[90%] xl:h-full pl-[5vw] md:pl-[2vw] md:pt-[2vh] md:pb-[2vh]">
-                  {beneficiaries.slice(0, 6).map((item, index) => (
-                    <div
-                      key={index}
-                      className="space-y-0  xl:h-[3vh]    leading-0"
-                    >
-                      <h1
+                  {beneficiaries ? (
+                    beneficiaries.slice(0, 6).map((item, index) => (
+                      <div
                         key={index}
-                        className="text-md  md:text-sm lg:text-md   capitalize "
+                        className="space-y-0  xl:h-[3vh]    leading-0"
                       >
-                        {item.beneficiaryName}
-                      </h1>
-                      <h1 className="text-sm md:text-sm">{item.accNum}</h1>
-                    </div>
-                  ))}
+                        <h1
+                          key={index}
+                          className="text-md  md:text-sm lg:text-md   capitalize "
+                        >
+                          {item.beneficiaryName}
+                        </h1>
+                        <h1 className="text-sm md:text-sm">{item.accNum}</h1>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="grid items-center w-full justify-center h-full">
+                      You don't have any saved accounts, yet.
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="h-auto md:h-[55vh] lg:h-[60vh]  md:w-[38vw] lg:w-[37vw] xl:w-[33vw] border-b-2 md:border-b-0 overflow-y-auto md:mt-[-4.5rem]  lg:mt-[-7.5rem] xl:mt-[-9.5rem] md:ml-[7vw] lg:ml-[8vw] xl:ml-[11vw] space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
@@ -573,7 +595,8 @@ function Profile() {
                     Recent Activity
                   </h1>
                   <h1 className="text-xs  lg:text-xs xl:text-sm pl-2">
-                    {recentTransactions.length} Transactions
+                    {recentTransactions ? recentTransactions.length : 0}{" "}
+                    Transactions
                   </h1>
                   <h1
                     className="text-xs md:text-xs xl:text-sm ml-[2vw] lg:ml-[4vw] flex items-center text-gray-200 hover:cursor-pointer"
@@ -593,7 +616,7 @@ function Profile() {
                     <h1>Status</h1>
                   </div>
                 </div>
-                {recentActivity.length < 1 ? (
+                {!recentActivity ? (
                   <p className="flex items-center justify-center pt-[5rem]">
                     There is no recent transactions
                   </p>
@@ -608,7 +631,7 @@ function Profile() {
                       >
                         <div className="grid grid-cols-2 gap-6 lg:gap-2 xl:gap-6 items-center text-xs md:text-sm lg:text-md ">
                           <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
-                          <h1 className="md:text-xs lg:text-md">{`Sent to ${item.Name}`}</h1>
+                          <h1 className="md:text-xs lg:text-md overflow-x-auto">{`Sent to ${item.Name}`}</h1>
                         </div>
                         <div className="grid grid-cols-2 md:gap-5 lg:gap-10  text-xs md:text-sm lg:text-md  ">
                           <h1 className="md:text-xs lg:text-md">
@@ -633,6 +656,9 @@ function Profile() {
             </>
           </div>
         )}
+
+        {/* profile edit section */}
+
         {isEditProfile ? (
           <form
             action="submit"
@@ -731,13 +757,19 @@ function Profile() {
           </form>
         ) : null}
       </div>
+
+      {/* sidebar */}
+
       {windowWidth > 768 ? null : isProfileClicked ? (
         <>
           <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
         </>
       ) : null}
+
+      {/* failed transactions card */}
+
       {failedTransaction ? (
-        <div className="fixed top-0 grid justify-center h-screen w-screen">
+        <div className="fixed top-0 grid justify-center h-screen w-screen z-[100]">
           {" "}
           <FailedTransactions />
         </div>

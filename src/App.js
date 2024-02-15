@@ -91,13 +91,30 @@ function App() {
   const [hasUpperCase, setHasUpperCase] = useState(false);
   const [hasSpecialChar, setHasSpecialChar] = useState(false);
   const [hasMinLength, setHasMinLength] = useState(false);
+  const [indiaCode, setIndiaCode] = useState(false);
+  const [singaporeCode, setSingaporeCode] = useState(false);
+  const [usRussiaCode, setUsRussiaCode] = useState(false);
 
-  const handleRegMobileNumber = (e) => {
-    const value = e.target.value;
-    if (value.length <= 10) {
-      const sanitizedValue = value.replace(/[^0-9]/g, "");
-      setRegMobileNumber(sanitizedValue);
+  const handleRegMobileNumber = (value, country) => {
+    // const value = e.target.value;
+    // if (value.length <= 10) {
+    // const sanitizedValue = value.replace(/[^0-9]/g, "");
+    const countryCode = country.dialCode;
+    if (countryCode === "91") {
+      setIndiaCode(true);
+      setSingaporeCode(false);
+      setUsRussiaCode(false);
+    } else if (countryCode === "1" || countryCode === "7") {
+      setIndiaCode(false);
+      setSingaporeCode(false);
+      setUsRussiaCode(true);
+    } else if (countryCode === "65") {
+      setSingaporeCode(true);
+      setIndiaCode(false);
+      setUsRussiaCode(false);
     }
+    setRegMobileNumber(value);
+    // }
   };
 
   const handleCreatePassword = (e) => {
@@ -106,14 +123,6 @@ function App() {
     const allowedPattern =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()-_+={}[\]:;'"<>,./?]).{8,}$/;
     const testedValue = allowedPattern.test(value);
-    const hasUpperCase = /[A-Z]/.test(testedValue);
-
-    const hasLowerCase = /[a-z]/.test(testedValue);
-
-    const hasSpecialChar = /[!@#$%^&*()-_+={}[\]:;'"<>,./?]/.test(testedValue);
-
-    const hasMinLength = testedValue.length >= 8;
-
     setCreatePassword(value);
     if (testedValue) {
       setPasswordError(false);
@@ -186,41 +195,67 @@ function App() {
     console.log("event emitted");
   }, []);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (connectionMode !== "socket") {
-      } else {
-        await socket.on("allSavedAccounts", (data) => {
-          const savedDetail = {
-            beneficiaryName: data.beneficiaryName,
-            accNum: data.accNum,
-            ifsc: data.ifsc,
-            editable: data.editable,
-          };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     if (connectionMode !== "socket") {
+  //     } else {
+  //       await socket.on("allSavedAccounts", (data) => {
+  //         const savedDetail = {
+  //           beneficiaryName: data.beneficiaryName,
+  //           accNum: data.accNum,
+  //           ifsc: data.ifsc,
+  //           editable: data.editable,
+  //         };
 
-          // Check if accNum is greater than 15 digits
-          if (String(savedDetail.accNum).length > 15) {
-            const isAlreadyStored = savedAcc.some((detail) => {
-              return (
-                detail.beneficiaryName === savedDetail.beneficiaryName &&
-                detail.accNum === savedDetail.accNum &&
-                detail.ifsc === savedDetail.ifsc &&
-                detail.editable === savedDetail.editable
-              );
-            });
+  //         // Check if accNum is greater than 15 digits
+  //         // if (String(savedDetail.accNum).length > 15) {
+  //         //   const isAlreadyStored = savedAcc.some((detail) => {
+  //         //     return (
+  //         //       detail.beneficiaryName === savedDetail.beneficiaryName &&
+  //         //       detail.accNum === savedDetail.accNum &&
+  //         //       detail.ifsc === savedDetail.ifsc &&
+  //         //       detail.editable === savedDetail.editable
+  //         //     );
+  //         //   });
 
-            if (!isAlreadyStored) {
-              setSavedAcc((prev) => [...prev, savedDetail]);
-            }
-          }
-          console.log("event received");
-        });
-      }
-    };
+  //         //   if (!isAlreadyStored) {
+  //         //     setSavedAcc((prev) => [...prev, savedDetail]);
+  //         //   }
+  //         // }
 
-    fetchData();
-    console.log("from effect");
-  }, []);
+  //         if (String(savedDetail.accNum).length > 15) {
+  //           const isAlreadyStored = savedAcc
+  //             ? savedAcc.some((detail) => {
+  //                 return (
+  //                   detail.beneficiaryName === savedDetail.beneficiaryName &&
+  //                   detail.accNum === savedDetail.accNum &&
+  //                   detail.ifsc === savedDetail.ifsc &&
+  //                   detail.editable === savedDetail.editable
+  //                 );
+  //               })
+  //             : false;
+
+  //           if (!isAlreadyStored) {
+  //             setSavedAcc((prevSavedAcc) => {
+  //               const updatedSavedAcc = prevSavedAcc
+  //                 ? [...prevSavedAcc, savedDetail]
+  //                 : [savedDetail];
+  //               sessionStorage.setItem(
+  //                 "savedAcc",
+  //                 JSON.stringify(updatedSavedAcc)
+  //               );
+  //               return updatedSavedAcc;
+  //             });
+  //           }
+  //         }
+  //         console.log("event received");
+  //       });
+  //     }
+  //   };
+
+  //   fetchData();
+  //   console.log("from effect");
+  // }, []);
 
   // useEffect(() => {
   //   if (connectionMode !== socket) {
@@ -366,6 +401,12 @@ function App() {
         hasUpperCase,
         hasSpecialChar,
         hasMinLength,
+        indiaCode,
+        setIndiaCode,
+        singaporeCode,
+        setSingaporeCode,
+        usRussiaCode,
+        setUsRussiaCode,
       }}
     >
       <Router>

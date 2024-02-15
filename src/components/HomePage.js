@@ -106,7 +106,7 @@ function HomePage() {
   return (
     <div className="h-screen fixed w-screen bg-gray-800 text-white font-sans">
       {isLogin ? (
-        <div className=" w-[80%] sm:w-[60%] md:w-[50%] lg:w-[33%]  mx-auto    shadow-md shadow-black h-auto rounded-xl  mt-[15vh] ">
+        <div className=" w-[80%] sm:w-[60%] md:w-[50%] lg:w-[36%] xl:w-[33%]  mx-auto    shadow-md shadow-black h-auto rounded-xl  mt-[15vh] ">
           {loader ? (
             <div className="fixed bg-transparent h-screen w-screen top-[0vh] left-[0vw] ">
               <div className="h-screen w-screen flex flex-col justify-center items-center">

@@ -4,6 +4,8 @@ import axios from "axios";
 import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import logo from "./images/Greenwhitelogo2.png";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 
 function SignUp() {
   const {
@@ -27,14 +29,12 @@ function SignUp() {
     setIsLogin,
     passwordError,
     setPasswordError,
-    setHasLowerCase,
-    setHasMinLength,
-    setHasSpecialChar,
-    setHasUpperCase,
-    hasLowerCase,
-    hasUpperCase,
-    hasSpecialChar,
-    hasMinLength,
+    usRussiaCode,
+    setUsRussiaCode,
+    indiaCode,
+    setIndiaCode,
+    singaporeCode,
+    setSingaporeCode,
   } = useContext(store);
 
   //   const [isLogin, setIsLogin] = useState(true);
@@ -72,19 +72,6 @@ function SignUp() {
     setCreatePassword("");
     setConfirmPassword("");
   };
-
-  // const handlePasswordError = () => {
-  //   if (hasLowerCase && hasUpperCase && hasSpecialChar && hasMinLength) {
-  //     setPasswordError(false);
-  //   } else if (
-  //     !hasLowerCase &&
-  //     hasUpperCase &&
-  //     hasSpecialChar &&
-  //     hasMinLength
-  //   ) {
-  //     setHasLowerCase(false);
-  //   }else if(!hasUpperCase &&)
-  // };
 
   const signupUser = async (e) => {
     e.preventDefault();
@@ -142,7 +129,7 @@ function SignUp() {
         setSignUpFailed(false);
 
         socket.emit("signUpUser", {
-          Mobile: regMobileNumber,
+          Mobile: regMobileNumber.slice(2),
           Password: createPassword,
         });
 
@@ -214,27 +201,45 @@ function SignUp() {
             <label htmlFor="" className="mb-[.2rem] text-[14px]">
               Mobile Number
             </label>
-            <input
-              className={
-                regMobileNumber.length < 10 && regMobileNumber
-                  ? "outline-0 h-10 w-full border-2 border-red-500  rounded-lg  p-[1rem] text-[16px]  border-box "
-                  : isAlreadyUser || (allInputAlert && !regMobileNumber)
-                  ? "outline-0 h-10 w-full border-2 border-red-500  rounded-lg  p-[1rem]  text-[16px] border-box "
-                  : "outline-0 h-10 w-full border-2 border-slate-200  rounded-lg  p-[1rem] text-[16px]  border-box "
-              }
-              type="tel"
-              minLength={10}
-              maxLength={10}
+
+            <PhoneInput
+              country={"in"}
+              placeholder="Enter Mobile Number"
               value={regMobileNumber}
               onChange={handleRegMobileNumber}
-              placeholder="Enter Mobile Number"
-              required={true}
+              inputProps={{
+                className:
+                  "outline-0 h-10  w-[100%] border-2 border-slate-300 rounded-lg text-[16px] pl-[3.5vw]  p-[1rem]   border-box ",
+              }}
+              countryCodeEditable={false}
+              onlyCountries={["in", "us", "ru", "sg"]}
+              buttonStyle={{
+                width: "12%",
+                paddingLeft: "2px",
+                background: "white",
+                border: "2px  solid rgb(203 213 225)",
+                borderColor: " rgb(203 213 225)",
+                borderRadius: "0.5rem 0 0 0.5rem",
+              }}
             />
-            {regMobileNumber.length < 10 && regMobileNumber ? (
+            {regMobileNumber.length < 12 && regMobileNumber && indiaCode ? (
               <p className="text-xs w-[80%] mt-[.4rem] text-red-500">
                 Mobile number must have 10 digits
               </p>
+            ) : singaporeCode &&
+              regMobileNumber &&
+              regMobileNumber.length < 10 ? (
+              <p className="text-xs w-[80%] mt-[.4rem]  text-red-500">
+                Mobile number must have 8 digits
+              </p>
+            ) : usRussiaCode &&
+              regMobileNumber &&
+              regMobileNumber.length < 11 ? (
+              <p className="text-xs w-[80%] mt-[.4rem]  text-red-500">
+                Mobile number must have 10 digits
+              </p>
             ) : null}
+
             {allInputAlert && !regMobileNumber ? (
               <div className="w-[80%]">
                 {" "}
@@ -286,27 +291,40 @@ function SignUp() {
               />
             )}
 
-            {passwordError ? (
-              !/[A-Z]/.test(createPassword) ? (
-                <p className="w-full text-red-500 text-xs mt-[-.8rem] mb-[.4rem] ">
-                  Password must have 1 upper case
-                </p>
-              ) : !/[a-z]/.test(createPassword) ? (
-                <p className="w-full text-red-500 text-xs mt-[-.8rem] mb-[.4rem]">
-                  Password must have 1 lower case
-                </p>
-              ) : !/[!@#$%^&*()-_+={}[\]:;'"<>,./?0-9]/.test(createPassword) ? (
-                <p className="w-full text-red-500 text-xs mt-[-.8rem] mb-[.4rem]">
-                  Password must have 1 special character
-                </p>
-              ) : createPassword.length < 8 ? (
-                <p className="w-full text-red-500 text-xs mt-[-.8rem] mb-[.4rem]">
-                  Password must have 8 letters
-                </p>
-              ) : null
-            ) : allInputAlert && !createPassword ? (
-              <p className="text-xs text-red-500 mt-[-.8rem] mb-[.4rem]">
+            {allInputAlert && !createPassword ? (
+              <p className="text-xs text-red-500 mt-[-.8rem] mb-[.6rem]">
                 Enter Password
+              </p>
+            ) : null}
+            {passwordError ? (
+              <p className="w-full text-red-500 text-xs mt-[-.8rem] mb-[.4rem] ">
+                {/[A-Z]/.test(createPassword) ? null : (
+                  <p className="w-full text-red-500 text-xs  ">
+                    Password must have 1 upper case{" "}
+                  </p>
+                )}{" "}
+                {/[a-z]/.test(createPassword) ? null : (
+                  <p className="w-full text-red-500 text-xs  ">
+                    Password must have 1 lower case{" "}
+                  </p>
+                )}{" "}
+                {/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(
+                  createPassword
+                ) ? null : (
+                  <p className="w-full text-red-500 text-xs  ">
+                    Password must have 1 special character{" "}
+                  </p>
+                )}{" "}
+                {/[0-9]/.test(createPassword) ? null : (
+                  <p className="w-full text-red-500 text-xs  ">
+                    Password must have 1 digit{" "}
+                  </p>
+                )}{" "}
+                {createPassword.length > 7 ? null : (
+                  <p className="w-full text-red-500 text-xs ">
+                    Password must have 8 characters{" "}
+                  </p>
+                )}
               </p>
             ) : null}
           </div>

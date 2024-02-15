@@ -9,6 +9,7 @@ import { AiOutlineMenuUnfold } from "react-icons/ai";
 import { RiMenuFoldFill } from "react-icons/ri";
 import Menu from "./Menu";
 import SideBar from "./SideBar";
+import { RiMenuUnfoldFill } from "react-icons/ri";
 
 function PaymentForm() {
   const {
@@ -72,21 +73,27 @@ function PaymentForm() {
     switch (menuItem) {
       case "Profile":
         navigate("/Profile ", { state: { prevPath: location.pathname } });
+        setIsProfileClicked(false);
         break;
       case "Back":
         navigate("/transferPage", { state: { prevPath: location.pathname } });
+        setIsProfileClicked(false);
         break;
       case "Beneficiaries":
         navigate("/Beneficiaries", { state: { prevPath: location.pathname } });
-        break;
-      case "Rewards":
-        console.log("Navigating to Rewards page");
-        break;
-      case "Contact":
-        console.log("Navigating to Contact page");
+        setIsProfileClicked(false);
         break;
       case "Transactions":
         navigate("/Transactions");
+        setIsProfileClicked(false);
+        break;
+      case "Rewards":
+        console.log("Navigating to Rewards page");
+        setIsProfileClicked(false);
+        break;
+      case "Contact":
+        console.log("Navigating to Contact page");
+        setIsProfileClicked(false);
         break;
       case "Menu":
         setIsProfileClicked(true);
@@ -100,7 +107,6 @@ function PaymentForm() {
         if (tabId) {
           sessionStorage.setItem("tabId", tabId);
         }
-
         logout();
         break;
       default:
@@ -291,7 +297,6 @@ function PaymentForm() {
           "Transactions",
           "Rewards",
           "Contact",
-
           "Log Out",
         ],
         onClickHandler: handleMenuClick,
@@ -307,22 +312,16 @@ function PaymentForm() {
   const menuProps = getMenuProps();
 
   const getSideBarProps = () => {
-    if (windowWidth > 640) {
-      return {
-        nav: ["Rewards", "Contact", "Transactions", "Log out"],
-      };
-    } else {
-      return {
-        nav: [
-          "Profile",
-          "Beneficiaries",
-          "Rewards",
-          "Contact",
-          "Transactions",
-          "Log Out",
-        ],
-      };
-    }
+    return {
+      nav: [
+        "Profile",
+        "Beneficiaries",
+        "Transactions",
+        "Rewards",
+        "Contact",
+        "Log out",
+      ],
+    };
   };
 
   const sideBarProps = getSideBarProps();
@@ -355,7 +354,7 @@ function PaymentForm() {
         regNumber: document.cookie,
       });
       socket.on("userNameAvailable", async (data) => {
-        sessionStorage.setItem("userName", data.user);
+        sessionStorage.setItem("userName", data.user ? data.user : "");
         const userName = sessionStorage.getItem("userName");
         await setUserNameFromDb(userName);
       });
@@ -434,7 +433,8 @@ function PaymentForm() {
     socket.emit("fetchList", {
       num: document.cookie,
     });
-    console.log("event emitted");
+
+    console.log("event emitted", document.cookie);
   }, []);
 
   useEffect(() => {
@@ -448,28 +448,26 @@ function PaymentForm() {
             ifsc: data.ifsc,
             editable: data.editable,
           };
+          console.log(savedDetail, "detail");
 
           // Check if accNum is greater than 15 digits
           if (String(savedDetail.accNum).length > 15) {
-            const isAlreadyStored = savedAcc.some((detail) => {
-              return (
-                detail.beneficiaryName === savedDetail.beneficiaryName &&
-                detail.accNum === savedDetail.accNum &&
-                detail.ifsc === savedDetail.ifsc &&
-                detail.editable === savedDetail.editable
-              );
-            });
+            const isAlreadyStored = savedAcc
+              ? savedAcc.some((detail) => {
+                  return (
+                    detail.beneficiaryName === savedDetail.beneficiaryName &&
+                    detail.accNum === savedDetail.accNum &&
+                    detail.ifsc === savedDetail.ifsc &&
+                    detail.editable === savedDetail.editable
+                  );
+                })
+              : false;
 
             if (!isAlreadyStored) {
-              // sessionStorage.setItem(
-              //   "savedAcc",
-              //   JSON.stringify([...prev, savedDetail])
-              // );
-
-              // setSavedAcc((prev) => [...prev, savedDetail]);
-
               setSavedAcc((prevSavedAcc) => {
-                const updatedSavedAcc = [...prevSavedAcc, savedDetail];
+                const updatedSavedAcc = prevSavedAcc
+                  ? [...prevSavedAcc, savedDetail]
+                  : [savedDetail];
                 sessionStorage.setItem(
                   "savedAcc",
                   JSON.stringify(updatedSavedAcc)
@@ -488,7 +486,7 @@ function PaymentForm() {
   }, []);
 
   useEffect(() => {
-    const length = savedAcc.length;
+    const length = savedAcc ? savedAcc.length : 0;
     sessionStorage.setItem("length", length);
     setSavedAccLength(sessionStorage.getItem("length"));
   }, [savedAcc]);
@@ -514,26 +512,43 @@ function PaymentForm() {
             Amount: data.Amount,
           };
 
-          const isAlreadyStored = recentTransactions.some((detail) => {
-            return (
-              detail.Date === transaction.Date &&
-              detail.Name === transaction.Name &&
-              detail.Status === transaction.Status &&
-              detail.Amount === transaction.Amount
-            );
-          });
-          if (!isAlreadyStored)
+          const isAlreadyStored = recentTransactions
+            ? recentTransactions.some((detail) => {
+                return (
+                  detail.Date === transaction.Date &&
+                  detail.Name === transaction.Name &&
+                  detail.Status === transaction.Status &&
+                  detail.Amount === transaction.Amount
+                );
+              })
+            : false;
+          if (!isAlreadyStored) {
             // setRecentTransactions((prev) => [...prev, transaction]);
+
             setRecentTransactions((prevTransact) => {
-              const updatedTransact = [...prevTransact, transaction];
+              const updatedTransact = prevTransact
+                ? [...prevTransact, transaction]
+                : [transaction];
               sessionStorage.setItem(
                 "savedTransactions",
                 JSON.stringify(updatedTransact)
               );
               return updatedTransact;
             });
+          }
+          // if (!isAlreadyStored) {
+          //   const updatedTransactions = recentTransactions
+          //     ? [...recentTransactions, transaction]
+          //     : [transaction];
+
+          //   setRecentTransactions(updatedTransactions);
+          //   sessionStorage.setItem(
+          //     "savedTransactions",
+          //     JSON.stringify(updatedTransactions)
+          //   );
+          // }
         });
-        const length = recentTransactions.length;
+        const length = recentTransactions ? recentTransactions.length : 0;
         setRecentTransactionsLength(length);
       }
     };

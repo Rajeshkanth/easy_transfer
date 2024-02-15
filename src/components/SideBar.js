@@ -18,7 +18,7 @@ function SideBar(props) {
   };
   return (
     <>
-      <div className="w-1/2 md:w-1/3 bg-gray-800 backdrop-blur-xl h-screen z-[500] text-white font-sans fixed top-0  text-black">
+      <div className="w-[65%]  sm:w-1/2 bg-gray-800 backdrop-blur-xl h-screen z-[500] text-white font-sans fixed top-0  ">
         <div className=" pt-2 pb-8 border-box h-[85vh] font-sans">
           <div className="flex justify-between items-center border-b-2 border-gray-600  text-white box-border pb-[.8rem] cursor-pointer ">
             <h1 className="ml-[2rem] text-xl font-bold ">Menu</h1>
@@ -30,7 +30,7 @@ function SideBar(props) {
             {nav.map((item, index) => (
               <h1
                 key={index}
-                className="hover:font-bold hover:border-2   rounded px-4 box-border rounded- px-4 box-border py-1"
+                className="hover:font-bold hover:border-2   rounded   px-2 box-border py-1"
                 onClick={() => handleClick(item)}
               >
                 {item}
