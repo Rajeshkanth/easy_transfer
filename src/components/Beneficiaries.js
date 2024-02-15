@@ -133,7 +133,7 @@ function Beneficiaries() {
 
   const getSideBarProps = () => {
     return {
-      nav: ["Back", "Profile", "Transactions", "Rewards", "Contact", "Log out"],
+      nav: ["Back", "Profile", "Transactions", "Rewards", "Contact", "Log Out"],
       onClickHandler: handleMenuClick,
     };
   };

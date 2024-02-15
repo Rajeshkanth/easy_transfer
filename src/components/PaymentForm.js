@@ -319,7 +319,7 @@ function PaymentForm() {
         "Transactions",
         "Rewards",
         "Contact",
-        "Log out",
+        "Log Out",
       ],
     };
   };
