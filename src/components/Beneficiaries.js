@@ -496,7 +496,7 @@ function Beneficiaries() {
                       </p>
                     ) : null}
                     <input
-                      type="tel"
+                      type="text"
                       className={
                         allInputsAlert && !savedIfsc
                           ? "block w-full px-4 py-2 border-red-500  outline-none rounded-lg bg-white border-2 "
