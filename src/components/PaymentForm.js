@@ -108,6 +108,7 @@ function PaymentForm() {
         if (tabId) {
           sessionStorage.setItem("tabId", tabId);
         }
+        setIsProfileClicked(false);
         logout();
         break;
       default:
@@ -219,24 +220,12 @@ function PaymentForm() {
       toAccountHolderName &&
       toIFSCNumber
     ) {
-      // setAccNumAlert(true);
       setAllInput(true);
     } else {
       setAllInput(true);
       console.log("else part");
     }
   };
-
-  // const sendAmountViaSocket = (e) => {
-  //   e.preventDefault();
-  //   if (clickable) {
-  //     sendAmountBySocket();
-  //   } else if (!clickable) {
-  //     setAccNumAlert(true);
-  //   } else {
-  //     setAllInput(true);
-  //   }
-  // };
 
   const sendAmountByPolling = async (e) => {
     try {

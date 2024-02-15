@@ -202,7 +202,7 @@ function SignUp() {
               Mobile Number
             </label>
 
-            <PhoneInput
+            {/* <PhoneInput
               country={"in"}
               placeholder="Enter Mobile Number"
               value={regMobileNumber}
@@ -220,6 +220,27 @@ function SignUp() {
                 border: "2px  solid rgb(203 213 225)",
                 borderColor: " rgb(203 213 225)",
                 borderRadius: "0.5rem 0 0 0.5rem",
+              }}
+            /> */}
+            <PhoneInput
+              country={"in"}
+              placeholder="Enter Mobile Number"
+              value={regMobileNumber}
+              onChange={handleRegMobileNumber}
+              inputProps={{
+                required: true,
+                className:
+                  "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+              }}
+              countryCodeEditable={false}
+              onlyCountries={["in", "us", "ru", "sg"]}
+              buttonStyle={{
+                width: "14% ",
+                paddingLeft: "0px",
+                backgroundColor: "white",
+                border: "2px  solid rgb(203 213 225)",
+                borderColor: "rgb(203 213 225)",
+                borderRadius: " 0.5rem 0 0 0.5rem ",
               }}
             />
             {regMobileNumber.length < 12 && regMobileNumber && indiaCode ? (
@@ -268,7 +289,7 @@ function SignUp() {
                   ? "outline-0 h-10 w-full rounded-lg text-[16px] p-[1rem] border-2 border-red-500  border-box "
                   : signUpFailed || (allInputAlert && !createPassword)
                   ? "outline-0 h-10 w-full rounded-lg text-[16px] p-[1rem] border-2 border-red-500  border-box "
-                  : "outline-0 h-10 w-full rounded-lg text-[16px] p-[1rem] border-2 border-slate-200  border-box "
+                  : "outline-0 h-10 w-full rounded-lg text-[16px] p-[1rem]  border-2 border-slate-300  border-box "
               }
               type={showCreatePassword ? "text" : "password"}
               min={6}
@@ -281,12 +302,12 @@ function SignUp() {
             />
             {showCreatePassword ? (
               <FaRegEye
-                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
+                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[22vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
                 onClick={() => handleShowPassword("create")}
               />
             ) : (
               <FaRegEyeSlash
-                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
+                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[22vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
                 onClick={() => handleShowPassword("create")}
               />
             )}
@@ -340,7 +361,7 @@ function SignUp() {
               className={
                 signUpFailed || (allInputAlert && !confirmPassword)
                   ? "outline-0 h-10 w-full rounded-lg  p-[1rem] text-[16px] border-2 border-red-500  border-box "
-                  : "outline-0 h-10 w-full rounded-lg  p-[1rem] text-[16px] border-2 border-slate-200  border-box "
+                  : "outline-0 h-10 w-full rounded-lg  p-[1rem] text-[16px] border-2 border-slate-300  border-box "
               }
               type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}
@@ -352,12 +373,12 @@ function SignUp() {
             />
             {showConfirmPassword ? (
               <FaRegEye
-                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
+                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[22vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
                 onClick={() => handleShowPassword("confirm")}
               />
             ) : (
               <FaRegEyeSlash
-                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
+                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[22vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
                 onClick={() => handleShowPassword("confirm")}
               />
             )}

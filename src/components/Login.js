@@ -192,7 +192,7 @@ function Login() {
     <>
       <div className="items-center justify-center pt-[2rem] text-gray-600 flex space-y-0 flex-col">
         <img
-          className="font-extrabold text-xl sm:text-4xl object-cover h-[7vh] sm:h-[7vh] md:h-[9vh] lg:h-[9vh] xl:h-[10vh] w-[80%] md:w-[80%] lg:w-[24vw] xl:w-[20vw] text-center text-gray-700 items-center font-poppins"
+          className="font-extrabold text-xl sm:text-4xl object-cover h-[7vh] sm:h-[7vh] md:h-[9vh] lg:h-[9vh] xl:h-[11vh] w-[80%] md:w-[80%] lg:w-[24vw] xl:w-[22vw] text-center text-gray-700 items-center font-poppins"
           src={logo}
         >
           {/* Easy Transfer */}
@@ -222,13 +222,13 @@ function Login() {
             inputProps={{
               required: true,
               className:
-                "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem]   border-box ",
+                "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
             }}
             countryCodeEditable={false}
             onlyCountries={["in", "us", "ru", "sg"]}
             buttonStyle={{
               width: "14% ",
-              paddingLeft: "2px",
+              paddingLeft: "0px",
               backgroundColor: "white",
               border: "2px  solid rgb(203 213 225)",
               borderColor: "rgb(203 213 225)",
@@ -272,10 +272,10 @@ function Login() {
           <input
             className={
               loginInputAlert && !password
-                ? "outline-0 h-10 w-full rounded-lg  p-[1rem] sm:p-[1rem] border-2 text-[16px] border-red-600  border-box  "
+                ? "outline-0 h-10 w-full rounded-lg  p-[1rem] pl-[.5rem] sm:p-[1rem] border-2 text-[16px] border-red-600  border-box  "
                 : loginFailed
-                ? "outline-0 h-10 w-full rounded-lg  p-[1rem] sm:p-[1rem] border-2 text-[16px] border-red-600  border-box  "
-                : "outline-0 h-10 w-full rounded-lg  p-[1rem] sm:p-[1rem] border-2 text-[16px] border-slate-300  border-box "
+                ? "outline-0 h-10 w-full rounded-lg  p-[1rem] pl.[.5rem] sm:p-[1rem] border-2 text-[16px] border-red-600  border-box  "
+                : "outline-0 h-10 w-full rounded-lg  p-[1rem] pl-[.5rem] sm:p-[1rem] border-2 text-[16px] border-slate-300  border-box "
             }
             type={showPassword ? "text" : "password"}
             minLength={6}
@@ -298,7 +298,7 @@ function Login() {
               className={
                 windowWidth < 640
                   ? "relative ml-[56.5vw] bottom-[2rem] text-zinc-400"
-                  : "relative  sm:ml-[42vw]  md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-[1rem] sm:bottom-[2rem] text-zinc-400"
+                  : "relative  sm:ml-[42vw]  md:ml-[35vw] lg:ml-[25vw] xl:ml-[23.8vw] bottom-[1rem] sm:bottom-[2rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />

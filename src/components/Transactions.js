@@ -37,22 +37,28 @@ function Transactions() {
 
       case "Profile":
         navigate("/Profile", { state: { prevPath: location.pathname } });
+        setIsProfileClicked(false);
         break;
       case "Home":
         navigate("/transferPage", { state: { prevPath: location.pathname } });
+        setIsProfileClicked(false);
       case "Back":
         {
           prevPath ? navigate(prevPath) : navigate("/transferPage");
         }
+        setIsProfileClicked(false);
         break;
       case "Rewards":
         console.log("Navigating to Rewards page");
+        setIsProfileClicked(false);
         break;
       case "Contact":
         console.log("Navigating to Contact page");
+        setIsProfileClicked(false);
         break;
       case "Beneficiaries":
         navigate("/Beneficiaries");
+        setIsProfileClicked(false);
         break;
       case "Log out":
         setSavedAcc([]);
@@ -63,7 +69,7 @@ function Transactions() {
           sessionStorage.setItem("tabId", tabId);
         }
         setLogOut(true);
-
+        setIsProfileClicked(false);
         navigate("/");
 
         break;
@@ -116,7 +122,7 @@ function Transactions() {
         "Profile",
         "Rewards",
         "Contact",
-        "Log out",
+        "Log Out",
       ],
       onClickHandler: handleMenuClick,
     };

@@ -104,7 +104,7 @@ function HomePage() {
   };
 
   return (
-    <div className="h-screen fixed w-screen bg-gray-800 text-white font-sans">
+    <div className="h-screen fixed w-screen bg-gray-800 text-white font-poppins">
       {isLogin ? (
         <div className=" w-[80%] sm:w-[60%] md:w-[50%] lg:w-[36%] xl:w-[33%]  mx-auto    shadow-md shadow-black h-auto rounded-xl  mt-[15vh] ">
           {loader ? (
