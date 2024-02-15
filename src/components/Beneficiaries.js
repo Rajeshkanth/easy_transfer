@@ -83,7 +83,7 @@ function Beneficiaries() {
         navigate("/Transactions");
         setIsProfileClicked(false);
         break;
-      case "Log out":
+      case "Log Out":
         setSavedAcc([]);
         setRecentTransactions([]);
         setLogOut(true);
