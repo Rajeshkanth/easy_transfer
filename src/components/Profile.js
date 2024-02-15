@@ -210,7 +210,7 @@ function Profile() {
         "Transactions",
         "Rewards",
         "Contact",
-        "Log out",
+        "Log Out",
       ],
       onClickHandler: handleMenuClick,
     };
@@ -629,9 +629,9 @@ function Profile() {
                         key={index}
                         className="grid grid-cols-2 gap-5  lg:gap-7 xl:gap-12 p-1 space-y-0 items-center pl-[5vw] md:pl-[1.2vw] pr-[2vw] border-b-2"
                       >
-                        <div className="grid grid-cols-2 gap-6 lg:gap-2 xl:gap-6 items-center text-xs md:text-sm lg:text-md ">
+                        <div className="grid grid-cols-2 gap-0 md:gap-6 lg:gap-2 xl:gap-6 items-center text-xs md:text-sm lg:text-md ">
                           <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
-                          <h1 className="md:text-xs lg:text-md overflow-x-auto">{`Sent to ${item.Name}`}</h1>
+                          <h1 className="md:text-xs lg:text-md overflow-x-auto lg:w-[100px]">{`Sent to ${item.Name}`}</h1>
                         </div>
                         <div className="grid grid-cols-2 md:gap-5 lg:gap-10  text-xs md:text-sm lg:text-md  ">
                           <h1 className="md:text-xs lg:text-md">

@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, memo } from "react";
 import {
   HashRouter as Router,
   Route,
@@ -423,4 +423,4 @@ function App() {
   );
 }
 
-export default App;
+export default memo(App);

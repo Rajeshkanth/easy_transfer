@@ -8,6 +8,7 @@ import SideBar from "./SideBar";
 import { RiMenuUnfoldFill } from "react-icons/ri";
 // import { MdKeyboardArrowLeft } from "react-icons/fa6";
 import { MdKeyboardArrowLeft } from "react-icons/md";
+import Loader from "./Loader";
 
 function Beneficiaries() {
   const {
@@ -41,7 +42,7 @@ function Beneficiaries() {
   const [savedAccNum, setSavedAccNum] = useState("");
   const [savedBeneficiaryName, setSavedBeneficiaryName] = useState("");
   const [savedIfsc, setSavedIfsc] = useState("");
-
+  const [loader, setLoader] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [newValueAdded, setNewValueAdded] = useState(false);
   const navigate = useNavigate();
@@ -193,7 +194,13 @@ function Beneficiaries() {
   };
 
   const saveBeneficiary = () => {
-    if (savedBeneficiaryName && savedAccNum && savedIfsc) {
+    if (
+      savedBeneficiaryName &&
+      savedAccNum &&
+      savedIfsc &&
+      String(savedAccNum).length > 15 &&
+      String(savedIfsc).length > 9
+    ) {
       setNewValueAdded(true);
       if (connectionMode !== "socket") {
       } else {
@@ -205,6 +212,7 @@ function Beneficiaries() {
           num: document.cookie,
         });
         setNewBeneficiarySended(true);
+        setLoader(true);
       }
       // if (savedBeneficiaryName && savedAccNum && savedIfsc) {
       //   const newBeneficiary = {
@@ -217,6 +225,8 @@ function Beneficiaries() {
       // }
 
       clearAllInputs();
+    } else {
+      setAllInputsAlert(true);
     }
   };
 
@@ -236,7 +246,14 @@ function Beneficiaries() {
   };
 
   const handleSaveButtonClick = () => {
-    if (clickable) {
+    if (
+      clickable &&
+      savedBeneficiaryName &&
+      savedAccNum &&
+      savedIfsc &&
+      String(savedAccNum).length > 15 &&
+      String(savedIfsc).length > 9
+    ) {
       setPlusIcon(false);
       saveBeneficiary();
       setAllInputsAlert(false);
@@ -285,7 +302,7 @@ function Beneficiaries() {
   useEffect(() => {
     if (connectionMode !== "socket") {
     } else {
-      socket.on("getSavedBeneficiary", (data) => {
+      socket.on("getSavedBeneficiary", async (data) => {
         const savedDetail = {
           beneficiaryName: data.beneficiaryName,
           accNum: data.accNum,
@@ -324,11 +341,12 @@ function Beneficiaries() {
             ? storeDetailsInsession1()
             : storeDetailsInsession2();
         }
+        setLoader(false);
 
         setNewBeneficiarySended(false);
       });
     }
-  }, [newBeneficiarySended]);
+  }, []);
 
   // useEffect(() => {
   //   if (connectionMode !== "socket") {
@@ -388,7 +406,7 @@ function Beneficiaries() {
               <h1 className="font-bold w-1/4 text-sm md:text-sm  xl:text-xl items-center flex">
                 Name
               </h1>
-              <h1 className="font-bold w-1/4 text-sm  md:text-sm xl:text-xl items-center flex ml-[-4vw] md:ml-[-3vw]">
+              <h1 className="font-bold w-1/4 text-sm  md:text-sm xl:text-xl items-center flex ml-[-3.5vw] md:ml-[-2.5vw]">
                 Account
               </h1>
               {windowWidth < 450 ? null : (
@@ -415,11 +433,11 @@ function Beneficiaries() {
                         : "grid grid-cols-4    h-auto  z-10  pt-3 pb-3 text-gray-700  w-[100%] pl-[8vw] sm:pl-[10vw] pr-[4vw] md:pr-[9vw]"
                     }
                   >
-                    <h1 className="flex items-center capitalize text-xs md:text-sm  xl:text-[16px]">
+                    <h1 className="flex items-center capitalize text-xs md:text-sm   xl:text-[16px]">
                       {" "}
                       {item.beneficiaryName}
                     </h1>
-                    <h1 className="flex items-center  text-xs md:text-sm xl:text-[16px] ml-[-6vw] md:ml-[-2vw]">
+                    <h1 className="flex items-center  text-xs md:text-sm xl:text-[16px] ml-[-9vw] sm:ml-[-6vw] md:ml-[-2vw]">
                       {item.accNum}
                     </h1>
                     {windowWidth < 450 ? null : (
@@ -451,15 +469,9 @@ function Beneficiaries() {
                 </div>
                 <form
                   action=""
-                  className="w-auto md:w-[60%] h-auto pb-[7vh] m-auto pt-[6vh] border-2 bg-white shadow-lg shadow-ash-800  mt-[0rem] text-gray-600 rounded-lg border-white  box-border"
+                  className="w-auto md:w-[60%] min-h-[40%] pb-[7vh] m-auto pt-[6vh] border-2 bg-white shadow-lg shadow-ash-800  mt-[0rem] text-gray-600 rounded-lg border-white  box-border"
                 >
-                  <div
-                    className={
-                      // allInputsAlert
-                      //   ? "w-[80%] m-auto space-y-2 pt-[2vh] "
-                      "w-[80%] m-auto space-y-5 pt-[2vh] "
-                    }
-                  >
+                  <div className={"w-[80%] m-auto space-y-5 pt-[2vh] "}>
                     <input
                       type="text"
                       className={
@@ -473,7 +485,7 @@ function Beneficiaries() {
                       required
                     />
                     {allInputsAlert && !savedBeneficiaryName ? (
-                      <p className="absolute top-[41vh] text-sm text-red-600 pointer-events-none  box-border">
+                      <p className="absolute top-[41.5vh] text-xs text-red-600 pointer-events-none  box-border">
                         Enter Name
                       </p>
                     ) : null}
@@ -490,8 +502,13 @@ function Beneficiaries() {
                       required
                       minLength={16}
                     />
+                    {savedAccNum.length < 16 && savedAccNum ? (
+                      <p className="absolute top-[49.8vh] text-xs text-red-600 pointer-events-none  box-border">
+                        Account number should have 16 digits
+                      </p>
+                    ) : null}
                     {allInputsAlert && !savedAccNum ? (
-                      <p className="absolute top-[49vh] text-sm text-red-600 pointer-events-none  box-border">
+                      <p className="absolute top-[49.8vh] text-xs text-red-600 pointer-events-none  box-border">
                         Enter Account Number
                       </p>
                     ) : null}
@@ -508,15 +525,20 @@ function Beneficiaries() {
                       required
                     />
                     {allInputsAlert && !savedIfsc ? (
-                      <p className="absolute top-[57vh]  text-sm text-red-600 pointer-events-none  box-border">
+                      <p className="absolute top-[57.9vh]  text-xs text-red-600 pointer-events-none  box-border">
                         Enter IFSC Code
+                      </p>
+                    ) : null}
+                    {String(savedIfsc).length < 10 && savedIfsc ? (
+                      <p className="absolute top-[57.9vh]  text-xs text-red-600 pointer-events-none  box-border">
+                        IFSC Code should have 10 digits
                       </p>
                     ) : null}
                     <input
                       type="button"
                       value="Save"
                       onClick={handleSaveButtonClick}
-                      className="w-full py-2 hover:bg-gray-600 bg-gray-800 hover:cursor-pointer text-white rounded-lg"
+                      className="w-full py-2 hover:bg-gray-600 bg bg-gray-800 hover:cursor-pointer text-white rounded-lg"
                     />
                   </div>
                 </form>
@@ -525,21 +547,13 @@ function Beneficiaries() {
           ) : null}
         </div>
       </div>
-      {/* {notify ? (
-        <div
-          onClick={() => setNotify(false)}
-          className="fixed top-0 bg-transparent z-[150] backdrop-blur-xl h-screen w-screen"
-        >
-          <div className="fixed bg-gray-700  h-[20vh] w-1/2 sm:w-[25vw] text-xl z-[100]  p-1 top-[65.2vh] sm:top-[64.7vh] ml-[35.5vw] sm:ml-[62.6vw] items-center text-center flex justify-center  backdrop-blur-sm rounded-[15px]   rounded-br-none">
-            <h3>Click to add new beneficiary details</h3>
+      {loader ? (
+        <>
+          <div className="fixed h-screen w-screen top-0">
+            <Loader bg={"bg-transparent backdrop-blur-md"} />
           </div>
-          <img
-            src={tag}
-            className="cursor-pointer fixed object-cover h-20 rounded-full  ml-[78vw] sm:ml-[85vw] top-[80vh] "
-            alt=""
-          />
-        </div>
-      ) : null} */}
+        </>
+      ) : null}
     </>
   );
 }

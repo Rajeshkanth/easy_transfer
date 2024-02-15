@@ -67,6 +67,7 @@ function PaymentForm() {
   const [sessionTiemedOut, setSessionTiemedOut] = useState(false);
   // const clickable = toAccountNumber.length > 15;
   const [accNumAlert, setAccNumAlert] = useState(false);
+  const [IFSCAlert, setIFSCAlert] = useState(false);
   const [sendButton, setSendButton] = useState(false);
 
   const handleMenuClick = (menuItem) => {
@@ -154,7 +155,8 @@ function PaymentForm() {
       toAccountNumber &&
       toAccountHolderName &&
       toIFSCNumber &&
-      String(toAccountNumber).length > 15
+      String(toAccountNumber).length > 15 &&
+      String(toIFSCNumber).length > 9
     ) {
       // setSendButton(true);
       setSendByBeneficiaries(false);
@@ -191,6 +193,7 @@ function PaymentForm() {
       setEnterAmount(false);
       setEnterToIfscNumber(false);
       setAccNumAlert(false);
+      setIFSCAlert(false);
       handleAllInput();
       navigate("/success");
     } else if (
@@ -202,6 +205,14 @@ function PaymentForm() {
     ) {
       setAccNumAlert(true);
       // setAllInput(true);
+    } else if (
+      amount &&
+      toAccountNumber &&
+      toAccountHolderName &&
+      toIFSCNumber &&
+      toIFSCNumber.length < 8
+    ) {
+      setIFSCAlert(true);
     } else if (
       !amount &&
       toAccountNumber &&
@@ -536,17 +547,6 @@ function PaymentForm() {
               return updatedTransact;
             });
           }
-          // if (!isAlreadyStored) {
-          //   const updatedTransactions = recentTransactions
-          //     ? [...recentTransactions, transaction]
-          //     : [transaction];
-
-          //   setRecentTransactions(updatedTransactions);
-          //   sessionStorage.setItem(
-          //     "savedTransactions",
-          //     JSON.stringify(updatedTransactions)
-          //   );
-          // }
         });
         const length = recentTransactions ? recentTransactions.length : 0;
         setRecentTransactionsLength(length);
@@ -560,7 +560,7 @@ function PaymentForm() {
       <div className=" h-screen   bg-gray-800 text-white font-sans fixed w-screen ">
         <Menu {...menuProps} onClickHandler={handleMenuClick} />
 
-        <div className="flex   w-full fixed top-[10%]  justify-center   ">
+        <div className="flex   w-full fixed top-[6%] md:top-[10%]  justify-center   ">
           <div className="w-[96vw]  flex  justify-evenly h-[90vh]  ">
             <div className="hidden sm:block sm:w-1/2 md:w-auto xl:w-[58%] xl:pl-[0vw]">
               {" "}
@@ -573,7 +573,13 @@ function PaymentForm() {
               </p>
             </div>
 
-            <form className="w-[80%] sm:w-5/12  h-[75vh] sm:h-[90%]  lg:h-[82%] md:w-2/5  lg:w-[40%] xl:w-1/3 relative pt-[0rem]  px-10 py-10  box-border  z-20 bg-white border-2 border-cyan-200  space-y-3 sm:space-y-0 rounded-md  mt-[3rem]   flex flex-col justify-center ">
+            <form
+              className={
+                sendByBeneficiaries
+                  ? "w-[80%] sm:w-5/12  h-[81vh] sm:h-[90%]  lg:h-[82%] md:w-2/5  lg:w-[40%] xl:w-1/3 relative pt-[0rem]  px-10 py-10  box-border mb-[2vh] md:mb-0  z-20 bg-white border-2 border-cyan-200  space-y-3 sm:space-y-0 rounded-md  mt-[3rem]   flex flex-col justify-center "
+                  : "w-[80%] sm:w-5/12  h-[75vh] sm:h-[90%]  lg:h-[82%] md:w-2/5  lg:w-[40%] xl:w-1/3 relative pt-[0rem]  px-10 py-10  box-border mb-[2vh] md:mb-0  z-20 bg-white border-2 border-cyan-200  space-y-3 sm:space-y-0 rounded-md  mt-[3rem]   flex flex-col justify-center "
+              }
+            >
               <div className=" h-auto sm:h-1/6 pt-[1rem]  text-gray-800   w-full text-center flex justify-center  rounded-md rounded-b-none  ">
                 <h1 className="  mt-2 sm:mt-4 md:mt-3 lg:mt-[1vh] sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-extrabold text-gray-600 text-[27px]">
                   Money Transfer
@@ -659,6 +665,7 @@ function PaymentForm() {
                   id="rec-ifsc-number"
                   name="rec-ifsc-number"
                   placeholder="IFSC Code"
+                  minLength={10}
                   value={toIFSCNumber}
                   onChange={(e) => {
                     handleToIfsc(e);
@@ -670,6 +677,11 @@ function PaymentForm() {
                       Enter IFSC
                     </p>
                   </>
+                ) : null}
+                {String(toIFSCNumber).length < 10 && toIFSCNumber ? (
+                  <p className="text-left text-xs text-red-600 mt-[-.6rem] md:mt-[-.8rem] md:ml-[3vw]  lg:ml-[1.4vw] mb-[.2rem]">
+                    IFSC code should have 10 digits
+                  </p>
                 ) : null}
 
                 <label
@@ -705,7 +717,7 @@ function PaymentForm() {
                   </p>
                 ) : null} */}
               </div>
-              <div className="w-full pt-0 sm:pt-[2rem]   min-h-[10%] box-border">
+              <div className="w-full pt-0 sm:pt-[2rem] mt-[4vh] md:mt-0  min-h-[10%] box-border">
                 <input
                   type="submit"
                   value="SEND"

@@ -192,7 +192,7 @@ function Login() {
     <>
       <div className="items-center justify-center pt-[2rem] text-gray-600 flex space-y-0 flex-col">
         <img
-          className="font-extrabold text-xl sm:text-4xl object-cover h-[8vh] md:h-[10vh] w-[80%] md:w-[80%] lg:w-[20vw] text-center text-gray-700 items-center font-poppins"
+          className="font-extrabold text-xl sm:text-4xl object-cover h-[7vh] sm:h-[7vh] md:h-[9vh] lg:h-[9vh] xl:h-[10vh] w-[80%] md:w-[80%] lg:w-[24vw] xl:w-[20vw] text-center text-gray-700 items-center font-poppins"
           src={logo}
         >
           {/* Easy Transfer */}
@@ -213,43 +213,6 @@ function Login() {
           <label htmlFor="" className="text-[14px] mb-[.1rem] ">
             Mobile Number
           </label>
-          {/* <input
-            className={
-              mobileNumber.length < 10 && mobileNumber
-                ? "outline-0 h-10  w-full border-2 border-red-600  text-[16px] rounded-lg  p-[1rem]    border-box  "
-                : isNewUser || (loginInputAlert && !mobileNumber)
-                ? "outline-0 h-10  w-full border-2 border-red-600  rounded-lg  text-[16px] p-[1rem]   border-box  "
-                : "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px]  p-[1rem]   border-box "
-            }
-            type="tel"
-            maxLength={10}
-            value={mobileNumber}
-            onChange={handleMobileNumber}
-            placeholder="Enter Mobile Number"
-          /> */}
-          {/* <PhoneInput
-            country={"in"}
-            placeholder="Enter Mobile Number"
-            value={mobileNumber}
-            onChange={handleMobileNumber}
-            inputClass={
-              mobileNumber.length < 10 && mobileNumber
-                ? "outline-0 h-10  w-full border-2 border-red-600  text-[16px] rounded-lg  p-[1rem]    border-box  "
-                : isNewUser || (loginInputAlert && !mobileNumber)
-                ? "outline-0 h-10  w-full border-2 border-red-600  rounded-lg  text-[16px] p-[1rem]   border-box  "
-                : "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px]  p-[1rem]   border-box "
-            }
-            inputProps={{
-              className:
-                "outline-0 h-10  w-[100%] border-2 border-slate-300 rounded-lg text-[16px] pl-[3vw]  p-[1rem]   border-box ",
-            }}
-            // inputStyle={{
-            //   width: "100%",
-            //   outline: 0,
-            //   border: "2px solid gray",
-            //   borderColor: "gray",
-            // }}
-          /> */}
 
           <PhoneInput
             country={"in"}
@@ -259,7 +222,7 @@ function Login() {
             inputProps={{
               required: true,
               className:
-                "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw]  p-[1rem]   border-box ",
+                "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem]   border-box ",
             }}
             countryCodeEditable={false}
             onlyCountries={["in", "us", "ru", "sg"]}
