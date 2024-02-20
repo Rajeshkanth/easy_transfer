@@ -313,18 +313,6 @@ function Login() {
                     className:
                       "1 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
                   }
-                : mobileNumber && mobileNumber.length < 12 && indiaCode
-                ? {
-                    required: true,
-                    className:
-                      "2 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
-                  }
-                : mobileNumber && mobileNumber.length < 11 && usRussiaCode
-                ? {
-                    required: true,
-                    className:
-                      "3 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
-                  }
                 : isNewUser
                 ? {
                     required: true,
@@ -448,11 +436,6 @@ function Login() {
         </div>
 
         <div className="w-[80%]">
-          {/* {loginInputAlert ? (
-            <p className=" text-red-500 text-xs cursor-default">
-              Fill all the inputs
-            </p>
-          ) : null} */}
           {loginInputAlert && !password ? (
             <p className="relative top-[-3vh] md:top-[-3vh] lg::top-[-2vh] text-red-500 text-xs cursor-default ">
               Enter Password
