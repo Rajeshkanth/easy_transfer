@@ -447,7 +447,7 @@ function Beneficiaries() {
           {plusIcon ? (
             <div className=" fixed top-0 box-border z-[200] backdrop-blur-xl h-screen w-screen">
               <div className="w-3/4 m-auto   h-full pt-[10vh] md:pt-[20vh]  pb-[2vh] box-border">
-                <div className="relative top-[13vh] cursor-pointer text-gray-700 text-xl text-bold left-[63vw] md:left-[59vw] lg:lefft-[56vw] h-[10vh] w-[10vw]">
+                <div className="relative top-[13vh] cursor-pointer text-gray-700 text-xl text-bold left-[63vw] md:left-[59vw] lg:left-[56vw] h-[10vh] w-[10vw]">
                   <CgClose onClick={closeBeneficiaryAdding} />
                 </div>
                 <form
@@ -468,7 +468,7 @@ function Beneficiaries() {
                       required
                     />
                     {allInputsAlert && !savedBeneficiaryName ? (
-                      <p className="absolute  top-[31vh] md:top-[41vh] lg:top-[41vh] xl:top-[41.5vh] text-xs text-red-600 pointer-events-none  box-border">
+                      <p className="absolute  top-[32vh] sm:top-[32vh] md:top-[42vh] lg:top-[42vh] xl:top-[41.5vh] text-xs text-red-600 pointer-events-none  box-border">
                         Enter name
                       </p>
                     ) : null}
@@ -486,12 +486,12 @@ function Beneficiaries() {
                       minLength={16}
                     />
                     {savedAccNum.length < 16 && savedAccNum ? (
-                      <p className="absolute top-[37.7vh] md:top-[47.7vh] lg:top-[47.7vh] xl:top-[49.8vh] text-xs text-red-600 pointer-events-none  box-border">
+                      <p className="absolute top-[41vh] sm:top-[41vh] md:top-[51vh] lg:top-[51vh] xl:top-[49.8vh] text-xs text-red-600 pointer-events-none  box-border">
                         Account number should have 16 digits
                       </p>
                     ) : null}
                     {allInputsAlert && !savedAccNum ? (
-                      <p className="absolute top-[37.7vh] md:top-[47.7vh] lg:top-[47.7vh] xl:top-[49.8vh] text-xs text-red-600 pointer-events-none  box-border">
+                      <p className="absolute top-[41vh] sm:top-[41vh] md:top-[51vh] lg:top-[51vh] xl:top-[49.8vh] text-xs text-red-600 pointer-events-none  box-border">
                         Enter account number
                       </p>
                     ) : null}
@@ -508,12 +508,12 @@ function Beneficiaries() {
                       required
                     />
                     {allInputsAlert && !savedIfsc ? (
-                      <p className="absolute top-[44.6vh] md:top-[54.5vh] lg:top-[54.5vh] xl:top-[57.9vh]  text-xs text-red-600 pointer-events-none  box-border">
+                      <p className="absolute top-[50.3vh] sm:top-[50.3vh] md:top-[60.5vh] lg:top-[60.5vh] xl:top-[57.9vh]  text-xs text-red-600 pointer-events-none  box-border">
                         Enter IFSC code
                       </p>
                     ) : null}
                     {String(savedIfsc).length < 10 && savedIfsc ? (
-                      <p className="absolute top-[44.6vh] md:top-[60.3vh] lg:top-[54.5vh] xl:top-[57.9vh]  text-xs text-red-600 pointer-events-none  box-border">
+                      <p className="absolute top-[50.3vh] sm:top-[50.3vh] md:top-[60.5vh] lg:top-[60.5vh] xl:top-[57.9vh]  text-xs text-red-600 pointer-events-none  box-border">
                         IFSC code should have 10 digits
                       </p>
                     ) : null}
