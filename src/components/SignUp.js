@@ -268,7 +268,7 @@ function SignUp() {
             )}
 
             {allInputAlert && !createPassword ? (
-              <p className="text-xs text-red-500 mt-[-.8rem] mb-[.6rem]">
+              <p className="text-xs text-red-500 mt-[-.8rem] mb-[.7rem]">
                 Enter Password
               </p>
             ) : null}

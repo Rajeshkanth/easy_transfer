@@ -19,6 +19,7 @@ function HomePage() {
     socket,
     setLoader,
     setNewUser,
+    passwordError,
   } = useContext(store);
 
   const navigate = useNavigate();
@@ -97,7 +98,13 @@ function HomePage() {
   };
 
   return (
-    <div className="h-screen fixed w-screen bg-gray-800 text-white font-poppins">
+    <div
+      className={
+        passwordError && windowWidth < 640 && !isLogin
+          ? "h-screen pt-10 w-screen bg-gray-800 text-white font-poppins"
+          : "h-screen fixed w-screen bg-gray-800 text-white font-poppins"
+      }
+    >
       {isLogin ? (
         <div className=" w-[80%] sm:w-[60%] md:w-[50%] lg:w-[36%] xl:w-[33%]  mx-auto    shadow-md shadow-black h-auto rounded-xl  mt-[15vh] ">
           {loader ? (
@@ -116,7 +123,13 @@ function HomePage() {
           )}
         </div>
       ) : (
-        <div className="mx-auto w-[80%] sm:w-[60%] md:w-[50%] lg:w-[33%]  text-gray-800  bg-white  box-border  mt-[15vh] rounded-xl h-auto">
+        <div
+          className={
+            passwordError
+              ? "mx-auto w-[80%] sm:w-[60%] md:w-[50%] lg:w-[33%]  text-gray-800  bg-white  box-border  mt-[6vh] rounded-xl h-auto"
+              : "mx-auto w-[80%] sm:w-[60%] md:w-[50%] lg:w-[33%]  text-gray-800  bg-white  box-border  mt-[15vh] rounded-xl h-auto"
+          }
+        >
           <div className="w-full border-2 bg-white text-gray-800 space-y-4 sm:space-y-5 lg:space-y-7 rounded-xl  shadow-md shadow-black">
             <SignUp />
           </div>
