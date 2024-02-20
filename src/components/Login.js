@@ -454,12 +454,12 @@ function Login() {
             </p>
           ) : null} */}
           {loginInputAlert && !password ? (
-            <p className="relative top-[-4vh] md:top-[-4.5vh] text-red-500 text-xs cursor-default mt-[.4rem] ">
+            <p className="relative top-[-3vh] md:top-[-3vh] lg::top-[-2vh] text-red-500 text-xs cursor-default ">
               Enter Password
             </p>
           ) : null}
           {loginFailed && !isNewUser ? (
-            <p className="relative top-[-3vh] md:top-[-3vh] text-xs  text-red-500">
+            <p className="relative top-[-3.3vh] md:top-[-3vh] lg:top-[-2vh] text-xs  text-red-500">
               Wrong password
             </p>
           ) : null}
