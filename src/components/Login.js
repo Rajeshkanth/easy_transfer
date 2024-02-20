@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, memo } from "react";
+import React, { useContext, useState, useEffect, memo, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { store } from "../App";
@@ -9,11 +9,14 @@ import logo from "./images/Greenwhitelogo2.png";
 // import PhoneInput2 from "react-phone-number-input";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import input from "react-international-phone";
-import "react-international-phone/style.css";
+import { PhoneNumberUtil } from "google-libphonenumber";
+// import { isValidPhoneNumber } from "react-phone-number-input";
+import parsePhoneNumber from "libphonenumber-js";
 
 function Login() {
   const navigate = useNavigate();
+
+  const inputRef = useRef(null);
 
   const [showPassword, setShowPassword] = useState(false);
   // const [isNewUser, setNewUser] = useState(false);
@@ -22,13 +25,20 @@ function Login() {
   const [indiaCode, setIndiaCode] = useState(false);
   const [singaporeCode, setSingaporeCode] = useState(false);
   const [usRussiaCode, setUsRussiaCode] = useState(false);
+  const [isValidIndianNumber, setIsValidIndianNumber] = useState(true);
+  const [isValidUsRussianNumber, setIsValidUsRussianNumber] = useState(false);
+  const [selectedCountryCode, setSelectedCountryCode] = useState("");
+  const [selectedDialCode, setSelectedDialCode] = useState("");
+  const numberUtil = PhoneNumberUtil.getInstance();
+  const [parsedNum, setParsedNum] = useState("");
+  // const phoneNumber = parsePhoneNumber(`+6594374758`, "SG");
+  // const checking = numberUtil.isValidNumber("+914542610685", "IN");
 
   const {
     password,
     setPassword,
     setMobileNumber,
     mobileNumber,
-    registeredUsers,
     setKey,
     windowWidth,
     setWindowWidth,
@@ -45,38 +55,105 @@ function Login() {
     setLoginInputAlert,
   } = useContext(store);
 
-  // const handleMobileNumber = (e) => {
-  //   const value = e.target.value;
-  //   const sanitizedValue = value.replace(/[^0-9]/g, "");
-  //   if (value.length <= 10) {
-  //     setMobileNumber(sanitizedValue);
-  //   }
-  // };
   const handleMobileNumber = (value, country) => {
-    // if (e && e.target && e.target.value) {
-    // const value = e.target.value;
-    // const sanitizedValue = value.replace(/[^0-9]/g, "");
-    // if (value.length <= 10) {
-    // setMobileNumber(sanitizedValue);
-    const countryCode = country.dialCode; //continue here
-    console.log(countryCode);
+    const dialCode = country.dialCode;
+    const countryCode = country.countryCode.toUpperCase();
+    // const maxLength = numberUtil.getLengthOfNationalDestinationCode("us");
+    // console.log(numberUtil.getExampleNumber(countryCode));
+    // console.log(numberUtil);
 
-    if (countryCode === "91") {
-      setIndiaCode(true);
-      setSingaporeCode(false);
-      setUsRussiaCode(false);
-    } else if (countryCode === "1" || countryCode === "7") {
-      setUsRussiaCode(true);
-      setIndiaCode(false);
-      setSingaporeCode(false);
-    } else if (countryCode === "65") {
-      setSingaporeCode(true);
-      setIndiaCode(false);
-      setUsRussiaCode(false);
+    const firstDigit = value.substring(dialCode.length, dialCode.length + 1);
+
+    // console.log(phones["am"]);
+    // const regex = phones[countryCode];
+    // console.log(regex);
+    // console.log(regex.test(mobileNumber), mobileNumber);
+
+    // setSelectedCountryCode(countryCode);
+    // setSelectedDialCode(dialCode);
+    // const isValid = isValidPhoneNumber(
+    //   `+${dialCode + value.slice(dialCode.length)}`
+    // );
+    // setIsValidIndianNumber(isValid);
+    // console.log(
+    //   isValidIndianNumber,
+    //   dialCode,
+    //   value.slice(dialCode.length),
+    //   isValidPhoneNumber(`+${dialCode + value.slice(dialCode.length)}`)
+    // );
+    // if (phoneNumber) {
+    //   const a = phoneNumber.isValid();
+    //   console.log(a, "85", phoneNumber.isValid());
+    // }
+
+    try {
+      const parsedNum = numberUtil.parse(
+        `+${value}`,
+        countryCode.toLowerCase()
+      );
+      const isValid = numberUtil.isValidNumber(parsedNum);
+      setIsValidIndianNumber(isValid);
+    } catch (err) {
+      console.log(err);
+      console.log("Value:", value);
+      console.log("Country Code:", countryCode);
     }
+
+    // if (regex.test(mobileNumber)) {
+    //   setIsValidIndianNumber(true);
+    // } else {
+    //   setIsValidIndianNumber(false);
+    // }
+    // if (dialCode === "91") {
+    //   if (/^[6-9]/.test(firstDigit)) {
+    //     setIndiaCode(true);
+    //     setSingaporeCode(false);
+    //     setUsRussiaCode(false);
+    //     setIsValidIndianNumber(true);
+    //   } else {
+    //     setIndiaCode(true);
+    //     setIsValidIndianNumber(false);
+    //     setSingaporeCode(false);
+    //     setUsRussiaCode(false);
+    //   }
+    // } else if (dialCode === "1") {
+    //   if (/^[2-9]/.test(firstDigit)) {
+    //     setIsValidIndianNumber(true);
+    //     setSingaporeCode(false);
+    //     setUsRussiaCode(true);
+    //     setIndiaCode(false);
+    //   } else {
+    //     setIsValidIndianNumber(false);
+    //     setSingaporeCode(false);
+    //     setUsRussiaCode(true);
+    //     setIndiaCode(false);
+    //   }
+    // } else if (dialCode === "7") {
+    //   if (/^[7-8]/.test(firstDigit)) {
+    //     setIsValidIndianNumber(true);
+    //     setSingaporeCode(false);
+    //     setUsRussiaCode(true);
+    //     setIndiaCode(false);
+    //   } else {
+    //     setIsValidIndianNumber(false);
+    //     setSingaporeCode(false);
+    //     setUsRussiaCode(true);
+    //     setIndiaCode(false);
+    //   }
+    // } else if (dialCode === "65") {
+    //   if (/^[8-9]/.test(firstDigit)) {
+    //     setIsValidIndianNumber(true);
+    //     setSingaporeCode(true);
+    //     setUsRussiaCode(false);
+    //     setIndiaCode(false);
+    //   } else {
+    //     setIsValidIndianNumber(false);
+    //     setSingaporeCode(true);
+    //     setUsRussiaCode(false);
+    //     setIndiaCode(false);
+    //   }
+    // }
     setMobileNumber(value);
-    // }
-    // }
   };
 
   const handlePassword = (e) => {
@@ -128,7 +205,6 @@ function Login() {
         setLoginFailed(false);
         setLoginInputAlert(false);
       } else if (request.status === 201) {
-        // setLoginFailed(true);
         setNewUser(true);
       } else if (request.status === 202) {
         setLoginFailed(true);
@@ -137,14 +213,21 @@ function Login() {
       setPassword("");
     } else {
       setLoginInputAlert(true);
-      // alert("Enter Valid Number");
     }
   };
 
   const loginToDashboardUsingSocket = async (e) => {
     e.preventDefault();
     console.log(mobileNumber);
-    if (mobileNumber && password && mobileNumber.length > 7) {
+    console.log(isValidIndianNumber);
+    if (
+      mobileNumber &&
+      password &&
+      mobileNumber.length > 7 &&
+      isValidIndianNumber
+      // isValidIndianNumber
+    ) {
+      console.log(mobileNumber, mobileNumber.slice(2).substring(0, 1));
       setLoader(true);
       await socket.emit("login", {
         Mobile: mobileNumber.slice(2),
@@ -164,14 +247,18 @@ function Login() {
       socket.on("newUser", () => {
         setNewUser(true);
         setLoader(false);
+        setIsValidIndianNumber(true);
       });
       socket.on("loginFailed", async () => {
         setLoader(false);
+        setIsValidIndianNumber(true);
         setLoginFailed(true);
       });
     } else {
       setLoginInputAlert(true);
+      setIsValidIndianNumber(false);
       setLoader(false);
+      // alert("failed");
     }
   };
 
@@ -188,15 +275,14 @@ function Login() {
       window.removeEventListener("resize", handleResize);
     };
   }, [windowWidth]);
+
   return (
     <>
       <div className="items-center justify-center pt-[2rem] text-gray-600 flex space-y-0 flex-col">
         <img
           className="font-extrabold text-xl sm:text-4xl object-cover h-[7vh] sm:h-[7vh] md:h-[9vh] lg:h-[9vh] xl:h-[11vh] w-[80%] md:w-[80%] lg:w-[24vw] xl:w-[22vw] text-center text-gray-700 items-center font-poppins"
           src={logo}
-        >
-          {/* Easy Transfer */}
-        </img>
+        ></img>
         <h1 className="text-center m-0 text-[4vw] sm:text-[3vh] md:text-2xl font-bold font-poppins    cursor-default ">
           Welcome Back
         </h1>
@@ -216,51 +302,120 @@ function Login() {
 
           <PhoneInput
             country={"in"}
+            countryCodeEditable={false}
             placeholder="Enter Mobile Number"
             value={mobileNumber}
             onChange={handleMobileNumber}
-            inputProps={{
-              required: true,
-              className:
-                "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
-            }}
-            countryCodeEditable={false}
-            onlyCountries={["in", "us", "ru", "sg"]}
-            buttonStyle={{
-              width: "14% ",
-              paddingLeft: "0px",
-              backgroundColor: "white",
-              border: "2px  solid rgb(203 213 225)",
-              borderColor: "rgb(203 213 225)",
-              borderRadius: " 0.5rem 0 0 0.5rem ",
-            }}
+            inputProps={
+              loginInputAlert && !mobileNumber
+                ? {
+                    required: true,
+                    className:
+                      "1 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                  }
+                : mobileNumber && mobileNumber.length < 12 && indiaCode
+                ? {
+                    required: true,
+                    className:
+                      "2 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                  }
+                : mobileNumber && mobileNumber.length < 11 && usRussiaCode
+                ? {
+                    required: true,
+                    className:
+                      "3 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                  }
+                : isNewUser
+                ? {
+                    required: true,
+                    className:
+                      "4 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                  }
+                : mobileNumber && !isValidIndianNumber
+                ? {
+                    required: true,
+                    className:
+                      "5 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                  }
+                : {
+                    required: true,
+                    className:
+                      "6 outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                  }
+            }
+            dialCodeEditable={false}
+            // onlyCountries={["in", "us", "ru", "sg"]}
+            buttonStyle={
+              loginInputAlert && !mobileNumber
+                ? {
+                    width: "14% ",
+                    paddingLeft: "0px",
+                    backgroundColor: "white",
+                    border: "2px  solid rgb(220 38 38)",
+                    borderColor: "rgb(220 38 38)",
+                    borderRadius: " 0.5rem 0 0 0.5rem ",
+                  }
+                : mobileNumber && mobileNumber.length < 12 && indiaCode
+                ? {
+                    width: "14% ",
+                    paddingLeft: "0px",
+                    backgroundColor: "white",
+                    border: "2px  solid rgb(220 38 38)",
+                    borderColor: "rgb(220 38 38)",
+                    borderRadius: " 0.5rem 0 0 0.5rem ",
+                  }
+                : isNewUser
+                ? {
+                    width: "14% ",
+                    paddingLeft: "0px",
+                    backgroundColor: "white",
+                    border: "2px  solid rgb(220 38 38)",
+                    borderColor: "rgb(220 38 38)",
+                    borderRadius: " 0.5rem 0 0 0.5rem ",
+                  }
+                : mobileNumber &&
+                  // !phones[selectedCountryCode].test(
+                  //   mobileNumber.slice(selectedDialCode.length)
+                  // )
+                  !isValidIndianNumber
+                ? {
+                    width: "14% ",
+                    paddingLeft: "0px",
+                    backgroundColor: "white",
+                    border: "2px  solid rgb(220 38 38)",
+                    borderColor: "rgb(220 38 38)",
+                    borderRadius: " 0.5rem 0 0 0.5rem ",
+                  }
+                : {
+                    width: "14% ",
+                    paddingLeft: "0px",
+                    backgroundColor: "white",
+                    border: "2px  solid rgb(203 213 225)",
+                    borderColor: "rgb(203 213 225)",
+                    borderRadius: " 0.5rem 0 0 0.5rem ",
+                  }
+            }
           />
 
-          {mobileNumber && indiaCode && mobileNumber.length < 12 ? (
-            <p className="text-xs w-[80%] mt-[.4rem]  text-red-500">
-              Mobile number must have 10 digits
-            </p>
-          ) : singaporeCode && mobileNumber && mobileNumber.length < 10 ? (
-            <p className="text-xs w-[80%] mt-[.4rem]  text-red-500">
-              Mobile number must have 8 digits
-            </p>
-          ) : usRussiaCode && mobileNumber && mobileNumber.length < 11 ? (
-            <p className="text-xs w-[80%] mt-[.4rem]  text-red-500">
-              Mobile number must have 10 digits
-            </p>
-          ) : null}
-          {!mobileNumber && loginInputAlert ? (
-            <p className="text-xs w-[80%] mt-[.2rem] text-red-500">
-              Enter Mobile Number
-            </p>
-          ) : null}
-          {isNewUser ? (
-            <div className="w-[80%] mb-2">
+          <div className="w-[80%] mb-2">
+            {mobileNumber ? (
+              isValidIndianNumber ? null : (
+                <p className="text-xs w-[80%] mt-[.4rem]  text-red-500">
+                  Invalid number
+                </p>
+              )
+            ) : null}
+            {!mobileNumber && loginInputAlert ? (
+              <p className="text-xs w-[80%] mt-[.4rem] text-red-500">
+                Enter Mobile Number
+              </p>
+            ) : null}
+            {isNewUser ? (
               <p className="text-xs mt-[.2rem] text-red-500">
                 Wrong Mobile Number
               </p>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
         <div className="flex flex-col space-y-1 w-[80%] ">
           <label
@@ -289,7 +444,7 @@ function Login() {
               className={
                 windowWidth < 640
                   ? "relative ml-[56.5vw] bottom-[2rem] text-zinc-400"
-                  : "relative  sm:ml-[42vw] md:ml-[35vw] lg:ml-[20vw] xl:ml-[23.8vw] bottom-0 sm:bottom-[2rem] text-zinc-400"
+                  : "relative  sm:ml-[42vw] md:ml-[35vw] lg:ml-[25vw] xl:ml-[23.8vw] bottom-0 sm:bottom-[2rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
@@ -312,12 +467,12 @@ function Login() {
             </p>
           ) : null} */}
           {loginInputAlert && !password ? (
-            <p className="relative top-[-4vh] text-red-500 text-xs cursor-default mt-[.4rem] ">
+            <p className="relative top-[-4.5vh] md:top-[-4.5vh] text-red-500 text-xs cursor-default mt-[.4rem] ">
               Enter Password
             </p>
           ) : null}
           {loginFailed && !isNewUser ? (
-            <p className="relative top-[-3vh] text-xs  text-red-500">
+            <p className="relative top-[-3.5vh] md:top-[-3vh] text-xs  text-red-500">
               Wrong password
             </p>
           ) : null}

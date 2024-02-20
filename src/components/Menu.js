@@ -2,12 +2,14 @@ import React, { memo, useContext, useEffect } from "react";
 import { store } from "../App";
 import logo from "./images/Greenwhitelogo2.png";
 import { RiMenuUnfoldFill } from "react-icons/ri";
+import { useNavigate } from "react-router";
 
 function Menu(props) {
   const { nav, onClickHandler } = props;
 
   const { windowWidth, setWindowWidth, setIsProfileClicked, isProfileClicked } =
     useContext(store);
+  const navigate = useNavigate();
 
   const handleClick = (item) => {
     if (onClickHandler) {
@@ -35,6 +37,7 @@ function Menu(props) {
         <img
           src={logo}
           className=" items-center object-contain  w-[40vw] md:w-[28vw] lg:w-[24vw] font-bold ml-[2rem] text-center  sm:ml-[0rem] xl:ml-[0rem] text-2xl lg:text-4xl  box-border   "
+          onClick={() => navigate("/transferPage")}
         ></img>
         {/* <div className="logo"></div> */}
       </div>

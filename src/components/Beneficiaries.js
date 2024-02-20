@@ -35,6 +35,7 @@ function Beneficiaries() {
     setPlusIcon,
     plusIcon,
     setRecentTransactions,
+    clearAll,
   } = useContext(store);
 
   // const [isProfileClicked, setIsProfileClicked] = useState(false);
@@ -58,7 +59,6 @@ function Beneficiaries() {
       case "Menu":
         setIsProfileClicked(true);
         break;
-
       case "Profile":
         navigate("/Profile", { state: { prevPath: location.pathname } });
         setIsProfileClicked(false);
@@ -85,10 +85,8 @@ function Beneficiaries() {
         setIsProfileClicked(false);
         break;
       case "Log Out":
-        setSavedAcc([]);
-        setRecentTransactions([]);
+        clearAll();
         setLogOut(true);
-        setIsProfileClicked(false);
         navigate("/");
         break;
       default:
@@ -105,7 +103,7 @@ function Beneficiaries() {
           "Transactions",
           "Rewards",
           "Contact",
-          "Log out",
+          "Log Out",
         ],
         onClickHandler: handleMenuClick,
       };
@@ -118,7 +116,7 @@ function Beneficiaries() {
           "Transactions",
           "Rewards",
           "Contact",
-          "Log out",
+          "Log Out",
         ],
         onClickHandler: handleMenuClick,
       };
@@ -214,15 +212,6 @@ function Beneficiaries() {
         setNewBeneficiarySended(true);
         setLoader(true);
       }
-      // if (savedBeneficiaryName && savedAccNum && savedIfsc) {
-      //   const newBeneficiary = {
-      //     beneficiaryName: savedBeneficiaryName,
-      //     accNum: savedAccNum,
-      //     ifsc: savedIfsc,
-      //     editable: false, // Assuming this is the default value
-      //   };
-      //   setSavedAcc((prevList) => [...prevList, newBeneficiary]);
-      // }
 
       clearAllInputs();
     } else {
@@ -348,15 +337,6 @@ function Beneficiaries() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   if (connectionMode !== "socket") {
-  //   } else {
-  //     socket.emit("fetchList", {
-  //       num: document.cookie,
-  //     });
-  //   }
-  // }, [socket]);
-
   useEffect(() => {
     const savedAcc = sessionStorage.getItem("savedAcc");
     setSavedAcc(JSON.parse(savedAcc));
@@ -418,7 +398,7 @@ function Beneficiaries() {
                 className="font-bold w-full md:w-[80%] py-2  lg:w-[60%] ml-[-3vw] md:ml-[-1.4vw] border-2 rounded-md cursor-pointer hover:bg-gray-100 hover:text-gray-800 text-center  text-[10px] md:text-sm xl:text-lg  bg-white text-gray-700"
                 onClick={addNewBeneficiary}
               >
-                Add Beneficiary
+                + Add Beneficiary
               </h1>
             </div>
             {savedAcc !== null ? (
@@ -448,16 +428,19 @@ function Beneficiaries() {
                     )}
                     <button
                       onClick={() => sendMoney(index)}
-                      className="text-xs px-4 py-2 md:text-lg lg:px-2 w-3/4 md:w-3/4 lg:w-1/2  ml-[4vw] md:ml-[7vw] border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                      className="text-xs px-4 py-3 md:text-[16px] lg:px-2 w-3/4 md:w-3/4 lg:w-1/2  ml-[4vw] md:ml-[7vw] border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                     >
                       Send
                     </button>
                   </div>
                 ))
             ) : (
-              <p className="grid items-center w-full justify-center h-full">
-                You don't have any saved accounts, yet.
-              </p>
+              <>
+                {" "}
+                <p className="grid items-center w-full justify-center h-full">
+                  You don't have any saved accounts, yet.
+                </p>
+              </>
             )}
           </div>
 
@@ -485,8 +468,8 @@ function Beneficiaries() {
                       required
                     />
                     {allInputsAlert && !savedBeneficiaryName ? (
-                      <p className="absolute top-[41.5vh] text-xs text-red-600 pointer-events-none  box-border">
-                        Enter Name
+                      <p className="absolute  top-[32vh] md:top-[42vh] lg:top-[42vh] xl:top-[41.5vh] text-xs text-red-600 pointer-events-none  box-border">
+                        Enter name
                       </p>
                     ) : null}
                     <input
@@ -503,13 +486,13 @@ function Beneficiaries() {
                       minLength={16}
                     />
                     {savedAccNum.length < 16 && savedAccNum ? (
-                      <p className="absolute top-[49.8vh] text-xs text-red-600 pointer-events-none  box-border">
+                      <p className="absolute top-[41vh] md:top-[51vh] lg:top-[51vh] xl:top-[49.8vh] text-xs text-red-600 pointer-events-none  box-border">
                         Account number should have 16 digits
                       </p>
                     ) : null}
                     {allInputsAlert && !savedAccNum ? (
-                      <p className="absolute top-[49.8vh] text-xs text-red-600 pointer-events-none  box-border">
-                        Enter Account Number
+                      <p className="absolute top-[41vh] md:top-[51vh] lg:top-[51vh] xl:top-[49.8vh] text-xs text-red-600 pointer-events-none  box-border">
+                        Enter account number
                       </p>
                     ) : null}
                     <input
@@ -525,13 +508,13 @@ function Beneficiaries() {
                       required
                     />
                     {allInputsAlert && !savedIfsc ? (
-                      <p className="absolute top-[57.9vh]  text-xs text-red-600 pointer-events-none  box-border">
-                        Enter IFSC Code
+                      <p className="absolute top-[50vh] sm:top-[50.4vh] md:top-[60.3vh] lg:top-[60.5vh] xl:top-[57.9vh]  text-xs text-red-600 pointer-events-none  box-border">
+                        Enter IFSC code
                       </p>
                     ) : null}
                     {String(savedIfsc).length < 10 && savedIfsc ? (
-                      <p className="absolute top-[57.9vh]  text-xs text-red-600 pointer-events-none  box-border">
-                        IFSC Code should have 10 digits
+                      <p className="absolute top-[50vh] sm:top-[50.4vh] md:top-[60.3vh] lg:top-[60.5vh] xl:top-[57.9vh]  text-xs text-red-600 pointer-events-none  box-border">
+                        IFSC code should have 10 digits
                       </p>
                     ) : null}
                     <input

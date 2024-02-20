@@ -14,7 +14,7 @@ import PaymentForm from "./components/PaymentForm";
 import Profile from "./components/Profile";
 import Success from "./components/Success";
 import Transactions from "./components/Transactions";
-
+import { PhoneNumberUtil } from "google-libphonenumber";
 export const store = createContext();
 const socket = io.connect("https://polling-server.onrender.com", {
   query: {
@@ -94,32 +94,38 @@ function App() {
   const [indiaCode, setIndiaCode] = useState(false);
   const [singaporeCode, setSingaporeCode] = useState(false);
   const [usRussiaCode, setUsRussiaCode] = useState(false);
+  const [isValidNumber, setIsValidNumber] = useState(true);
+  const phoneNumber = PhoneNumberUtil.getInstance();
+
+  const clearAll = () => {
+    setSavedAcc([]);
+    setRecentTransactions([]);
+    const tabId = sessionStorage.getItem("tabId");
+    sessionStorage.clear();
+    if (tabId) {
+      sessionStorage.setItem("tabId", tabId);
+    }
+    setIsProfileClicked(false);
+  };
 
   const handleRegMobileNumber = (value, country) => {
-    // const value = e.target.value;
-    // if (value.length <= 10) {
-    // const sanitizedValue = value.replace(/[^0-9]/g, "");
-    const countryCode = country.dialCode;
-    if (countryCode === "91") {
-      setIndiaCode(true);
-      setSingaporeCode(false);
-      setUsRussiaCode(false);
-    } else if (countryCode === "1" || countryCode === "7") {
-      setIndiaCode(false);
-      setSingaporeCode(false);
-      setUsRussiaCode(true);
-    } else if (countryCode === "65") {
-      setSingaporeCode(true);
-      setIndiaCode(false);
-      setUsRussiaCode(false);
+    const dialCode = country.dialCode;
+    try {
+      const parsedNum = phoneNumber.parseAndKeepRawInput(
+        `+${value}`,
+        country.countryCode
+      );
+      const isValid = phoneNumber.isValidNumber(parsedNum);
+      console.log(isValid);
+      setIsValidNumber(isValid);
+    } catch (err) {
+      console.log(err);
     }
     setRegMobileNumber(value);
-    // }
   };
 
   const handleCreatePassword = (e) => {
     const value = e.target.value;
-
     const allowedPattern =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()-_+={}[\]:;'"<>,./?]).{8,}$/;
     const testedValue = allowedPattern.test(value);
@@ -133,7 +139,6 @@ function App() {
 
   const handleConfirmPassword = (e) => {
     const value = e.target.value;
-
     const allowedPattern =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()-_+={}[\]:;'"<>,./?]).{8,}$/;
     const testedValue = allowedPattern.test(value);
@@ -141,7 +146,7 @@ function App() {
     if (testedValue) {
       setPasswordError(false);
     } else {
-      setPassword(true);
+      setPasswordError(true);
     }
   };
 
@@ -152,9 +157,6 @@ function App() {
     }
   };
 
-  const closeProfile = () => {
-    setIsProfileClicked(false);
-  };
   useEffect(() => {
     const storedTabId = sessionStorage.getItem("tabId");
     if (storedTabId) {
@@ -195,86 +197,11 @@ function App() {
     console.log("event emitted");
   }, []);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (connectionMode !== "socket") {
-  //     } else {
-  //       await socket.on("allSavedAccounts", (data) => {
-  //         const savedDetail = {
-  //           beneficiaryName: data.beneficiaryName,
-  //           accNum: data.accNum,
-  //           ifsc: data.ifsc,
-  //           editable: data.editable,
-  //         };
-
-  //         // Check if accNum is greater than 15 digits
-  //         // if (String(savedDetail.accNum).length > 15) {
-  //         //   const isAlreadyStored = savedAcc.some((detail) => {
-  //         //     return (
-  //         //       detail.beneficiaryName === savedDetail.beneficiaryName &&
-  //         //       detail.accNum === savedDetail.accNum &&
-  //         //       detail.ifsc === savedDetail.ifsc &&
-  //         //       detail.editable === savedDetail.editable
-  //         //     );
-  //         //   });
-
-  //         //   if (!isAlreadyStored) {
-  //         //     setSavedAcc((prev) => [...prev, savedDetail]);
-  //         //   }
-  //         // }
-
-  //         if (String(savedDetail.accNum).length > 15) {
-  //           const isAlreadyStored = savedAcc
-  //             ? savedAcc.some((detail) => {
-  //                 return (
-  //                   detail.beneficiaryName === savedDetail.beneficiaryName &&
-  //                   detail.accNum === savedDetail.accNum &&
-  //                   detail.ifsc === savedDetail.ifsc &&
-  //                   detail.editable === savedDetail.editable
-  //                 );
-  //               })
-  //             : false;
-
-  //           if (!isAlreadyStored) {
-  //             setSavedAcc((prevSavedAcc) => {
-  //               const updatedSavedAcc = prevSavedAcc
-  //                 ? [...prevSavedAcc, savedDetail]
-  //                 : [savedDetail];
-  //               sessionStorage.setItem(
-  //                 "savedAcc",
-  //                 JSON.stringify(updatedSavedAcc)
-  //               );
-  //               return updatedSavedAcc;
-  //             });
-  //           }
-  //         }
-  //         console.log("event received");
-  //       });
-  //     }
-  //   };
-
-  //   fetchData();
-  //   console.log("from effect");
-  // }, []);
-
-  // useEffect(() => {
-  //   if (connectionMode !== socket) {
-  //   } else if (!logOut) {
-  //     socket.on("getSavedBeneficiary", (data) => {
-  //       const savedDetail = {
-  //         beneficiaryName: data.beneficiaryName,
-  //         accNum: data.accNum,
-  //         ifsc: data.ifsc,
-  //         editable: data.editable,
-  //       };
-  //       setSavedAcc((prev) => [...prev, savedDetail]);
-  //     });
-  //   }
-  // }, [socket]);
-
   return (
     <store.Provider
       value={{
+        setIsValidNumber,
+        isValidNumber,
         setSavedAccLength,
         setTabId,
         setConnectionMode,
@@ -407,6 +334,7 @@ function App() {
         setSingaporeCode,
         usRussiaCode,
         setUsRussiaCode,
+        clearAll,
       }}
     >
       <Router>

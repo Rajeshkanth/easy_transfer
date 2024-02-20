@@ -303,7 +303,12 @@ function PaymentForm() {
       };
     } else if (windowWidth > 640) {
       return {
-        nav: ["Beneficiaries", "Profile", "Menu"],
+        nav: [
+          "Beneficiaries",
+          "Profile",
+          "Transactions",
+          { icon: <RiMenuUnfoldFill />, id: "Menu" },
+        ],
         onClickHandler: handleMenuClick,
       };
     }
@@ -551,7 +556,7 @@ function PaymentForm() {
 
         <div className="flex   w-full fixed top-[6%] md:top-[10%]  justify-center   ">
           <div className="w-[96vw]  flex  justify-evenly h-[90vh]  ">
-            <div className="hidden sm:block sm:w-1/2 md:w-auto xl:w-[58%] xl:pl-[0vw]">
+            <div className="hidden sm:block sm:w-1/2 md:w-auto xl:w-[58%] xl:pl-[0vw] cursor-default">
               {" "}
               <h1 className="text-4xl font-sans  font-light mt-[12rem] ml-[0rem]  md:text-5xl lg:text-6xl ">
                 The Secure, <br /> easiest and fastest <br /> way to transfer

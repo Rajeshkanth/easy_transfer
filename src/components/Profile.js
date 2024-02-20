@@ -12,6 +12,7 @@ import profileAlternate from "./images/user-profile-icon-flat-style-member-avata
 import FailedTransactions from "./FailedTransactions";
 // import { MdKeyboardArrowLeft } from "react-icons/fa6";
 import { MdKeyboardArrowLeft } from "react-icons/md";
+import { RiMenuUnfoldFill } from "react-icons/ri";
 function Profile() {
   const {
     initatedAmountSend,
@@ -59,6 +60,7 @@ function Profile() {
     failedTransaction,
     setFailedTransaction,
     setSavedAccLength,
+    clearAll,
   } = useContext(store);
   const navigate = useNavigate();
   const location = useLocation();
@@ -147,14 +149,7 @@ function Profile() {
         setIsProfileClicked(true);
         break;
       case "Log Out":
-        setSavedAcc([]);
-        setRecentTransactions([]);
-        const tabId = sessionStorage.getItem("tabId");
-        sessionStorage.clear();
-        if (tabId) {
-          sessionStorage.setItem("tabId", tabId);
-        }
-        setIsProfileClicked(false);
+        clearAll();
         logout();
         break;
       default:
@@ -189,12 +184,7 @@ function Profile() {
       };
     } else if (windowWidth > 640) {
       return {
-        nav: [
-          { icon: <MdKeyboardArrowLeft />, id: "Back" },
-
-          "Beneficiaries",
-          "Menu",
-        ],
+        nav: [{ icon: <RiMenuUnfoldFill />, id: "Menu" }],
         onClickHandler: handleMenuClick,
       };
     }
@@ -272,7 +262,10 @@ function Profile() {
           setAccFromDb(data.accNum);
           setUserName("");
           setAge("");
-          sessionStorage.setItem("userName", userName ? userName : "");
+          sessionStorage.setItem(
+            "userName",
+            data.userName ? data.userName : ""
+          );
         });
         setIsEditProfile(false);
       } else {
@@ -447,10 +440,10 @@ function Profile() {
           <Menu {...menuProps} onClickHandler={handleMenuClick} />
         )}
         {isEditProfile ? null : (
-          <div className="bg-slate-100  w-screen text-gray-700 h-auto flex flex-col  md:h-screen box-border md:grid md:grid-cols-4  md:gap-0 lg:gap-2 md:pb-2 md:pl-[3vw] lg:pl-[2vw] xl:pl-[3vw] md:pt-6 ">
+          <div className="bg-slate-100  w-screen text-gray-700 h-auto flex flex-col  md:h-screen box-border md:grid md:grid-cols-4  md:gap-0 lg:gap-2 md:pb-2 md:pl-[3vw] lg:pl-[2vw] xl:pl-[3vw] md:pt-6 cursor-default">
             <>
-              <div className="h-[50vh] md:h-[35vh] lg:h-[40vh] md:w-[20vw] border-b-2 md:border-b-0  items-center justify-center bg-white md:md:shadow-md shadow-gray-300 rounded-md">
-                <div className=" h-[150px] w-[150px] md:h-[120px] md:w-[120px] lg:w-[120px] lg:h-[w-120px] xl:h-[200px] xl:w-[200px] bg-white  absolute lg:fixed top-[12vh]  md:top-[16vh] lg:top-[17vh] xl:top-[16vh] z-5 overflow-hidden shadow-lg left-[10vw] sm:left-[12vw] md:left-[6vw] lg:left-[6vw] xl:left-[6vw] rounded-full border-2 border-gray-600">
+              <div className="h-[50vh] md:h-[35vh] lg:h-[40vh] md:w-[20vw] border-b-2 md:border-b-0  items-center justify-center bg-white  md:md:shadow-md shadow-gray-300 rounded-md">
+                <div className=" h-[150px] w-[150px] md:h-[120px] md:w-[120px] lg:w-[120px] lg:h-[w-120px] xl:h-[200px] xl:w-[200px] bg-white  absolute lg:fixed top-[12vh]  md:top-[16vh] lg:top-[17vh] xl:top-[16vh] z-5 overflow-hidden shadow-lg left-[10vw] sm:left-[6vw] md:left-[6vw] lg:left-[6vw] xl:left-[6vw] rounded-full border-2 border-gray-600">
                   {
                     <>
                       <img
@@ -484,23 +477,28 @@ function Profile() {
                   </div>
                 ) : null}
                 {windowWidth > 640 ? (
-                  <div className="grid grid-rows-2 gap-8 md:gap-7 lg:gap-8 h-[10%] w-full mt-[35vh] md:mt-[25vh] lg:mt-[28vh] xl:mt-[30vh] pl-[0vw] md:pl-[4vw] lg:ml-[1vw] xl:ml-[2vw] item-center m-auto text-gray-700">
-                    <h1 className=" text-2xl pl-[12vw] md:pl-1  lg:pl-2 xl:pl-2  grid grid-cols-2 gap-[10px] md:gap-[80px] lg:gap-10 items-center font-extrabold  w-[82%] sm:w-1/2 md:w-[60%]  lg:w-3/4 text-center sm:text-center">
-                      {userNameFromDb
-                        ? userNameFromDb
-                        : sessionStorage.getItem("userName")}{" "}
-                      <MdModeEdit
-                        onClick={editProfile}
-                        className="cursor-pointer"
-                      />
-                    </h1>
-                    <h1 className=" text-lg font-lighter   w-[82%] sm:w-[47%] md:w-1/2 text-center sm:text-center">
-                      {document.cookie}
-                    </h1>
+                  <div className=" lg:gap-8 h-[10%] w-[100%] justify-center    mt-[35vh] md:mt-[25vh] lg:mt-[28vh] xl:mt-[30vh] sm:ml-[-2%] md:ml-0 pl-[0vw] md:pl-[0vw] item-center m-auto text-gray-700">
+                    <div className="w-full m-auto sm:ml-[-6%] md:ml-0 md:mauto lg:m-auto h-auto flex  items-center  ">
+                      {" "}
+                      <h1 className=" md:m-auto flex text-2xl sm:pl-[0vw] md:pl-0 sm:ml-[0vw]  lg:pl-0 xl:pl-[0vw]   items-center justify-center font-extrabold  w-[82%] sm:w-1/2 md:w-[60%]  lg:w-auto text-center sm:text-center">
+                        {userNameFromDb
+                          ? userNameFromDb
+                          : sessionStorage.getItem("userName")}{" "}
+                        <MdModeEdit
+                          onClick={editProfile}
+                          className="cursor-pointer text-2xl md:m-auto "
+                        />
+                      </h1>
+                    </div>
+                    <div className="w-full m-auto sm:ml-[-4%] md:ml-0 h-auto flex justify-between">
+                      <h1 className=" text-lg font-lighter   w-[82%] sm:w-[47%] sm:ml-[-1vw] md:ml-0 md:w-full text-center sm:text-center">
+                        {document.cookie}
+                      </h1>
+                    </div>
                   </div>
                 ) : null}
               </div>
-              <div className="h-[20vh]  grid md:block  md:w-[20vw] border-b-2 md:border-b-0 pb-2  md:pb-[8rem] xl:pb-0 bg-white space-y-2 box-border pt-[3vh] pl-[15vw] md:pl-[2vw] pr-[2vw] md:items-center md:justify-center md:shadow-md shadow-gray-300 rounded-md grid-rows-3">
+              <div className="h-[20vh]  grid md:block  md:w-[20vw] border-b-2 md:border-b-0 pb-2  md:pb-[8rem] xl:pb-0 bg-white hover:bg-gray-100 space-y-2 box-border pt-[3vh] pl-[10vw] md:pl-[2vw] pr-[2vw] md:items-center md:justify-center md:shadow-md shadow-gray-300 rounded-md grid-rows-3">
                 <h1 className="text-4xl font-bold">
                   {recentTransactionsLength ? recentTransactionsLength : 0}
                 </h1>
@@ -514,7 +512,7 @@ function Profile() {
                   View Details <IoIosArrowForward />
                 </h1>
               </div>
-              <div className="h-[20vh]  grid grid-rows-3 md:block md:w-[20vw] border-b-2 md:border-b-0 pb-2  md:pb-[8rem] xl:pb-0 md:pb-0 bg-white box-border md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-[3vh] pl-[15vw] md:pl-[2vw] pr-[2vw] md:items-center md:justify-center ">
+              <div className="h-[20vh]  grid grid-rows-3 md:block md:w-[20vw] border-b-2 md:border-b-0 pb-2  md:pb-[8rem] xl:pb-0 md:pb-0 bg-white hover:bg-gray-100 box-border md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-[3vh] pl-[10vw] md:pl-[2vw] pr-[2vw] md:items-center md:justify-center ">
                 <h1 className="text-4xl font-bold">
                   {beneficiaries ? beneficiaries.length : 0}
                 </h1>
@@ -528,7 +526,7 @@ function Profile() {
                   View Details <IoIosArrowForward />
                 </h1>
               </div>
-              <div className="h-[20vh] grid grid-rows-3 md:block md:w-[20vw] border-b-2 md:border-b-0 pb-2 md:pb-[8rem]  xl:pb-0 box-border bg-white  md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-[3vh] pl-[15vw] md:pl-[2vw] pr-[2vw] items-left md:items-center md:justify-center">
+              <div className="h-[20vh] grid grid-rows-3 md:block md:w-[20vw] border-b-2 md:border-b-0 pb-2 md:pb-[8rem]  xl:pb-0 box-border bg-white hover:bg-gray-100  md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-[3vh] pl-[10vw] md:pl-[2vw] pr-[2vw] items-left md:items-center md:justify-center">
                 <h1 className="text-4xl font-bold">
                   {canceledPayments ? canceledPayments : 0}
                 </h1>
@@ -542,7 +540,7 @@ function Profile() {
                   View Details <IoIosArrowForward />
                 </h1>
               </div>
-              <div className="h-[31vh] md:h-[40vh] lg:h-[40vh]  border-b-2 pb-0 md:pb-0 md:w-[20vw] bg-white space-y-4 md:space-y-[5rem] flex flex-col pt-[1rem] md:pt-[4rem] items-center md:shadow-md shadow-gray-300 rounded-md">
+              <div className="h-[31vh] md:h-[40vh] lg:h-[40vh]  border-b-2 pb-0 md:pb-0 md:w-[20vw] bg-white hover:bg-gray-100 space-y-4 md:space-y-[5rem] flex flex-col pt-[1rem] md:pt-[4rem] items-center md:shadow-md shadow-gray-300 rounded-md">
                 <div className="flex flex-col items-center space-y-2 justify-center">
                   <h1 className="m-0 text-4xl items-center flex justify-center border-2 rounded-full p-2 bg-slate-100">
                     <IoIosWallet />
@@ -556,7 +554,7 @@ function Profile() {
                   Customer Support
                 </h1>
               </div>
-              <div className="h-[50vh] md:h-[55vh] lg:h-[60vh] xl:h-[60vh] border-b-2 md:border-b-0 md:w-[28vw] lg:w-[30vw] xl:w-[31vw] md:pl-0 md:mt-[-4.5rem] lg:mt-[-7.5rem] xl:mt-[-9.5rem] bg-white space-y-2  md:space-y-1 pt-2 md:pt-4 md:shadow-md shadow-gray-300 rounded-md">
+              <div className="h-[50vh] md:h-[55vh] lg:h-[60vh] xl:h-[60vh] border-b-2 md:border-b-0 md:w-[28vw] lg:w-[30vw] xl:w-[31vw] md:pl-0 md:mt-[-4.5rem] lg:mt-[-7.5rem] xl:mt-[-9.5rem] bg-white hover:bg-gray-100 space-y-2  md:space-y-1 pt-2 md:pt-4 md:shadow-md shadow-gray-300 rounded-md">
                 <div className="grid grid-cols-2 gap-[35vw] sm:gap-[45vw] md:gap-0 xl:gap-20  pl-4 md:pl-[2vw] ">
                   <h1 className="text-lg md:text-sm lg:text-xl ">Recipients</h1>
                   <h1
@@ -566,7 +564,13 @@ function Profile() {
                     View more <IoIosArrowForward />
                   </h1>
                 </div>
-                <div className="grid   h-[50%] pt-[1vh]  md:h-[90%] lg:h-[90%] xl:h-full pl-[5vw] md:pl-[2vw] md:pt-[2vh] md:pb-[2vh]">
+                <div
+                  className={
+                    beneficiaries && beneficiaries.length < 5
+                      ? "space-y-10   h-[50%] pt-[1vh]  md:h-[90%] lg:h-[90%] xl:h-full pl-[5vw] md:pl-[2vw] md:pt-[2vh] md:pb-[2vh]"
+                      : "grid   h-[50%] pt-[1vh]  md:h-[90%] lg:h-[90%] xl:h-full pl-[5vw] md:pl-[2vw] md:pt-[2vh] md:pb-[2vh]"
+                  }
+                >
                   {beneficiaries ? (
                     beneficiaries.slice(0, 6).map((item, index) => (
                       <div
@@ -589,7 +593,7 @@ function Profile() {
                   )}
                 </div>
               </div>
-              <div className="h-auto md:h-[55vh] lg:h-[60vh]  md:w-[38vw] lg:w-[37vw] xl:w-[33vw] border-b-2 md:border-b-0 overflow-y-auto md:mt-[-4.5rem]  lg:mt-[-7.5rem] xl:mt-[-9.5rem] md:ml-[7vw] lg:ml-[8vw] xl:ml-[11vw] space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
+              <div className="h-auto md:h-[55vh] lg:h-[60vh]  md:w-[38vw] lg:w-[37vw] xl:w-[33vw] border-b-2 md:border-b-0 overflow-y-auto md:mt-[-4.5rem]  lg:mt-[-7.5rem] xl:mt-[-9.5rem] md:ml-[7vw] lg:ml-[8vw] xl:ml-[11vw] space-y-1 bg-white hover:bg-gray-100 md:shadow-md shadow-gray-300  md:rounded-md">
                 <div className="grid grid-cols-3 md:gap-0 sticky top-0 z-5 bg-slate-700 text-white h-[6vh] pl-4 border-b-2  items-center">
                   <h1 className="text-sm  md:text-xs lg:text-md xl:text-xl  md:pr-0 border-r-2">
                     Recent Activity
@@ -631,7 +635,7 @@ function Profile() {
                       >
                         <div className="grid grid-cols-2 gap-0 md:gap-6 lg:gap-2 xl:gap-6 items-center text-xs md:text-sm lg:text-md ">
                           <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
-                          <h1 className="md:text-xs lg:text-md overflow-x-auto lg:w-[100px]">{`Sent to ${item.Name}`}</h1>
+                          <h1 className="md:text-xs lg:text-md overflow-x-auto lg:w-[110px]">{`Sent to ${item.Name}`}</h1>
                         </div>
                         <div className="grid grid-cols-2 md:gap-5 lg:gap-10  text-xs md:text-sm lg:text-md  ">
                           <h1 className="md:text-xs lg:text-md">

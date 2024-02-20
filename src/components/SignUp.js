@@ -18,23 +18,16 @@ function SignUp() {
     setRegMobileNumber,
     setCreatePassword,
     setConfirmPassword,
-    registeredUsers,
+    isValidNumber,
     userName,
     setLoggedUser,
     windowWidth,
     setWindowWidth,
     connectionMode,
     socket,
-    isLogin,
     setIsLogin,
     passwordError,
     setPasswordError,
-    usRussiaCode,
-    setUsRussiaCode,
-    indiaCode,
-    setIndiaCode,
-    singaporeCode,
-    setSingaporeCode,
   } = useContext(store);
 
   //   const [isLogin, setIsLogin] = useState(true);
@@ -122,7 +115,9 @@ function SignUp() {
 
   const signUpUserUsingSocket = (e) => {
     e.preventDefault();
+
     if (regMobileNumber && createPassword && confirmPassword) {
+      console.log("clicked");
       if (createPassword !== confirmPassword) {
         setSignUpFailed(true);
       } else {
@@ -181,16 +176,10 @@ function SignUp() {
     <>
       <>
         <div className="space-y-3 sm:space-y-0 lg:space-y-0 flex flex-col items-center justify-center pt-[2rem] text-gray-600">
-          {/* <img
-            className="object-cover h-[10vh] w-[20vw]  text-center text-gray-700 items-center font-poppins"
-            src={logo}
-          ></img> */}
           <img
             className="font-extrabold text-xl sm:text-4xl object-cover h-[8vh] md:h-[10vh] w-[80%] md:w-[65%] lg:w-[25vw] text-center text-gray-700 items-center font-poppins"
             src={logo}
-          >
-            {/* Easy Transfer */}
-          </img>
+          ></img>
           <h1 className="text-center m-0 text-[4vw]   sm:text-2xl font-bold font-poppins    cursor-default ">
             User Register
           </h1>
@@ -202,26 +191,6 @@ function SignUp() {
               Mobile Number
             </label>
 
-            {/* <PhoneInput
-              country={"in"}
-              placeholder="Enter Mobile Number"
-              value={regMobileNumber}
-              onChange={handleRegMobileNumber}
-              inputProps={{
-                className:
-                  "outline-0 h-10  w-[100%] border-2 border-slate-300 rounded-lg text-[16px] pl-[3.5vw]  p-[1rem]   border-box ",
-              }}
-              countryCodeEditable={false}
-              onlyCountries={["in", "us", "ru", "sg"]}
-              buttonStyle={{
-                width: "12%",
-                paddingLeft: "2px",
-                background: "white",
-                border: "2px  solid rgb(203 213 225)",
-                borderColor: " rgb(203 213 225)",
-                borderRadius: "0.5rem 0 0 0.5rem",
-              }}
-            /> */}
             <PhoneInput
               country={"in"}
               placeholder="Enter Mobile Number"
@@ -233,7 +202,6 @@ function SignUp() {
                   "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
               }}
               countryCodeEditable={false}
-              onlyCountries={["in", "us", "ru", "sg"]}
               buttonStyle={{
                 width: "14% ",
                 paddingLeft: "0px",
@@ -243,23 +211,10 @@ function SignUp() {
                 borderRadius: " 0.5rem 0 0 0.5rem ",
               }}
             />
-            {regMobileNumber.length < 12 && regMobileNumber && indiaCode ? (
-              <p className="text-xs w-[80%] mt-[.4rem] text-red-500">
-                Mobile number must have 10 digits
-              </p>
-            ) : singaporeCode &&
-              regMobileNumber &&
-              regMobileNumber.length < 10 ? (
-              <p className="text-xs w-[80%] mt-[.4rem]  text-red-500">
-                Mobile number must have 8 digits
-              </p>
-            ) : usRussiaCode &&
-              regMobileNumber &&
-              regMobileNumber.length < 11 ? (
-              <p className="text-xs w-[80%] mt-[.4rem]  text-red-500">
-                Mobile number must have 10 digits
-              </p>
-            ) : null}
+
+            {isValidNumber ? null : (
+              <p className="text-xs mt-[.2rem] text-red-500">Invalid Number</p>
+            )}
 
             {allInputAlert && !regMobileNumber ? (
               <div className="w-[80%]">
@@ -286,10 +241,10 @@ function SignUp() {
             <input
               className={
                 passwordError
-                  ? "outline-0 h-10 w-full rounded-lg text-[16px] p-[1rem] border-2 border-red-500  border-box "
+                  ? "outline-0 h-10 w-full rounded-lg text-[16px] pl-2 sm:p-[1rem] border-2 border-red-500  border-box "
                   : signUpFailed || (allInputAlert && !createPassword)
-                  ? "outline-0 h-10 w-full rounded-lg text-[16px] p-[1rem] border-2 border-red-500  border-box "
-                  : "outline-0 h-10 w-full rounded-lg text-[16px] p-[1rem]  border-2 border-slate-300  border-box "
+                  ? "outline-0 h-10 w-full rounded-lg text-[16px] pl-2 sm:p-[1rem] border-2 border-red-500  border-box "
+                  : "outline-0 h-10 w-full rounded-lg text-[16px] pl-2  sm:p-[1rem]  border-2 border-slate-300  border-box "
               }
               type={showCreatePassword ? "text" : "password"}
               min={6}
@@ -360,8 +315,8 @@ function SignUp() {
             <input
               className={
                 signUpFailed || (allInputAlert && !confirmPassword)
-                  ? "outline-0 h-10 w-full rounded-lg  p-[1rem] text-[16px] border-2 border-red-500  border-box "
-                  : "outline-0 h-10 w-full rounded-lg  p-[1rem] text-[16px] border-2 border-slate-300  border-box "
+                  ? "outline-0 h-10 w-full rounded-lg pl-2 sm:p-[1rem] text-[16px] border-2 border-red-500  border-box "
+                  : "outline-0 h-10 w-full rounded-lg pl-2 sm:p-[1rem] text-[16px] border-2 border-slate-300  border-box "
               }
               type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}

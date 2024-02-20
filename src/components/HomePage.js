@@ -10,20 +10,13 @@ function HomePage() {
     windowWidth,
     setWindowWidth,
     isLogin,
-    setSavedAcc,
-    password,
     setPassword,
     setMobileNumber,
     mobileNumber,
-    registeredUsers,
     setKey,
-    loginFailed,
     setLoginFailed,
-    loginInputAlert,
     setLoginInputAlert,
-    connectionMode,
     socket,
-    setIsLogin,
     setLoader,
     setNewUser,
   } = useContext(store);
@@ -124,7 +117,7 @@ function HomePage() {
         </div>
       ) : (
         <div className="mx-auto w-[80%] sm:w-[60%] md:w-[50%] lg:w-[33%]  text-gray-800  bg-white  box-border  mt-[15vh] rounded-xl h-auto">
-          <div className="w-full border-2 bg-white text-gray-800 space-y-4 sm:space-y-5 lg:space-y-7 rounded-2xl  shadow-md shadow-black">
+          <div className="w-full border-2 bg-white text-gray-800 space-y-4 sm:space-y-5 lg:space-y-7 rounded-xl  shadow-md shadow-black">
             <SignUp />
           </div>
         </div>

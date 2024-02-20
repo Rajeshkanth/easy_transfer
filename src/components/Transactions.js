@@ -6,6 +6,7 @@ import SideBar from "./SideBar";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { MdArrowBackIos } from "react-icons/md";
 import { MdKeyboardArrowLeft } from "react-icons/md";
+import { RiMenuUnfoldFill } from "react-icons/ri";
 
 function Transactions() {
   const {
@@ -60,7 +61,7 @@ function Transactions() {
         navigate("/Beneficiaries");
         setIsProfileClicked(false);
         break;
-      case "Log out":
+      case "Log Out":
         setSavedAcc([]);
         setRecentTransactions([]);
         const tabId = sessionStorage.getItem("tabId");
@@ -87,7 +88,7 @@ function Transactions() {
           "Profile",
           "Rewards",
           "Contact",
-          "Log out",
+          "Log Out",
         ],
         onClickHandler: handleMenuClick,
       };
@@ -100,13 +101,13 @@ function Transactions() {
           "Profile",
           "Rewards",
           "Contact",
-          "Log out",
+          "Log Out",
         ],
         onClickHandler: handleMenuClick,
       };
     } else if (windowWidth > 640) {
       return {
-        nav: [{ icon: <FaArrowLeftLong />, id: "Back" }, "Profile", "Menu"],
+        nav: [{ icon: <RiMenuUnfoldFill />, id: "Menu" }],
         onClickHandler: handleMenuClick,
       };
     }
@@ -253,9 +254,16 @@ function Transactions() {
               </div>
             </div>
             {recentTransactions === null ? (
-              <p className="flex items-center text-gray-700 justify-center pt-[5rem]">
-                There is no recent transactions
-              </p>
+              <div className="grid  items-center  h-[50%] text-gray-700 justify-center text-[16px]">
+                <p className=" pt-[0rem]">There is no recent transactions</p>
+              </div>
+            ) : recentTransactions.filter((item) => item.Status === "Pending")
+                .length < 1 ? (
+              <>
+                <div className="grid  items-center  h-[50%] text-gray-700 justify-center text-[16px]">
+                  <p className=" pt-[0rem]">There is no pending transactions</p>
+                </div>{" "}
+              </>
             ) : (
               recentTransactions
                 .filter((item) => item.Status === "Pending")
@@ -304,9 +312,14 @@ function Transactions() {
               </div>
             </div>
             {!recentTransactions ? (
-              <p className="flex items-center text-gray-700 justify-center pt-[5rem]">
-                There is no recent transactions
-              </p>
+              <div className="grid  items-center h-[80%] text-gray-700 justify-center">
+                <p className=" pt-[0rem]">There is no recent transactions</p>
+              </div>
+            ) : recentTransactions.filter((item) => item.Status === "completed")
+                .length < 1 ? (
+              <div className="grid  items-center h-[80%] text-gray-700 justify-center">
+                <p className=" pt-[0rem]">There is no completed transactions</p>
+              </div>
             ) : (
               recentTransactions
                 .filter((item) => item.Status === "completed")
@@ -357,9 +370,14 @@ function Transactions() {
               </div>
             </div>
             {!recentTransactions ? (
-              <p className="flex items-center text-gray-700 justify-center pt-[5rem]">
-                There is no recent transactions
-              </p>
+              <div className="grid  items-center h-[50%] text-gray-700 justify-center">
+                <p className="">There is no recent transactions</p>
+              </div>
+            ) : recentTransactions.filter((item) => item.Status === "canceled")
+                .length < 1 ? (
+              <div className="grid  items-center h-[50%] text-gray-700 justify-center">
+                <p className="">There is no canceled transactions</p>
+              </div>
             ) : (
               recentTransactions
                 .filter((item) => item.Status === "canceled")
