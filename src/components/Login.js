@@ -355,15 +355,6 @@ function Login() {
                     borderColor: "rgb(220 38 38)",
                     borderRadius: " 0.5rem 0 0 0.5rem ",
                   }
-                : mobileNumber && mobileNumber.length < 12 && indiaCode
-                ? {
-                    width: "14% ",
-                    paddingLeft: "0px",
-                    backgroundColor: "white",
-                    border: "2px  solid rgb(220 38 38)",
-                    borderColor: "rgb(220 38 38)",
-                    borderRadius: " 0.5rem 0 0 0.5rem ",
-                  }
                 : isNewUser
                 ? {
                     width: "14% ",
@@ -373,11 +364,7 @@ function Login() {
                     borderColor: "rgb(220 38 38)",
                     borderRadius: " 0.5rem 0 0 0.5rem ",
                   }
-                : mobileNumber &&
-                  // !phones[selectedCountryCode].test(
-                  //   mobileNumber.slice(selectedDialCode.length)
-                  // )
-                  !isValidIndianNumber
+                : mobileNumber && !isValidIndianNumber
                 ? {
                     width: "14% ",
                     paddingLeft: "0px",
@@ -467,12 +454,12 @@ function Login() {
             </p>
           ) : null} */}
           {loginInputAlert && !password ? (
-            <p className="relative top-[-4.5vh] md:top-[-4.5vh] text-red-500 text-xs cursor-default mt-[.4rem] ">
+            <p className="relative top-[-4%] md:top-[-4.5vh] text-red-500 text-xs cursor-default mt-[.4rem] ">
               Enter Password
             </p>
           ) : null}
           {loginFailed && !isNewUser ? (
-            <p className="relative top-[-3.5vh] md:top-[-3vh] text-xs  text-red-500">
+            <p className="relative top-[-3%] md:top-[-3vh] text-xs  text-red-500">
               Wrong password
             </p>
           ) : null}
