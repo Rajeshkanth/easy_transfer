@@ -8,7 +8,7 @@ function FailedTransactions() {
   return (
     <>
       <div className="flex h-screen w-screen bg-transparent backdrop-blur-md justify-center items-center font-poppins">
-        <div className=" md:h-3/4 w-[70%] md:w-3/4 bg-white shadow-sm shadow-black  text-gray-100 p-0 md:pt-[8vh]  pb-5 box-border overflow-y-auto  rounded-md ">
+        <div className="h-[65%] md:h-3/4 w-[70%] md:w-3/4 bg-white shadow-sm shadow-black  text-gray-100 p-0 md:pt-[8vh]  pb-5 box-border overflow-y-auto  rounded-md ">
           <div className="flex justify-between p-5 h-[8vh] box-border rounded-md rounded-b-none  w-[70.1%] top-[10.2vh] absolute md:top-[12.5vh] z-10 bg-gray-800  md:w-[75%] md:pl-[5vw] lg:pl-[5vw] text-2xl text-gray-100 items-center">
             <h1 className="font-bold text-xs w-1/2  md:text-2xl">
               Failed Transactions

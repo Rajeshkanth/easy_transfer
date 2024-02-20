@@ -443,7 +443,7 @@ function Profile() {
           <div className="bg-slate-100  w-screen text-gray-700 h-auto flex flex-col  md:h-screen box-border md:grid md:grid-cols-4  md:gap-0 lg:gap-2 md:pb-2 md:pl-[3vw] lg:pl-[2vw] xl:pl-[3vw] md:pt-6 cursor-default">
             <>
               <div className="h-[50vh] md:h-[35vh] lg:h-[40vh] md:w-[20vw] border-b-2 md:border-b-0  items-center justify-center bg-white  md:md:shadow-md shadow-gray-300 rounded-md">
-                <div className=" h-[150px] w-[150px] md:h-[120px] md:w-[120px] lg:w-[120px] lg:h-[w-120px] xl:h-[200px] xl:w-[200px] bg-white  absolute lg:fixed top-[12vh]  md:top-[16vh] lg:top-[17vh] xl:top-[16vh] z-5 overflow-hidden shadow-lg left-[10vw] sm:left-[6vw] md:left-[6vw] lg:left-[6vw] xl:left-[6vw] rounded-full border-2 border-gray-600">
+                <div className=" h-[150px] w-[150px] md:h-[120px] md:w-[120px] lg:w-[120px] lg:h-[w-120px] xl:h-[200px] xl:w-[200px] bg-white  absolute lg:fixed top-[12vh]  md:top-[16vh] lg:top-[17vh] xl:top-[16vh] z-5 overflow-hidden shadow-lg left-[5vw] sm:left-[6vw] md:left-[6vw] lg:left-[6vw] xl:left-[6vw] rounded-full border-2 border-gray-600">
                   {
                     <>
                       <img
@@ -466,7 +466,7 @@ function Profile() {
                   }
                 </div>
                 {windowWidth < 640 ? (
-                  <div className="w-1/2 absolute h-[10vh]  top-[36vh] grid grid-rows-2  left-[15vw]">
+                  <div className="w-1/2 absolute h-[10vh]  top-[36vh] grid grid-rows-2  left-[10vw]">
                     <h1 className="flex items-center   font-bold text-2xl">
                       {userNameFromDb
                         ? userNameFromDb
@@ -550,7 +550,7 @@ function Profile() {
                   </h1>
                   <h1 className=" text-sm">Available Balance</h1>
                 </div>
-                <h1 className=" bg-slate-700 cursor-pointer hover:bg-gray-600 w-full md:w-[20%] lg:w-[20%] h-[6vh] md:h-[6vh] lg:h-[6vh] absolute top-[134vh] md:top-[78.5vh] lg:top-[80vh] xl:top-[81vh]  text-white text-center flex items-center justify-center md:rounded-tr-none md:rounded-tl-none md:rounded-md">
+                <h1 className=" bg-slate-700 cursor-pointer hover:bg-gray-600 w-full md:w-[20%] lg:w-[20%] h-[6vh] md:h-[6.2vh] lg:h-[6vh] absolute top-[134vh] md:top-[78.5vh] lg:top-[80vh] xl:top-[81vh]  text-white text-center flex items-center justify-center md:rounded-tr-none md:rounded-tl-none md:rounded-md">
                   Customer Support
                 </h1>
               </div>
