@@ -6,35 +6,22 @@ import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import Loader from "./Loader";
 import logo from "./images/Greenwhitelogo2.png";
-// import PhoneInput2 from "react-phone-number-input";
+
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { PhoneNumberUtil } from "google-libphonenumber";
-// import { isValidPhoneNumber } from "react-phone-number-input";
-import parsePhoneNumber from "libphonenumber-js";
 
 function Login() {
   const navigate = useNavigate();
 
-  const inputRef = useRef(null);
-
   const [showPassword, setShowPassword] = useState(false);
-  // const [isNewUser, setNewUser] = useState(false);
   const [showCreatePassword, setShowCreatePassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [indiaCode, setIndiaCode] = useState(false);
-  const [singaporeCode, setSingaporeCode] = useState(false);
-  const [usRussiaCode, setUsRussiaCode] = useState(false);
   const [isValidIndianNumber, setIsValidIndianNumber] = useState(true);
-  const [isValidUsRussianNumber, setIsValidUsRussianNumber] = useState(false);
-  const [selectedCountryCode, setSelectedCountryCode] = useState("");
-  const [selectedDialCode, setSelectedDialCode] = useState("");
   const numberUtil = PhoneNumberUtil.getInstance();
-  const [parsedNum, setParsedNum] = useState("");
-  // const phoneNumber = parsePhoneNumber(`+6594374758`, "SG");
-  // const checking = numberUtil.isValidNumber("+914542610685", "IN");
 
   const {
+    setIsLoggedOut,
     password,
     setPassword,
     setMobileNumber,
@@ -58,33 +45,6 @@ function Login() {
   const handleMobileNumber = (value, country) => {
     const dialCode = country.dialCode;
     const countryCode = country.countryCode.toUpperCase();
-    // const maxLength = numberUtil.getLengthOfNationalDestinationCode("us");
-    // console.log(numberUtil.getExampleNumber(countryCode));
-    // console.log(numberUtil);
-
-    const firstDigit = value.substring(dialCode.length, dialCode.length + 1);
-
-    // console.log(phones["am"]);
-    // const regex = phones[countryCode];
-    // console.log(regex);
-    // console.log(regex.test(mobileNumber), mobileNumber);
-
-    // setSelectedCountryCode(countryCode);
-    // setSelectedDialCode(dialCode);
-    // const isValid = isValidPhoneNumber(
-    //   `+${dialCode + value.slice(dialCode.length)}`
-    // );
-    // setIsValidIndianNumber(isValid);
-    // console.log(
-    //   isValidIndianNumber,
-    //   dialCode,
-    //   value.slice(dialCode.length),
-    //   isValidPhoneNumber(`+${dialCode + value.slice(dialCode.length)}`)
-    // );
-    // if (phoneNumber) {
-    //   const a = phoneNumber.isValid();
-    //   console.log(a, "85", phoneNumber.isValid());
-    // }
 
     try {
       const parsedNum = numberUtil.parse(
@@ -98,61 +58,6 @@ function Login() {
       console.log("Value:", value);
       console.log("Country Code:", countryCode);
     }
-
-    // if (regex.test(mobileNumber)) {
-    //   setIsValidIndianNumber(true);
-    // } else {
-    //   setIsValidIndianNumber(false);
-    // }
-    // if (dialCode === "91") {
-    //   if (/^[6-9]/.test(firstDigit)) {
-    //     setIndiaCode(true);
-    //     setSingaporeCode(false);
-    //     setUsRussiaCode(false);
-    //     setIsValidIndianNumber(true);
-    //   } else {
-    //     setIndiaCode(true);
-    //     setIsValidIndianNumber(false);
-    //     setSingaporeCode(false);
-    //     setUsRussiaCode(false);
-    //   }
-    // } else if (dialCode === "1") {
-    //   if (/^[2-9]/.test(firstDigit)) {
-    //     setIsValidIndianNumber(true);
-    //     setSingaporeCode(false);
-    //     setUsRussiaCode(true);
-    //     setIndiaCode(false);
-    //   } else {
-    //     setIsValidIndianNumber(false);
-    //     setSingaporeCode(false);
-    //     setUsRussiaCode(true);
-    //     setIndiaCode(false);
-    //   }
-    // } else if (dialCode === "7") {
-    //   if (/^[7-8]/.test(firstDigit)) {
-    //     setIsValidIndianNumber(true);
-    //     setSingaporeCode(false);
-    //     setUsRussiaCode(true);
-    //     setIndiaCode(false);
-    //   } else {
-    //     setIsValidIndianNumber(false);
-    //     setSingaporeCode(false);
-    //     setUsRussiaCode(true);
-    //     setIndiaCode(false);
-    //   }
-    // } else if (dialCode === "65") {
-    //   if (/^[8-9]/.test(firstDigit)) {
-    //     setIsValidIndianNumber(true);
-    //     setSingaporeCode(true);
-    //     setUsRussiaCode(false);
-    //     setIndiaCode(false);
-    //   } else {
-    //     setIsValidIndianNumber(false);
-    //     setSingaporeCode(true);
-    //     setUsRussiaCode(false);
-    //     setIndiaCode(false);
-    //   }
-    // }
     setMobileNumber(value);
   };
 
@@ -189,18 +94,22 @@ function Login() {
 
   const loginToDashboard = async (e) => {
     e.preventDefault();
-    if (mobileNumber && password && mobileNumber.length > 8) {
+    if (
+      mobileNumber &&
+      password &&
+      mobileNumber.length > 8 &&
+      isValidIndianNumber
+    ) {
       const request = await axios.post(
         "https://polling-server.onrender.com/loginRequest",
         {
-          Mobile: mobileNumber,
+          Mobile: mobileNumber.slice(2),
           Password: password,
         }
       );
-
       if (request.status === 200) {
         navigate("/transferPage");
-        document.cookie = mobileNumber;
+        document.cookie = mobileNumber.slice(2);
         setKey(document.cookie);
         setLoginFailed(false);
         setLoginInputAlert(false);
@@ -236,6 +145,7 @@ function Login() {
 
       socket.on("loginSuccess", () => {
         setLoader(false);
+        setIsLoggedOut(false);
         navigate("/transferPage");
         document.cookie = mobileNumber.slice(2);
         setMobileNumber("");
@@ -246,15 +156,18 @@ function Login() {
       });
       socket.on("newUser", () => {
         setNewUser(true);
+        setIsLoggedOut(true);
         setLoader(false);
         setIsValidIndianNumber(true);
       });
       socket.on("loginFailed", async () => {
+        setIsLoggedOut(true);
         setLoader(false);
         setIsValidIndianNumber(true);
         setLoginFailed(true);
       });
     } else {
+      setIsLoggedOut(true);
       setLoginInputAlert(true);
       setIsValidIndianNumber(false);
       setLoader(false);
@@ -418,8 +331,8 @@ function Login() {
             <FaRegEye
               className={
                 windowWidth < 640
-                  ? "relative ml-[56.5vw] bottom-[2rem] text-zinc-400"
-                  : "relative  sm:ml-[42vw] md:ml-[35vw] lg:ml-[25vw] xl:ml-[23.8vw] bottom-0 sm:bottom-[2rem] text-zinc-400"
+                  ? "cursor-pointer relative ml-[56.5vw] bottom-[2rem] text-zinc-400"
+                  : "cursor-pointer relative  sm:ml-[42vw] md:ml-[35vw] lg:ml-[25vw] xl:ml-[23.8vw] bottom-0 sm:bottom-[2rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
@@ -427,8 +340,8 @@ function Login() {
             <FaRegEyeSlash
               className={
                 windowWidth < 640
-                  ? "relative ml-[56.5vw] bottom-[2rem] text-zinc-400"
-                  : "relative  sm:ml-[42vw]  md:ml-[35vw] lg:ml-[25vw] xl:ml-[23.8vw] bottom-[1rem] sm:bottom-[2rem] text-zinc-400"
+                  ? "cursor-pointer relative ml-[56.5vw] bottom-[2rem] text-zinc-400"
+                  : "cursor-pointer relative  sm:ml-[42vw]  md:ml-[35vw] lg:ml-[25vw] xl:ml-[23.8vw] bottom-[1rem] sm:bottom-[2rem] text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
@@ -442,7 +355,7 @@ function Login() {
             </p>
           ) : null}
           {loginFailed && !isNewUser ? (
-            <p className="relative top-[-3.3vh] md:top-[-3vh] lg:top-[-2vh] text-xs  text-red-500">
+            <p className="relative top-[-3vh] md:top-[-3vh] lg:top-[-2vh] text-xs  text-red-500">
               Wrong password
             </p>
           ) : null}

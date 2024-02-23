@@ -4,19 +4,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import axios from "axios";
 import { store } from "../App";
-import { IoWarningOutline } from "react-icons/io5";
-import { AiOutlineMenuUnfold } from "react-icons/ai";
-import { RiMenuFoldFill } from "react-icons/ri";
 import Menu from "./Menu";
 import SideBar from "./SideBar";
 import { RiMenuUnfoldFill } from "react-icons/ri";
+import { useIdleTimer } from "react-idle-timer";
 
 function PaymentForm() {
   const {
-    initatedAmountSend,
     setInitatedAmountSend,
     currentDate,
-    setCurrentDate,
     setAgeFromDb,
     setAccFromDb,
     setDobFromDb,
@@ -44,31 +40,20 @@ function PaymentForm() {
     setEnterAccountNumber,
     setEnterToIfscNumber,
     setEnterAmount,
-    enterAccountHolderName,
-    enterAccountNumber,
-    enterToIfscNumber,
-    enterAmount,
     setSavedAcc,
-    balance,
-    setBalance,
-    recentTransactions,
     setRecentTransactions,
-    setTabId,
-    uuidv4,
-    setConnectionMode,
-    setRecentTransactionsLength,
+    setIsLoggedOut,
     setSavedAccLength,
+    handleSocket,
   } = useContext(store);
 
   const navigate = useNavigate();
   const location = useLocation();
 
   const [allInput, setAllInput] = useState(false);
-  const [sessionTiemedOut, setSessionTiemedOut] = useState(false);
   // const clickable = toAccountNumber.length > 15;
   const [accNumAlert, setAccNumAlert] = useState(false);
   const [IFSCAlert, setIFSCAlert] = useState(false);
-  const [sendButton, setSendButton] = useState(false);
 
   const handleMenuClick = (menuItem) => {
     switch (menuItem) {
@@ -103,6 +88,7 @@ function PaymentForm() {
         handleSocket();
         setSavedAcc([]);
         setRecentTransactions([]);
+        setIsLoggedOut(true);
         const tabId = sessionStorage.getItem("tabId");
         sessionStorage.clear();
         if (tabId) {
@@ -142,12 +128,6 @@ function PaymentForm() {
     navigate("/");
   };
 
-  const handleSocket = () => {
-    if (connectionMode === "socket") {
-      socket.off();
-    }
-  };
-
   const sendAmountBySocket = (e) => {
     e.preventDefault();
     console.log("clicked");
@@ -159,7 +139,6 @@ function PaymentForm() {
       String(toAccountNumber).length > 15 &&
       String(toIFSCNumber).length > 9
     ) {
-      // setSendButton(true);
       setSendByBeneficiaries(false);
       setInitatedAmountSend(true);
       const newReceiver = {
@@ -338,6 +317,29 @@ function PaymentForm() {
     navigate("/Beneficiaries");
   };
 
+  const onIdle = () => {
+    console.log("user is idle");
+
+    setTimeout(() => {
+      handleSocket();
+      setSavedAcc([]);
+      setRecentTransactions([]);
+      setIsLoggedOut(true);
+      const tabId = sessionStorage.getItem("tabId");
+      sessionStorage.clear();
+      if (tabId) {
+        sessionStorage.setItem("tabId", tabId);
+      }
+      setIsProfileClicked(false);
+      logout();
+    }, 3000);
+    alert("Session expired! You will be redirected to login page");
+  };
+  useIdleTimer({
+    timeout: 1000 * 60 * 5,
+    onIdle,
+  });
+
   useEffect(() => {
     if (connectionMode !== "socket") {
       axios
@@ -410,7 +412,7 @@ function PaymentForm() {
       //   setRecentTransactions((prev) => [...prev, lastTransaction]);
       // });
     }
-  }, [socket, connectionMode, setUserNameFromDb]);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -428,66 +430,10 @@ function PaymentForm() {
     setAllInput(false);
     return () => {
       handleAllInput();
-      if (connectionMode === "socket") {
-        socket.off();
-      }
+      // if (connectionMode === "socket") {
+      //   socket.off();
+      // }
     };
-  }, []);
-
-  useEffect(() => {
-    socket.emit("fetchList", {
-      num: document.cookie,
-    });
-
-    console.log("event emitted", document.cookie);
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (connectionMode !== "socket") {
-      } else {
-        await socket.on("allSavedAccounts", (data) => {
-          const savedDetail = {
-            beneficiaryName: data.beneficiaryName,
-            accNum: data.accNum,
-            ifsc: data.ifsc,
-            editable: data.editable,
-          };
-          console.log(savedDetail, "detail");
-
-          // Check if accNum is greater than 15 digits
-          if (String(savedDetail.accNum).length > 15) {
-            const isAlreadyStored = savedAcc
-              ? savedAcc.some((detail) => {
-                  return (
-                    detail.beneficiaryName === savedDetail.beneficiaryName &&
-                    detail.accNum === savedDetail.accNum &&
-                    detail.ifsc === savedDetail.ifsc &&
-                    detail.editable === savedDetail.editable
-                  );
-                })
-              : false;
-
-            if (!isAlreadyStored) {
-              setSavedAcc((prevSavedAcc) => {
-                const updatedSavedAcc = prevSavedAcc
-                  ? [...prevSavedAcc, savedDetail]
-                  : [savedDetail];
-                sessionStorage.setItem(
-                  "savedAcc",
-                  JSON.stringify(updatedSavedAcc)
-                );
-                return updatedSavedAcc;
-              });
-            }
-          }
-          console.log("event received");
-        });
-      }
-    };
-
-    fetchData();
-    console.log("from effect");
   }, []);
 
   useEffect(() => {
@@ -496,58 +442,49 @@ function PaymentForm() {
     setSavedAccLength(sessionStorage.getItem("length"));
   }, [savedAcc]);
 
-  useEffect(() => {
-    if (connectionMode !== "socket") {
-    } else {
-      socket.emit("getTransactionDetails", {
-        num: document.cookie,
-      });
-    }
-  }, []);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     if (connectionMode !== "socket") {
+  //     } else {
+  //       socket.on("transactionDetailsFromDb", (data) => {
+  //         const transaction = {
+  //           Date: data.Date,
+  //           Name: data.Name,
+  //           Status: data.Status,
+  //           Amount: data.Amount,
+  //         };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (connectionMode !== "socket") {
-      } else {
-        socket.on("transactionDetailsFromDb", (data) => {
-          const transaction = {
-            Date: data.Date,
-            Name: data.Name,
-            Status: data.Status,
-            Amount: data.Amount,
-          };
+  //         const isAlreadyStored = recentTransactions
+  //           ? recentTransactions.some((detail) => {
+  //               return (
+  //                 detail.Date === transaction.Date &&
+  //                 detail.Name === transaction.Name &&
+  //                 detail.Status === transaction.Status &&
+  //                 detail.Amount === transaction.Amount
+  //               );
+  //             })
+  //           : false;
+  //         if (!isAlreadyStored) {
+  //           // setRecentTransactions((prev) => [...prev, transaction]);
 
-          const isAlreadyStored = recentTransactions
-            ? recentTransactions.some((detail) => {
-                return (
-                  detail.Date === transaction.Date &&
-                  detail.Name === transaction.Name &&
-                  detail.Status === transaction.Status &&
-                  detail.Amount === transaction.Amount
-                );
-              })
-            : false;
-          if (!isAlreadyStored) {
-            // setRecentTransactions((prev) => [...prev, transaction]);
-
-            setRecentTransactions((prevTransact) => {
-              const updatedTransact = prevTransact
-                ? [...prevTransact, transaction]
-                : [transaction];
-              sessionStorage.setItem(
-                "savedTransactions",
-                JSON.stringify(updatedTransact)
-              );
-              return updatedTransact;
-            });
-          }
-        });
-        const length = recentTransactions ? recentTransactions.length : 0;
-        setRecentTransactionsLength(length);
-      }
-    };
-    fetchData();
-  }, [socket]);
+  //           setRecentTransactions((prevTransact) => {
+  //             const updatedTransact = prevTransact
+  //               ? [...prevTransact, transaction]
+  //               : [transaction];
+  //             sessionStorage.setItem(
+  //               "savedTransactions",
+  //               JSON.stringify(updatedTransact)
+  //             );
+  //             return updatedTransact;
+  //           });
+  //         }
+  //       });
+  //       const length = recentTransactions ? recentTransactions.length : 0;
+  //       setRecentTransactionsLength(length);
+  //     }
+  //   };
+  //   fetchData();
+  // }, [socket]);
 
   return (
     <>

@@ -7,6 +7,7 @@ import { FaArrowLeftLong } from "react-icons/fa6";
 import { MdArrowBackIos } from "react-icons/md";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { RiMenuUnfoldFill } from "react-icons/ri";
+import { useIdleTimer } from "react-idle-timer";
 
 function Transactions() {
   const {
@@ -23,6 +24,9 @@ function Transactions() {
     windowWidth,
     recentTransactions,
     setRecentTransactions,
+    setIsLoggedOut,
+    handleSocket,
+    setLoggedUser,
   } = useContext(store);
 
   const navigate = useNavigate();
@@ -70,6 +74,7 @@ function Transactions() {
           sessionStorage.setItem("tabId", tabId);
         }
         setLogOut(true);
+        setIsLoggedOut(true);
         setIsProfileClicked(false);
         navigate("/");
 
@@ -131,63 +136,72 @@ function Transactions() {
 
   const sideBarProps = getSideBarProps();
 
+  const onIdle = () => {
+    console.log("user is idle");
+
+    setTimeout(() => {
+      handleSocket();
+      setSavedAcc([]);
+      setRecentTransactions([]);
+      setIsLoggedOut(true);
+      const tabId = sessionStorage.getItem("tabId");
+      sessionStorage.clear();
+      if (tabId) {
+        sessionStorage.setItem("tabId", tabId);
+      }
+      setIsProfileClicked(false);
+      setLoggedUser("");
+      navigate("/");
+    }, 3000);
+    alert("Session expired! You will be redirected to login page");
+  };
+  useIdleTimer({
+    timeout: 1000 * 60 * 5,
+    onIdle,
+  });
+
   useEffect(() => {
-    if (connectionMode !== "socket") {
-    } else {
-      socket.emit("getTransactionDetails", {
-        num: document.cookie,
-      });
-    }
+    socket.emit("getTransactionDetails", {
+      num: document.cookie,
+    });
 
     return () => {
-      if (connectionMode !== "socket") {
-      } else {
-        socket.off();
-      }
+      socket.off();
     };
   }, []);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (connectionMode !== "socket") {
-  //     } else {
-  //       socket.on("transactionDetailsFromDb", (data) => {
-  //         const transaction = {
-  //           Date: data.Date,
-  //           Name: data.Name,
-  //           Status: data.Status,
-  //           Amount: data.Amount,
-  //         };
-
-  //         const isAlreadyStored = recentTransactions.some((detail) => {
-  //           return (
-  //             detail.Date === transaction.Date &&
-  //             detail.Name === transaction.Name &&
-  //             detail.Status === transaction.Status &&
-  //             detail.Amount === transaction.Amount
-  //           );
-  //         });
-  //         if (!isAlreadyStored)
-  //           setRecentTransactions((prev) => [...prev, transaction]);
-  //       });
-  //       const length = recentTransactions.length;
-  //       setRecentTransactionsLength(length);
-  //     }
-  //   };
-  //   fetchData();
-  //   return () => {
-  //     if (connectionMode !== "socket") {
-  //     } else {
-  //       socket.off();
-  //     }
-  //   };
-  // }, [socket]);
-
   useEffect(() => {
-    const transactions = sessionStorage.getItem("savedTransactions");
-    console.log(transactions);
-    setRecentTransactions(JSON.parse(transactions));
-  }, []);
+    const fetchData = async () => {
+      socket.on("transactionDetailsFromDb", (data) => {
+        const transaction = {
+          Date: data.Date,
+          Name: data.Name,
+          Status: data.Status,
+          Amount: data.Amount,
+        };
+
+        const isAlreadyStored = recentTransactions.some((detail) => {
+          return (
+            detail.Date === transaction.Date &&
+            detail.Name === transaction.Name &&
+            detail.Status === transaction.Status &&
+            detail.Amount === transaction.Amount
+          );
+        });
+        if (!isAlreadyStored)
+          setRecentTransactions((prev) => [...prev, transaction]);
+      });
+      const length = recentTransactions.length;
+      setRecentTransactionsLength(length);
+    };
+    fetchData();
+  }, [socket]);
+
+  // useEffect(() => {
+  //   const transactions = sessionStorage.getItem("savedTransactions");
+  //   console.log(transactions);
+  //   setRecentTransactions(JSON.parse(transactions));
+  // }, []);
   useEffect(() => {
     return () => {
       setLogOut(false);

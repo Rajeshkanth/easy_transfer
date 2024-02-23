@@ -10,14 +10,7 @@ function HomePage() {
     windowWidth,
     setWindowWidth,
     isLogin,
-    setPassword,
-    setMobileNumber,
-    mobileNumber,
-    setKey,
     setLoginFailed,
-    setLoginInputAlert,
-    socket,
-    setLoader,
     setNewUser,
     passwordError,
   } = useContext(store);
@@ -45,27 +38,6 @@ function HomePage() {
         console.log(`Unknown menu item: ${menuItem}`);
     }
   };
-
-  useEffect(() => {
-    socket.on("loginSuccess", () => {
-      setLoader(false);
-      navigate("/transferPage");
-      document.cookie = mobileNumber;
-      setMobileNumber("");
-      setPassword("");
-      setKey(document.cookie);
-      setLoginFailed(false);
-      setLoginInputAlert(false);
-    });
-    socket.on("newUser", () => {
-      setNewUser(true);
-      setLoader(false);
-    });
-    socket.on("loginFailed", async () => {
-      setLoader(false);
-      setLoginFailed(true);
-    });
-  }, []);
 
   useEffect(() => {
     setLoginFailed(false);
@@ -125,7 +97,7 @@ function HomePage() {
       ) : (
         <div
           className={
-            passwordError
+            passwordError && windowWidth < 640
               ? "mx-auto w-[80%] sm:w-[60%] md:w-[50%] lg:w-[33%]  text-gray-800  bg-white  box-border  mt-[6vh] rounded-xl h-auto"
               : "mx-auto w-[80%] sm:w-[60%] md:w-[50%] lg:w-[33%]  text-gray-800  bg-white  box-border  mt-[15vh] rounded-xl h-auto"
           }

@@ -10,16 +10,15 @@ import { IoIosWallet } from "react-icons/io";
 import { MdModeEdit } from "react-icons/md";
 import profileAlternate from "./images/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752-fotor-20240208155618.png";
 import FailedTransactions from "./FailedTransactions";
-// import { MdKeyboardArrowLeft } from "react-icons/fa6";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { RiMenuUnfoldFill } from "react-icons/ri";
+import { useIdleTimer } from "react-idle-timer";
 function Profile() {
   const {
-    initatedAmountSend,
-    setInitatedAmountSend,
+    handleSocket,
+    setIsLoggedOut,
     recentTransactionsLength,
     setRecentTransactionsLength,
-    savedAcc,
     recentTransactions,
     setRecentTransactions,
     userName,
@@ -48,25 +47,21 @@ function Profile() {
     setIsProfileClicked,
     isProfileClicked,
     setLoggedUser,
-    accFromDb,
-    dobFromDb,
-    mobileFromDb,
     setSavedAcc,
     balance,
-    setBalance,
-    savedAccLength,
     setCanceledPaymentsCount,
     canceledPayments,
     failedTransaction,
     setFailedTransaction,
-    setSavedAccLength,
     clearAll,
+    recentActivity,
+    setRecentActivity,
   } = useContext(store);
   const navigate = useNavigate();
   const location = useLocation();
   const prevPath = location.state?.prevPath;
   const [isEditProfile, setIsEditProfile] = useState(false);
-  const [recentActivity, setRecentActivity] = useState([]);
+  // const [recentActivity, setRecentActivity] = useState([]);
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [img, setImg] = useState(null);
 
@@ -126,10 +121,12 @@ function Profile() {
         {
           prevPath ? navigate(prevPath) : navigate("/transferPage");
         }
+        setSavedAcc([]);
         setIsProfileClicked(false);
         break;
       case "Beneficiaries":
         navigate("/Beneficiaries", { state: { prevPath: location.pathname } });
+        setSavedAcc([]);
         setIsProfileClicked(false);
         break;
       case "Rewards":
@@ -142,10 +139,11 @@ function Profile() {
         break;
       case "Transactions":
         navigate("/Transactions");
+        setSavedAcc([]);
         setIsProfileClicked(false);
         break;
       case "Menu":
-        setSavedAcc([]);
+        // setSavedAcc([]);
         setIsProfileClicked(true);
         break;
       case "Log Out":
@@ -309,6 +307,28 @@ function Profile() {
     // setCvv("");
   };
 
+  const onIdle = () => {
+    console.log("user is idle");
+    setTimeout(() => {
+      handleSocket();
+      setSavedAcc([]);
+      setRecentTransactions([]);
+      setIsLoggedOut(true);
+      const tabId = sessionStorage.getItem("tabId");
+      sessionStorage.clear();
+      if (tabId) {
+        sessionStorage.setItem("tabId", tabId);
+      }
+      setIsProfileClicked(false);
+      logout();
+    }, 3000);
+    alert("Session expired! You will be redirected to login page");
+  };
+  useIdleTimer({
+    timeout: 1000 * 60 * 5,
+    onIdle,
+  });
+
   useEffect(() => {
     if (connectionMode !== "socket") {
       axios
@@ -350,21 +370,74 @@ function Profile() {
   }, [socket, connectionMode, setUserNameFromDb]);
 
   useEffect(() => {
-    if (connectionMode !== "socket") {
-    } else {
-      socket.emit("getTransactionDetails", {
-        num: document.cookie,
-      });
-    }
+    socket.emit("getTransactionDetailsCount", {
+      num: document.cookie,
+    });
+
+    socket.emit("getRecipientsForProfile", {
+      num: document.cookie,
+    });
+
+    socket.emit("getSavedAccountsForProfile", {
+      num: document.cookie,
+    });
 
     return () => {
-      if (connectionMode !== "socket") {
-      } else {
-        socket.off();
-        // setRecentTransactions([]);
-      }
+      socket.off();
     };
-  }, [socket]);
+  }, []);
+
+  useEffect(() => {
+    socket.on("transactionsCountFromDB", async (data) => {
+      const { count } = data;
+      const transaction = {
+        Date: data.Date,
+        Name: data.Name,
+        Status: data.Status,
+        Amount: data.Amount,
+      };
+
+      const isAlreadyStored = recentActivity.some((detail) => {
+        return (
+          detail.Date === transaction.Date &&
+          detail.Name === transaction.Name &&
+          detail.Status === transaction.Status &&
+          detail.Amount === transaction.Amount
+        );
+      });
+      if (!isAlreadyStored) {
+        setRecentActivity((prev) => [...prev, transaction]);
+      }
+
+      await setRecentTransactionsLength(count);
+    });
+
+    socket.on("savedAccountsFromDb", async (data) => {
+      const { count } = data;
+      const account = {
+        Name: data.beneficiaryName,
+        Account: data.accNum,
+      };
+
+      const isAlreadyStored = beneficiaries.some((detail) => {
+        return (
+          detail.Name === account.Name && detail.Account === account.Account
+        );
+      });
+
+      if (!isAlreadyStored) {
+        setBeneficiaries((prev) => [...prev, account]);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    const canceledPaymentsCount = recentActivity.filter(
+      (transaction) => transaction.Status === "canceled"
+    ).length;
+
+    setCanceledPaymentsCount(canceledPaymentsCount);
+  }, [recentActivity]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -377,57 +450,25 @@ function Profile() {
       window.removeEventListener("resize", handleResize);
     };
   }, [windowWidth]);
-  useEffect(() => {
-    setSavedAccLength(sessionStorage.getItem("length"));
-  }, []);
 
   // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (connectionMode !== "socket") {
-  //     } else {
-  //       socket.on("transactionDetailsFromDb", (data) => {
-  //         const transaction = {
-  //           Date: data.Date,
-  //           Name: data.Name,
-  //           Status: data.Status,
-  //           Amount: data.Amount,
-  //         };
-
-  //         setRecentTransactions((prev) => [...prev, transaction]);
-  //       });
-  //       const length = recentTransactions.length;
-  //       setRecentTransactionsLength(length);
-  //     }
-  //   };
-  //   fetchData();
-
-  //   return () => {
-  //     if (connectionMode !== "socket") {
-  //     } else {
-  //       socket.off();
-  //       setRecentTransactions([]);
-  //     }
-  //   };
-  // }, [socket, connectionMode]);
-
-  useEffect(() => {
-    const transactions = sessionStorage.getItem("savedTransactions");
-    const beneficiary = sessionStorage.getItem("savedAcc");
-    const recentTransactions = JSON.parse(transactions);
-    const beneficiaries = JSON.parse(beneficiary);
-    const canceledPaymentsCount = recentTransactions
-      ? recentTransactions.filter(
-          (transaction) => transaction.Status === "canceled"
-        ).length
-      : null;
-    console.log(canceledPaymentsCount);
-    setCanceledPaymentsCount(canceledPaymentsCount);
-    setRecentTransactionsLength(
-      recentTransactions ? recentTransactions.length : 0
-    );
-    setBeneficiaries(beneficiaries);
-    setRecentActivity(recentTransactions);
-  }, []);
+  //   const transactions = sessionStorage.getItem("savedTransactions");
+  //   const beneficiary = sessionStorage.getItem("savedAcc");
+  //   const recentTransactions = JSON.parse(transactions);
+  //   const beneficiaries = JSON.parse(beneficiary);
+  //   const canceledPaymentsCount = recentTransactions
+  //     ? recentTransactions.filter(
+  //         (transaction) => transaction.Status === "canceled"
+  //       ).length
+  //     : null;
+  //   console.log(canceledPaymentsCount);
+  //   setCanceledPaymentsCount(canceledPaymentsCount);
+  //   setRecentTransactionsLength(
+  //     recentTransactions ? recentTransactions.length : 0
+  //   );
+  //   setBeneficiaries(beneficiaries);
+  //   setRecentActivity(recentTransactions);
+  // }, []);
 
   return (
     <>
@@ -468,10 +509,7 @@ function Profile() {
                 {windowWidth < 640 ? (
                   <div className="w-1/2 absolute h-[10vh]  top-[36vh] grid grid-rows-2  left-[10vw]">
                     <h1 className="flex items-center   font-bold text-2xl">
-                      {userNameFromDb
-                        ? userNameFromDb
-                        : sessionStorage.getItem("userName")}{" "}
-                      <MdModeEdit onClick={editProfile} />
+                      {userNameFromDb} <MdModeEdit onClick={editProfile} />
                     </h1>
                     <h1>{document.cookie}</h1>
                   </div>
@@ -481,9 +519,8 @@ function Profile() {
                     <div className="w-full m-auto sm:ml-[-6%] md:ml-0 md:mauto lg:m-auto h-auto flex  items-center  ">
                       {" "}
                       <h1 className=" md:m-auto flex text-2xl sm:pl-[0vw] md:pl-0 sm:ml-[0vw]  lg:pl-0 xl:pl-[0vw]   items-center justify-center font-extrabold  w-[82%] sm:w-1/2 md:w-[60%]  lg:w-auto text-center sm:text-center">
-                        {userNameFromDb
-                          ? userNameFromDb
-                          : sessionStorage.getItem("userName")}{" "}
+                        {userNameFromDb}
+
                         <MdModeEdit
                           onClick={editProfile}
                           className="cursor-pointer text-2xl md:m-auto "
@@ -581,9 +618,9 @@ function Profile() {
                           key={index}
                           className="text-md  md:text-sm lg:text-md   capitalize "
                         >
-                          {item.beneficiaryName}
+                          {item.Name}
                         </h1>
-                        <h1 className="text-sm md:text-sm">{item.accNum}</h1>
+                        <h1 className="text-sm md:text-sm">{item.Account}</h1>
                       </div>
                     ))
                   ) : (

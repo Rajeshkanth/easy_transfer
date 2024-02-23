@@ -196,20 +196,69 @@ function SignUp() {
               placeholder="Enter Mobile Number"
               value={regMobileNumber}
               onChange={handleRegMobileNumber}
-              inputProps={{
-                required: true,
-                className:
-                  "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
-              }}
+              inputProps={
+                allInputAlert && !regMobileNumber
+                  ? {
+                      required: true,
+                      className:
+                        "outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                    }
+                  : isAlreadyUser
+                  ? {
+                      required: true,
+                      className:
+                        "outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                    }
+                  : !isValidNumber
+                  ? {
+                      required: true,
+                      className:
+                        "outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                    }
+                  : {
+                      required: true,
+                      className:
+                        "outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                    }
+              }
               countryCodeEditable={false}
-              buttonStyle={{
-                width: "14% ",
-                paddingLeft: "0px",
-                backgroundColor: "white",
-                border: "2px  solid rgb(203 213 225)",
-                borderColor: "rgb(203 213 225)",
-                borderRadius: " 0.5rem 0 0 0.5rem ",
-              }}
+              buttonStyle={
+                allInputAlert && !regMobileNumber
+                  ? {
+                      width: "14% ",
+                      paddingLeft: "0px",
+                      backgroundColor: "white",
+                      border: "2px  solid rgb(220 38 38)",
+                      borderColor: "rgb(220 38 38)",
+                      borderRadius: " 0.5rem 0 0 0.5rem ",
+                    }
+                  : isAlreadyUser
+                  ? {
+                      width: "14% ",
+                      paddingLeft: "0px",
+                      backgroundColor: "white",
+                      border: "2px  solid rgb(220 38 38)",
+                      borderColor: "rgb(220 38 38)",
+                      borderRadius: " 0.5rem 0 0 0.5rem ",
+                    }
+                  : !isValidNumber
+                  ? {
+                      width: "14% ",
+                      paddingLeft: "0px",
+                      backgroundColor: "white",
+                      border: "2px  solid rgb(220 38 38)",
+                      borderColor: "rgb(220 38 38)",
+                      borderRadius: " 0.5rem 0 0 0.5rem ",
+                    }
+                  : {
+                      width: "14% ",
+                      paddingLeft: "0px",
+                      backgroundColor: "white",
+                      border: "2px  solid rgb(203 213 225)",
+                      borderColor: "rgb(203 213 225)",
+                      borderRadius: " 0.5rem 0 0 0.5rem ",
+                    }
+              }
             />
 
             {isValidNumber ? null : (
@@ -257,12 +306,12 @@ function SignUp() {
             />
             {showCreatePassword ? (
               <FaRegEye
-                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[22vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
+                className="cursor-pointer relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[22vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
                 onClick={() => handleShowPassword("create")}
               />
             ) : (
               <FaRegEyeSlash
-                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[22vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
+                className="cursor-pointer relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[22vw] xl:ml-[23.8vw] bottom-[1.7rem] text-zinc-400"
                 onClick={() => handleShowPassword("create")}
               />
             )}
@@ -328,12 +377,12 @@ function SignUp() {
             />
             {showConfirmPassword ? (
               <FaRegEye
-                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[22vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
+                className="cursor-pointer relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[22vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
                 onClick={() => handleShowPassword("confirm")}
               />
             ) : (
               <FaRegEyeSlash
-                className="relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[22vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
+                className="cursor-pointer relative ml-[56.5vw] sm:ml-[42vw] md:ml-[35vw] lg:ml-[22vw] xl:ml-[23.8vw] bottom-[1.8rem] text-zinc-400"
                 onClick={() => handleShowPassword("confirm")}
               />
             )}

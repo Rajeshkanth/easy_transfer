@@ -3,8 +3,7 @@ import { store } from "../App";
 import { IoMdCloseCircle } from "react-icons/io";
 import { CgClose } from "react-icons/cg";
 function FailedTransactions() {
-  const { recentTransactions, failedTransaction, setFailedTransaction } =
-    useContext(store);
+  const { recentActivity, setFailedTransaction } = useContext(store);
   return (
     <>
       <div className="flex h-screen w-screen bg-transparent backdrop-blur-md justify-center items-center font-poppins">
@@ -32,8 +31,8 @@ function FailedTransactions() {
               </ul>
             </ul>
             <div className="space-y-2 text-gray-700  cursor-default">
-              {recentTransactions ? (
-                recentTransactions
+              {recentActivity ? (
+                recentActivity
                   .filter((item) => item.Status === "canceled")
                   .map((item, index) => (
                     <ul

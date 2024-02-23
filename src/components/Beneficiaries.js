@@ -9,9 +9,12 @@ import { RiMenuUnfoldFill } from "react-icons/ri";
 // import { MdKeyboardArrowLeft } from "react-icons/fa6";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import Loader from "./Loader";
+import { useIdleTimer } from "react-idle-timer";
 
 function Beneficiaries() {
   const {
+    setIsLoggedOut,
+    handleSocket,
     socket,
     connectionMode,
     setLoggedUser,
@@ -60,20 +63,24 @@ function Beneficiaries() {
         setIsProfileClicked(true);
         break;
       case "Profile":
+        setSavedAcc([]);
         navigate("/Profile", { state: { prevPath: location.pathname } });
         setIsProfileClicked(false);
         break;
       case "Home":
         navigate("/transferPage", { state: { prevPath: location.pathname } });
+        setSavedAcc([]);
         setIsProfileClicked(false);
       case "Back":
         {
           prevPath ? navigate(prevPath) : navigate("/transferPage");
         }
         setIsProfileClicked(false);
+        setSavedAcc([]);
         break;
       case "Rewards":
         console.log("Navigating to Rewards page");
+
         setIsProfileClicked(false);
         break;
       case "Contact":
@@ -82,6 +89,7 @@ function Beneficiaries() {
         break;
       case "Transactions":
         navigate("/Transactions");
+        setSavedAcc([]);
         setIsProfileClicked(false);
         break;
       case "Log Out":
@@ -139,26 +147,33 @@ function Beneficiaries() {
 
   const sideBarProps = getSideBarProps();
 
-  const profile = () => {
-    setIsProfileClicked(true);
-  };
-
-  const closeProfile = () => {
-    setIsProfileClicked(false);
-  };
-  const navigateToProfile = () => {
-    navigate("/Profile");
-  };
-
   const logout = () => {
     setLoggedUser("");
-    // setSavedAcc([]);
     navigate("/");
   };
 
-  const gotoTransferPage = () => {
-    navigate("/transferPage");
+  const onIdle = () => {
+    console.log("user is idle");
+
+    setTimeout(() => {
+      handleSocket();
+      setSavedAcc([]);
+      setRecentTransactions([]);
+      setIsLoggedOut(true);
+      const tabId = sessionStorage.getItem("tabId");
+      sessionStorage.clear();
+      if (tabId) {
+        sessionStorage.setItem("tabId", tabId);
+      }
+      setIsProfileClicked(false);
+      logout();
+    }, 3000);
+    alert("Session expired! You will be redirected to login page");
   };
+  useIdleTimer({
+    timeout: 1000 * 60 * 5,
+    onIdle,
+  });
 
   const handleSavedAccNum = (e) => {
     const value = e.target.value;
@@ -253,7 +268,7 @@ function Beneficiaries() {
 
   useEffect(() => {
     return () => {
-      // setSavedAcc([]);
+      setSavedAcc([]);
       setLogOut(false);
     };
   }, []);
@@ -288,6 +303,14 @@ function Beneficiaries() {
     // console.log(savedAcc);
   }, [userNameFromDb, connectionMode, socket]);
 
+  const storeDetailsInsession1 = (savedDetail) => {
+    setSavedAcc([savedDetail]);
+  };
+
+  const storeDetailsInsession2 = (savedDetail) => {
+    setSavedAcc((prev) => [...prev, savedDetail]);
+  };
+
   useEffect(() => {
     if (connectionMode !== "socket") {
     } else {
@@ -298,48 +321,70 @@ function Beneficiaries() {
           ifsc: data.ifsc,
           editable: data.editable,
         };
-        // setSavedAcc((prev) => [...prev, savedDetail]);
+        console.log(savedAcc, "before");
+        setSavedAcc((prev) => [...prev, savedDetail]);
+        console.log(savedAcc, "after");
 
-        const isAlreadyStored =
-          savedAcc === null
-            ? false
-            : savedAcc.some((detail) => {
-                return (
-                  detail.beneficiaryName === savedDetail.beneficiaryName &&
-                  detail.accNum === savedDetail.accNum &&
-                  detail.ifsc === savedDetail.ifsc &&
-                  detail.editable === savedDetail.editable
-                );
-              });
-
-        const storeDetailsInsession1 = () => {
-          setSavedAcc([savedDetail]);
-          sessionStorage.setItem("savedAcc", JSON.stringify([savedDetail]));
-        };
-
-        const storeDetailsInsession2 = () => {
-          setSavedAcc((prev) => [...prev, savedDetail]);
-          sessionStorage.setItem(
-            "savedAcc",
-            JSON.stringify([...savedAcc, savedDetail])
-          );
-        };
-        // If savedDetail is not already present, update the savedAcc array
-        if (!isAlreadyStored) {
-          savedAcc === null
-            ? storeDetailsInsession1()
-            : storeDetailsInsession2();
-        }
         setLoader(false);
-
         setNewBeneficiarySended(false);
       });
     }
   }, []);
 
   useEffect(() => {
-    const savedAcc = sessionStorage.getItem("savedAcc");
-    setSavedAcc(JSON.parse(savedAcc));
+    socket.emit("fetchList", {
+      num: document.cookie,
+      emit: "emitted from ben",
+    });
+    console.log("event emitted", document.cookie);
+
+    return () => {
+      socket.off();
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await socket.on("allSavedAccounts", async (data) => {
+        await console.log(data.emitted);
+        const savedDetail = {
+          beneficiaryName: data.beneficiaryName,
+          accNum: data.accNum,
+          ifsc: data.ifsc,
+          editable: data.editable,
+        };
+
+        if (String(savedDetail.accNum).length > 15) {
+          const isAlreadyStored = savedAcc
+            ? savedAcc.some((detail) => {
+                return (
+                  detail.beneficiaryName === savedDetail.beneficiaryName &&
+                  detail.accNum === savedDetail.accNum &&
+                  detail.ifsc === savedDetail.ifsc &&
+                  detail.editable === savedDetail.editable
+                );
+              })
+            : false;
+
+          if (!isAlreadyStored) {
+            setSavedAcc((prevSavedAcc) => {
+              const updatedSavedAcc = prevSavedAcc
+                ? [...prevSavedAcc, savedDetail]
+                : [savedDetail];
+              sessionStorage.setItem(
+                "savedAcc",
+                JSON.stringify(updatedSavedAcc)
+              );
+              return updatedSavedAcc;
+            });
+          }
+        }
+        console.log("event received");
+      });
+    };
+
+    fetchData();
+    console.log("from effect");
   }, []);
 
   useEffect(() => {
@@ -358,7 +403,6 @@ function Beneficiaries() {
     setTimeout(() => {
       setNotify(false);
     }, 3000);
-
     return () => {
       setNotify(true);
     };
@@ -401,7 +445,7 @@ function Beneficiaries() {
                 + Add Beneficiary
               </h1>
             </div>
-            {savedAcc !== null ? (
+            {savedAcc.length !== 0 ? (
               savedAcc
                 .filter((item) => String(item.accNum).length > 15)
                 .map((item, index) => (
@@ -474,7 +518,7 @@ function Beneficiaries() {
                       required
                     />
                     {allInputsAlert && !savedBeneficiaryName ? (
-                      <p className=" sm:absolute  top-[-5vh] sm:top-[32vh] md:top-[42vh] lg:top-[42vh] xl:top-[41.5vh] text-xs text-red-600 pointer-events-none  box-border">
+                      <p className=" sm:absolute  top-[-5vh] sm:top-[31.6vh] md:top-[41.8vh] lg:top-[41.8vh] xl:top-[41.2vh] text-xs text-red-600 pointer-events-none  box-border">
                         Enter name
                       </p>
                     ) : null}
@@ -492,12 +536,12 @@ function Beneficiaries() {
                       minLength={16}
                     />
                     {savedAccNum.length < 16 && savedAccNum ? (
-                      <p className=" sm:absolute top-[-2vh] sm:top-[41vh] md:top-[51vh] lg:top-[51vh] xl:top-[49.8vh] text-xs text-red-600 pointer-events-none  box-border">
+                      <p className=" sm:absolute top-[-2vh] sm:top-[40.5vh] md:top-[50.5vh] lg:top-[50.8vh] xl:top-[49vh] text-xs text-red-600 pointer-events-none  box-border">
                         Account number should have 16 digits
                       </p>
                     ) : null}
                     {allInputsAlert && !savedAccNum ? (
-                      <p className=" sm:absolute top-[-2vh] sm:top-[41vh] md:top-[51vh] lg:top-[51vh] xl:top-[49.8vh] text-xs text-red-600 pointer-events-none  box-border">
+                      <p className=" sm:absolute top-[-2vh] sm:top-[40.5vh] md:top-[50.5vh] lg:top-[50.8vh] xl:top-[49vh] text-xs text-red-600 pointer-events-none  box-border">
                         Enter account number
                       </p>
                     ) : null}
@@ -514,12 +558,12 @@ function Beneficiaries() {
                       required
                     />
                     {allInputsAlert && !savedIfsc ? (
-                      <p className=" sm:absolute top-[-2vh] sm:top-[50.3vh] md:top-[60.5vh] lg:top-[60.5vh] xl:top-[57.9vh]  text-xs text-red-600 pointer-events-none  box-border">
+                      <p className=" sm:absolute top-[-2vh] sm:top-[49.6vh] md:top-[59.5vh] lg:top-[59.5vh] xl:top-[57vh]  text-xs text-red-600 pointer-events-none  box-border">
                         Enter IFSC code
                       </p>
                     ) : null}
                     {String(savedIfsc).length < 10 && savedIfsc ? (
-                      <p className=" sm:absolute top-[-2vh] sm:top-[50.3vh] md:top-[60.5vh] lg:top-[60.5vh] xl:top-[57.9vh]  text-xs text-red-600 pointer-events-none  box-border">
+                      <p className=" sm:absolute top-[-2vh] sm:top-[49.6vh] md:top-[59.5vh] lg:top-[59.5vh] xl:top-[57vh]  text-xs text-red-600 pointer-events-none  box-border">
                         IFSC code should have 10 digits
                       </p>
                     ) : null}

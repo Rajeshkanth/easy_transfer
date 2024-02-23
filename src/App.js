@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, memo } from "react";
+import { createContext, useState, useEffect, memo, useRef } from "react";
 import {
   HashRouter as Router,
   Route,
@@ -15,8 +15,15 @@ import Profile from "./components/Profile";
 import Success from "./components/Success";
 import Transactions from "./components/Transactions";
 import { PhoneNumberUtil } from "google-libphonenumber";
+import PrivateRoutes from "./components/PrivateRoutes";
+import { useIdleTimer } from "react-idle-timer";
 export const store = createContext();
-const socket = io.connect("https://polling-server.onrender.com", {
+// const socket = io.connect("https://polling-server.onrender.com", {
+//   query: {
+//     tabId: sessionStorage.getItem("tabId"),
+//   },
+// });
+const socket = io.connect("http://localhost:8080", {
   query: {
     tabId: sessionStorage.getItem("tabId"),
   },
@@ -31,6 +38,8 @@ function getDate() {
 }
 
 function App() {
+  const idleTimerRef = useRef(null);
+  const [recentActivity, setRecentActivity] = useState([]);
   const [currentDate, setCurrentDate] = useState(getDate());
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [amount, setAmount] = useState("");
@@ -95,13 +104,22 @@ function App() {
   const [singaporeCode, setSingaporeCode] = useState(false);
   const [usRussiaCode, setUsRussiaCode] = useState(false);
   const [isValidNumber, setIsValidNumber] = useState(true);
+  const [isLoggedOut, setIsLoggedOut] = useState(false);
   const phoneNumber = PhoneNumberUtil.getInstance();
+
+  const handleSocket = () => {
+    if (connectionMode === "socket") {
+      socket.off();
+    }
+  };
 
   const clearAll = () => {
     setSavedAcc([]);
     setRecentTransactions([]);
+    setIsLoggedOut(true);
     const tabId = sessionStorage.getItem("tabId");
     sessionStorage.clear();
+
     if (tabId) {
       sessionStorage.setItem("tabId", tabId);
     }
@@ -190,16 +208,21 @@ function App() {
     };
   }, []);
 
-  useEffect(() => {
-    socket.emit("fetchList", {
-      num: document.cookie,
-    });
-    console.log("event emitted");
-  }, []);
+  // useEffect(() => {
+  //   socket.emit("fetchList", {
+  //     num: document.cookie,
+  //     emit: "emitted",
+  //   });
+  // }, []);
 
   return (
     <store.Provider
       value={{
+        recentActivity,
+        setRecentActivity,
+        handleSocket,
+        isLoggedOut,
+        setIsLoggedOut,
         setIsValidNumber,
         isValidNumber,
         setSavedAccLength,
@@ -339,12 +362,14 @@ function App() {
     >
       <Router>
         <Routes>
+          <Route element={<PrivateRoutes />}>
+            <Route path="/transferPage" element={<PaymentForm />}></Route>
+            <Route path="/success" element={<Success />}></Route>
+            <Route path="/Profile" element={<Profile />}></Route>
+            <Route path="/Beneficiaries" element={<Beneficiaries />}></Route>
+            <Route path="/Transactions" element={<Transactions />}></Route>
+          </Route>
           <Route path="/" element={<HomePage />}></Route>
-          <Route path="/transferPage" element={<PaymentForm />}></Route>
-          <Route path="/success" element={<Success />}></Route>
-          <Route path="/Profile" element={<Profile />}></Route>
-          <Route path="/Beneficiaries" element={<Beneficiaries />}></Route>
-          <Route path="/Transactions" element={<Transactions />}></Route>
         </Routes>
       </Router>
     </store.Provider>
