@@ -105,7 +105,10 @@ function App() {
   const [usRussiaCode, setUsRussiaCode] = useState(false);
   const [isValidNumber, setIsValidNumber] = useState(true);
   const [isLoggedOut, setIsLoggedOut] = useState(false);
+  const [isEditProfile, setIsEditProfile] = useState(false);
   const phoneNumber = PhoneNumberUtil.getInstance();
+
+  const [inputValues, setInputValues] = useState({});
 
   const handleSocket = () => {
     if (connectionMode === "socket") {
@@ -218,6 +221,10 @@ function App() {
   return (
     <store.Provider
       value={{
+        isEditProfile,
+        setIsEditProfile,
+        inputValues,
+        setInputValues,
         recentActivity,
         setRecentActivity,
         handleSocket,

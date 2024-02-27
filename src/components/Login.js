@@ -21,6 +21,8 @@ function Login() {
   const numberUtil = PhoneNumberUtil.getInstance();
 
   const {
+    inputValues,
+    setInputValues,
     setIsLoggedOut,
     password,
     setPassword,
@@ -69,6 +71,16 @@ function Login() {
     }
   };
 
+  const handleChangeInput = (e) => {
+    // console.log(e.target.name);
+
+    if (e.target.name === "password") {
+      setInputValues((prev) => {
+        return { ...prev, [e.target.name]: e.target.value };
+      });
+    }
+  };
+
   const signup = () => {
     setIsLogin(false);
     setMobileNumber("");
@@ -94,35 +106,55 @@ function Login() {
 
   const loginToDashboard = async (e) => {
     e.preventDefault();
-    if (
-      mobileNumber &&
-      password &&
-      mobileNumber.length > 8 &&
-      isValidIndianNumber
-    ) {
-      const request = await axios.post(
-        "https://polling-server.onrender.com/loginRequest",
-        {
-          Mobile: mobileNumber.slice(2),
-          Password: password,
+
+    if (mobileNumber && password && isValidIndianNumber) {
+      setIsValidIndianNumber(false);
+      setLoader(true);
+
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/loginRequest",
+          {
+            Mobile: mobileNumber.slice(2),
+            Password: password,
+          }
+        );
+
+        if (response.status === 200) {
+          setLoader(false);
+          setIsLoggedOut(false);
+          navigate("/transferPage");
+          document.cookie = mobileNumber.slice(2);
+          setMobileNumber("");
+          setPassword("");
+          setKey(document.cookie);
+          setLoginFailed(false);
+          setLoginInputAlert(false);
+        } else if (response.status === 201) {
+          setNewUser(true);
+          setIsLoggedOut(true);
+          setLoader(false);
+        } else if (response.status === 202) {
+          setIsLoggedOut(true);
+          setLoader(false);
+          setLoginFailed(true);
         }
-      );
-      if (request.status === 200) {
-        navigate("/transferPage");
-        document.cookie = mobileNumber.slice(2);
-        setKey(document.cookie);
-        setLoginFailed(false);
-        setLoginInputAlert(false);
-      } else if (request.status === 201) {
-        setNewUser(true);
-      } else if (request.status === 202) {
-        setLoginFailed(true);
+      } catch (error) {
+        console.log(error);
+        setIsLoggedOut(true);
+        setLoader(false);
+        setLoginInputAlert(true);
       }
-      setMobileNumber("");
-      setPassword("");
     } else {
+      setIsLoggedOut(true);
       setLoginInputAlert(true);
+      setLoader(false);
     }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log(inputValues);
   };
 
   const loginToDashboardUsingSocket = async (e) => {
@@ -137,12 +169,12 @@ function Login() {
       // isValidIndianNumber
     ) {
       console.log(mobileNumber, mobileNumber.slice(2).substring(0, 1));
+      setIsValidIndianNumber(false);
       setLoader(true);
       await socket.emit("login", {
         Mobile: mobileNumber.slice(2),
         Password: password,
       });
-
       socket.on("loginSuccess", () => {
         setLoader(false);
         setIsLoggedOut(false);
@@ -169,15 +201,16 @@ function Login() {
     } else {
       setIsLoggedOut(true);
       setLoginInputAlert(true);
-      setIsValidIndianNumber(false);
+
       setLoader(false);
       // alert("failed");
     }
   };
-
   useEffect(() => {
     setLoginInputAlert(false);
   }, []);
+
+  useEffect(() => {}, []);
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -214,6 +247,7 @@ function Login() {
           </label>
 
           <PhoneInput
+            name="mobileNumber"
             country={"in"}
             countryCodeEditable={false}
             placeholder="Enter Mobile Number"
@@ -288,13 +322,13 @@ function Login() {
           <div className="w-[80%] mb-2">
             {mobileNumber ? (
               isValidIndianNumber ? null : (
-                <p className="text-xs w-[80%] mt-[.4rem]  text-red-500">
+                <p className="text-xs w-[80%] mt-[.2rem]  text-red-500">
                   Invalid number
                 </p>
               )
             ) : null}
             {!mobileNumber && loginInputAlert ? (
-              <p className="text-xs w-[80%] mt-[.4rem] text-red-500">
+              <p className="text-xs w-[80%] mt-[.2rem] text-red-500">
                 Enter Mobile Number
               </p>
             ) : null}
@@ -313,6 +347,7 @@ function Login() {
             Password
           </label>
           <input
+            name="password"
             className={
               loginInputAlert && !password
                 ? "outline-0 h-10 w-full rounded-lg  p-[1rem] pl-[.5rem] sm:p-[1rem] border-2 text-[16px] border-red-600  border-box  "
@@ -324,6 +359,8 @@ function Login() {
             minLength={6}
             value={password}
             onChange={handlePassword}
+            // value={inputValues.password}
+            // onChange={handleChangeInput}
             placeholder="Enter Your Password"
           />
 
@@ -350,12 +387,12 @@ function Login() {
 
         <div className="w-[80%]">
           {loginInputAlert && !password ? (
-            <p className="relative top-[-3vh] md:top-[-3vh] lg::top-[-2vh] text-red-500 text-xs cursor-default ">
+            <p className="relative top-[-3vh] md:top-[-3vh] lg::top-[-3vh] text-red-500 text-xs cursor-default ">
               Enter Password
             </p>
           ) : null}
           {loginFailed && !isNewUser ? (
-            <p className="relative top-[-3vh] md:top-[-3vh] lg:top-[-2vh] text-xs  text-red-500">
+            <p className="relative top-[-3vh] md:top-[-3vh] lg:top-[-3vh] text-xs  text-red-500">
               Wrong password
             </p>
           ) : null}
@@ -369,7 +406,8 @@ function Login() {
             onClick={
               connectionMode === "socket"
                 ? loginToDashboardUsingSocket
-                : loginToDashboard
+                : // handleSubmit
+                  loginToDashboard
             }
           >
             Log in

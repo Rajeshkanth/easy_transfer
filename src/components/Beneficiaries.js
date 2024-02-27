@@ -25,15 +25,12 @@ function Beneficiaries() {
     setToAccountNumber,
     setToIFSCNumber,
     setToAccountHolderName,
-    sendByBeneficiaries,
     setSendByBeneficiaries,
     savedAcc,
     setSavedAcc,
     isProfileClicked,
     setIsProfileClicked,
-    logOut,
     setLogOut,
-    notify,
     setNotify,
     setPlusIcon,
     plusIcon,
@@ -41,13 +38,10 @@ function Beneficiaries() {
     clearAll,
   } = useContext(store);
 
-  // const [isProfileClicked, setIsProfileClicked] = useState(false);
-  const [newBeneficiary, setNewBeneficiary] = useState(false);
   const [savedAccNum, setSavedAccNum] = useState("");
   const [savedBeneficiaryName, setSavedBeneficiaryName] = useState("");
   const [savedIfsc, setSavedIfsc] = useState("");
   const [loader, setLoader] = useState(false);
-  const [isEdit, setIsEdit] = useState(false);
   const [newValueAdded, setNewValueAdded] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -80,7 +74,6 @@ function Beneficiaries() {
         break;
       case "Rewards":
         console.log("Navigating to Rewards page");
-
         setIsProfileClicked(false);
         break;
       case "Contact":
@@ -170,6 +163,7 @@ function Beneficiaries() {
     }, 3000);
     alert("Session expired! You will be redirected to login page");
   };
+
   useIdleTimer({
     timeout: 1000 * 60 * 5,
     onIdle,
@@ -206,7 +200,7 @@ function Beneficiaries() {
     navigate("/transferPage");
   };
 
-  const saveBeneficiary = () => {
+  const saveBeneficiary = async () => {
     if (
       savedBeneficiaryName &&
       savedAccNum &&
@@ -216,6 +210,34 @@ function Beneficiaries() {
     ) {
       setNewValueAdded(true);
       if (connectionMode !== "socket") {
+        const response = await axios.post(
+          "http://localhost:8080/saveNewBeneficiary",
+          {
+            SavedBeneficiaryName: savedBeneficiaryName,
+            SavedAccNum: savedAccNum,
+            SavedIfsc: savedIfsc,
+            editable: false,
+            num: document.cookie,
+          }
+        );
+        setNewBeneficiarySended(true);
+        setLoader(true);
+        if (response.status === 200) {
+          console.log(response.data);
+          const savedDetail = {
+            beneficiaryName: response.data.beneficiaryName,
+            accNum: response.data.accNum,
+            ifsc: response.data.ifsc,
+          };
+          console.log(savedAcc, "before");
+          setSavedAcc((prev) => [...prev, savedDetail]);
+          console.log(savedAcc, "after");
+
+          setLoader(false);
+          setNewBeneficiarySended(false);
+        } else {
+          console.error("Request failed with status:", response.status);
+        }
       } else {
         socket.emit("saveNewBeneficiary", {
           SavedBeneficiaryName: savedBeneficiaryName,
@@ -273,43 +295,13 @@ function Beneficiaries() {
     };
   }, []);
 
-  useEffect(() => {
-    if (connectionMode !== "socket") {
-      axios
-        .post("https://polling-server.onrender.com/checkUserName", {
-          regNumber: document.cookie,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            setUserNameFromDb(response.data.user);
-          } else {
-            setUserNameFromDb("");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      socket.emit("checkUserName", {
-        regNumber: document.cookie,
-      });
-      socket.on("userNameAvailable", (data) => {
-        setUserNameFromDb(data.user);
-      });
-      socket.on("userNotFound", () => {
-        setUserNameFromDb("");
-      });
-    }
-    // console.log(savedAcc);
-  }, [userNameFromDb, connectionMode, socket]);
+  // const storeDetailsInsession1 = (savedDetail) => {
+  //   setSavedAcc([savedDetail]);
+  // };
 
-  const storeDetailsInsession1 = (savedDetail) => {
-    setSavedAcc([savedDetail]);
-  };
-
-  const storeDetailsInsession2 = (savedDetail) => {
-    setSavedAcc((prev) => [...prev, savedDetail]);
-  };
+  // const storeDetailsInsession2 = (savedDetail) => {
+  //   setSavedAcc((prev) => [...prev, savedDetail]);
+  // };
 
   useEffect(() => {
     if (connectionMode !== "socket") {
@@ -332,6 +324,19 @@ function Beneficiaries() {
   }, []);
 
   useEffect(() => {
+    axios
+      .post("http://localhost:8080/getBeneficiaryDetails", {
+        num: document.cookie,
+      })
+      .then((res) => {
+        console.log(res.data);
+
+        setSavedAcc(res.data);
+      })
+      .catch((err) => {
+        console.error("Error:", err);
+      });
+
     socket.emit("fetchList", {
       num: document.cookie,
       emit: "emitted from ben",
@@ -346,7 +351,7 @@ function Beneficiaries() {
   useEffect(() => {
     const fetchData = async () => {
       await socket.on("allSavedAccounts", async (data) => {
-        await console.log(data.emitted);
+        // await console.log(data.emitted);
         const savedDetail = {
           beneficiaryName: data.beneficiaryName,
           accNum: data.accNum,
@@ -379,12 +384,11 @@ function Beneficiaries() {
             });
           }
         }
-        console.log("event received");
+        // console.log("event received");
       });
     };
 
     fetchData();
-    console.log("from effect");
   }, []);
 
   useEffect(() => {
@@ -419,7 +423,7 @@ function Beneficiaries() {
         {/* </div> */}
 
         <div className="h-[80vh] md:h-screen   m-auto  bg-white block md:flex  md:pl-[0rem] box-border">
-          <div className="m-auto h-screen sm:h-[90vh] w-[100%]   text-gray-800   bg-white pt-[18vh] sm:pt-[10vh] md:pt-0 mt-[0rem] pb-[1rem] box-border overflow-x-auto space-y-2 lg:space-y-0">
+          <div className="m-auto h-screen sm:h-[100vh] md:h-[90vh] w-[100%]   text-gray-800   bg-white pt-[18vh] sm:pt-[10vh] md:pt-0 mt-[0rem] pb-[1rem] box-border overflow-x-auto space-y-2 lg:space-y-0">
             <div
               className={
                 windowWidth < 450
@@ -536,12 +540,12 @@ function Beneficiaries() {
                       minLength={16}
                     />
                     {savedAccNum.length < 16 && savedAccNum ? (
-                      <p className=" sm:absolute top-[-2vh] sm:top-[40.5vh] md:top-[50.5vh] lg:top-[50.8vh] xl:top-[49vh] text-xs text-red-600 pointer-events-none  box-border">
+                      <p className=" sm:absolute top-[-2vh] sm:top-[41vh] md:top-[51vh]  xl:top-[49.5vh] text-xs text-red-600 pointer-events-none  box-border">
                         Account number should have 16 digits
                       </p>
                     ) : null}
                     {allInputsAlert && !savedAccNum ? (
-                      <p className=" sm:absolute top-[-2vh] sm:top-[40.5vh] md:top-[50.5vh] lg:top-[50.8vh] xl:top-[49vh] text-xs text-red-600 pointer-events-none  box-border">
+                      <p className=" sm:absolute top-[-2vh] sm:top-[41vh] md:top-[51vh]  xl:top-[49.5vh] text-xs text-red-600 pointer-events-none  box-border">
                         Enter account number
                       </p>
                     ) : null}
@@ -558,12 +562,12 @@ function Beneficiaries() {
                       required
                     />
                     {allInputsAlert && !savedIfsc ? (
-                      <p className=" sm:absolute top-[-2vh] sm:top-[49.6vh] md:top-[59.5vh] lg:top-[59.5vh] xl:top-[57vh]  text-xs text-red-600 pointer-events-none  box-border">
+                      <p className=" sm:absolute top-[-2vh] sm:top-[50.4vh] md:top-[60.5vh] xl:top-[57.8vh]  text-xs text-red-600 pointer-events-none  box-border">
                         Enter IFSC code
                       </p>
                     ) : null}
                     {String(savedIfsc).length < 10 && savedIfsc ? (
-                      <p className=" sm:absolute top-[-2vh] sm:top-[49.6vh] md:top-[59.5vh] lg:top-[59.5vh] xl:top-[57vh]  text-xs text-red-600 pointer-events-none  box-border">
+                      <p className=" sm:absolute top-[-2vh] sm:top-[50.4vh] md:top-[60.5vh]  xl:top-[57.8vh]  text-xs text-red-600 pointer-events-none  box-border">
                         IFSC code should have 10 digits
                       </p>
                     ) : null}

@@ -8,6 +8,7 @@ import Menu from "./Menu";
 import SideBar from "./SideBar";
 import { RiMenuUnfoldFill } from "react-icons/ri";
 import { useIdleTimer } from "react-idle-timer";
+import { TextGenerateEffect } from "../TextGenerate";
 
 function PaymentForm() {
   const {
@@ -128,6 +129,16 @@ function PaymentForm() {
     navigate("/");
   };
 
+  const inputAlerts = () => {
+    setAllInput(false);
+    setEnterAccountHolderName(false);
+    setEnterAccountNumber(false);
+    setEnterAmount(false);
+    setEnterToIfscNumber(false);
+    setAccNumAlert(false);
+    setIFSCAlert(false);
+  };
+
   const sendAmountBySocket = (e) => {
     e.preventDefault();
     console.log("clicked");
@@ -159,7 +170,7 @@ function PaymentForm() {
         Uid: uuid(),
       };
       console.log(newTransactions);
-      // setRecentTransactions((prev) => [...prev, newTransactions]);
+
       socket.emit("paymentPageConnected", {
         num: document.cookie,
         connected: true,
@@ -167,13 +178,7 @@ function PaymentForm() {
         NewTransactions: newTransactions,
         Uid: uuid(),
       });
-      setAllInput(false);
-      setEnterAccountHolderName(false);
-      setEnterAccountNumber(false);
-      setEnterAmount(false);
-      setEnterToIfscNumber(false);
-      setAccNumAlert(false);
-      setIFSCAlert(false);
+      inputAlerts();
       handleAllInput();
       navigate("/success");
     } else if (
@@ -206,10 +211,51 @@ function PaymentForm() {
     }
   };
 
+  // const sendAmountByPolling = async (e) => {
+  //   try {
+  //     e.preventDefault();
+  //     if (amount && toAccountNumber && toAccountHolderName && toIFSCNumber) {
+  //       const newReceiver = {
+  //         Amount: amount,
+  //         AccNum: toAccountNumber,
+  //         AccHolder: toAccountHolderName,
+  //         Ifsc: toIFSCNumber,
+  //         tabId: sessionStorage.getItem("tabId"),
+  //         type: "polling",
+  //       };
+  //       console.log("hello");
+  //       navigate("/success");
+  //       handleAllInput();
+  //       const response = await axios.post(
+  //         "http://localhost:8080/fromPaymentAlert",
+
+  //         {
+  //           data: newReceiver,
+  //         }
+  //       );
+  //       setAllInput(false);
+  //     } else {
+  //       setAllInput(true);
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+
   const sendAmountByPolling = async (e) => {
     try {
       e.preventDefault();
-      if (amount && toAccountNumber && toAccountHolderName && toIFSCNumber) {
+      console.log("clicked");
+      if (
+        amount &&
+        toAccountNumber &&
+        toAccountHolderName &&
+        toIFSCNumber &&
+        String(toAccountNumber).length > 15 &&
+        String(toIFSCNumber).length > 9
+      ) {
+        setSendByBeneficiaries(false);
+        setInitatedAmountSend(true);
         const newReceiver = {
           Amount: amount,
           AccNum: toAccountNumber,
@@ -218,22 +264,63 @@ function PaymentForm() {
           tabId: sessionStorage.getItem("tabId"),
           type: "polling",
         };
-        console.log("hello");
+
+        const newTransactions = {
+          Amount: amount,
+          Date: currentDate,
+          Description: `Sent to ${toAccountHolderName}`,
+          Status: `Pending`,
+          Name: toAccountHolderName,
+          Uid: uuid(),
+        };
+
+        console.log(newTransactions);
+
         navigate("/success");
         handleAllInput();
+
         const response = await axios.post(
-          "https://polling-server.onrender.com/fromPaymentAlert",
-          // `http://localhost:8080/fromPaymentAlert`,
+          "http://localhost:8080/fromPaymentAlert",
           {
             data: newReceiver,
+            newTransaction: newTransactions,
+            num: document.cookie,
           }
         );
-        setAllInput(false);
+
+        if (response.status === 200) {
+          setAllInput(false);
+        }
+      } else if (
+        amount &&
+        toAccountNumber &&
+        toAccountHolderName &&
+        toIFSCNumber &&
+        toAccountNumber.length < 15
+      ) {
+        setAccNumAlert(true);
+      } else if (
+        amount &&
+        toAccountNumber &&
+        toAccountHolderName &&
+        toIFSCNumber &&
+        toIFSCNumber.length < 8
+      ) {
+        setIFSCAlert(true);
+      } else if (
+        !amount &&
+        toAccountNumber &&
+        toAccountHolderName &&
+        toIFSCNumber
+      ) {
+        setAllInput(true);
       } else {
         setAllInput(true);
+        console.log("else part");
       }
     } catch (err) {
       console.log(err);
+      // Handle error scenario, if needed
     }
   };
 
@@ -242,17 +329,6 @@ function PaymentForm() {
     setToAccountHolderName("");
     setToAccountNumber("");
     setToIFSCNumber("");
-  };
-
-  const closeProfile = () => {
-    setIsProfileClicked(false);
-  };
-  const navigateToProfile = () => {
-    navigate("/profile");
-  };
-
-  const savedAccounts = () => {
-    navigate("/Beneficiaries");
   };
 
   const getMenuProps = () => {
@@ -319,7 +395,6 @@ function PaymentForm() {
 
   const onIdle = () => {
     console.log("user is idle");
-
     setTimeout(() => {
       handleSocket();
       setSavedAcc([]);
@@ -335,84 +410,11 @@ function PaymentForm() {
     }, 3000);
     alert("Session expired! You will be redirected to login page");
   };
+
   useIdleTimer({
     timeout: 1000 * 60 * 5,
     onIdle,
   });
-
-  useEffect(() => {
-    if (connectionMode !== "socket") {
-      axios
-        .post("https://polling-server.onrender.com/checkUserName", {
-          regNumber: document.cookie,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            setUserNameFromDb(response.data.user);
-          } else {
-            setUserNameFromDb("");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      socket.emit("checkUserName", {
-        regNumber: document.cookie,
-      });
-      socket.on("userNameAvailable", async (data) => {
-        sessionStorage.setItem("userName", data.user ? data.user : "");
-        const userName = sessionStorage.getItem("userName");
-        await setUserNameFromDb(userName);
-      });
-      socket.on("userNotFound", async () => {
-        await setUserNameFromDb("");
-      });
-    }
-  }, [userNameFromDb, connectionMode, socket]);
-
-  useEffect(() => {
-    if (connectionMode !== "socket") {
-      axios
-        .post("https://polling-server.onrender.com/checkUserName", {
-          regNumber: document.cookie,
-        })
-        .then((response) => {
-          if (response.status === 200) {
-            setUserNameFromDb(response.data.user);
-            setAgeFromDb(response.data.age);
-            setAgeFromDb(response.data.age);
-            setDobFromDb(response.data.dob);
-            setAccFromDb(response.data.accNum);
-          } else {
-            setUserNameFromDb("");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      socket.emit("checkUserName", {
-        regNumber: document.cookie,
-      });
-      socket.on("userNameAvailable", (data) => {
-        setUserNameFromDb(data.user);
-        setAgeFromDb(data.age);
-        setDobFromDb(data.dob);
-        setAccFromDb(data.accNum);
-        // setCard(data.card);
-        // setCvv()
-      });
-      socket.on("userNotFound", () => {
-        setUserNameFromDb("");
-        setAgeFromDb("");
-      });
-      // socket.on("transactionDetails", (data) => {
-      //   const { lastTransaction } = data;
-      //   setRecentTransactions((prev) => [...prev, lastTransaction]);
-      // });
-    }
-  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -430,9 +432,6 @@ function PaymentForm() {
     setAllInput(false);
     return () => {
       handleAllInput();
-      // if (connectionMode === "socket") {
-      //   socket.off();
-      // }
     };
   }, []);
 
@@ -441,50 +440,6 @@ function PaymentForm() {
     sessionStorage.setItem("length", length);
     setSavedAccLength(sessionStorage.getItem("length"));
   }, [savedAcc]);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (connectionMode !== "socket") {
-  //     } else {
-  //       socket.on("transactionDetailsFromDb", (data) => {
-  //         const transaction = {
-  //           Date: data.Date,
-  //           Name: data.Name,
-  //           Status: data.Status,
-  //           Amount: data.Amount,
-  //         };
-
-  //         const isAlreadyStored = recentTransactions
-  //           ? recentTransactions.some((detail) => {
-  //               return (
-  //                 detail.Date === transaction.Date &&
-  //                 detail.Name === transaction.Name &&
-  //                 detail.Status === transaction.Status &&
-  //                 detail.Amount === transaction.Amount
-  //               );
-  //             })
-  //           : false;
-  //         if (!isAlreadyStored) {
-  //           // setRecentTransactions((prev) => [...prev, transaction]);
-
-  //           setRecentTransactions((prevTransact) => {
-  //             const updatedTransact = prevTransact
-  //               ? [...prevTransact, transaction]
-  //               : [transaction];
-  //             sessionStorage.setItem(
-  //               "savedTransactions",
-  //               JSON.stringify(updatedTransact)
-  //             );
-  //             return updatedTransact;
-  //           });
-  //         }
-  //       });
-  //       const length = recentTransactions ? recentTransactions.length : 0;
-  //       setRecentTransactionsLength(length);
-  //     }
-  //   };
-  //   fetchData();
-  // }, [socket]);
 
   return (
     <>
@@ -495,10 +450,13 @@ function PaymentForm() {
           <div className="w-[96vw]  flex  justify-evenly h-[90vh]  ">
             <div className="hidden sm:block sm:w-1/2 md:w-auto xl:w-[58%] xl:pl-[0vw] cursor-default">
               {" "}
-              <h1 className="text-4xl font-sans  font-light mt-[12rem] ml-[0rem]  md:text-5xl lg:text-6xl ">
+              {/* <h1 className="text-4xl font-sans  font-light mt-[12rem] ml-[0rem]  md:text-5xl lg:text-6xl ">
                 The Secure, <br /> easiest and fastest <br /> way to transfer
                 money.{" "}
-              </h1>
+              </h1> */}
+              <TextGenerateEffect
+                words={`The Secure,  \n easiest and fastest \n way to transfer money.`}
+              />
               <p className="ml-[0rem] mt-[4rem] text-xs md:text-sm text-gray-300 lg:text-xl">
                 send & receive money in minutes without paying extra charges.
               </p>
@@ -507,12 +465,12 @@ function PaymentForm() {
             <form
               className={
                 sendByBeneficiaries
-                  ? "w-[80%] sm:w-5/12  h-[81vh] sm:h-[90%]  lg:h-[82%] md:w-2/5  lg:w-[40%] xl:w-1/3 relative pt-[0rem]  px-10 py-10  box-border mb-[2vh] md:mb-0  z-20 bg-white border-2 border-cyan-200  space-y-3 sm:space-y-0 rounded-md  mt-[3rem]   flex flex-col justify-center "
-                  : "w-[80%] sm:w-5/12  h-[75vh] sm:h-[90%]  lg:h-[82%] md:w-2/5  lg:w-[40%] xl:w-1/3 relative pt-[0rem]  px-10 py-10  box-border mb-[2vh] md:mb-0  z-20 bg-white border-2 border-cyan-200  space-y-3 sm:space-y-0 rounded-md  mt-[3rem]   flex flex-col justify-center "
+                  ? "w-[80%] sm:w-5/12  h-[81vh] sm:h-[90%]  lg:h-[90%] md:w-2/5  lg:w-[40%] xl:w-1/3 relative pt-[0rem]  px-10 py-10  box-border mb-[2vh] md:mb-0  z-20 bg-white border-2 border-cyan-200  space-y-3 sm:space-y-0 rounded-md  mt-[3rem]   flex flex-col justify-center "
+                  : "w-[80%] sm:w-5/12  h-[75vh] sm:h-[90%]  lg:h-[85%] md:w-2/5  lg:w-[40%] xl:w-1/3 relative pt-[0rem]  px-10 py-10  box-border mb-[2vh] md:mb-0  z-20 bg-white border-2 border-cyan-200  space-y-3 sm:space-y-0 rounded-md  mt-[3rem]   flex flex-col justify-center "
               }
             >
               <div className=" h-auto sm:h-1/6 pt-[1rem]  text-gray-800   w-full text-center flex justify-center  rounded-md rounded-b-none  ">
-                <h1 className="  mt-2 sm:mt-4 md:mt-3 lg:mt-[1vh] sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-extrabold text-gray-600 text-[27px]">
+                <h1 className="cursor-default  mt-2 sm:mt-4 md:mt-3 lg:mt-[1vh] sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-extrabold text-gray-600 text-[27px]">
                   Money Transfer
                 </h1>
               </div>
@@ -543,10 +501,7 @@ function PaymentForm() {
                   </>
                 ) : null}
 
-                <label
-                  // className="relative  top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-800"
-                  className="block px-1 text-sm mb-[.2rem] pointer-events-none md:ml-[2.4vw] lg:ml-[1vw] leading-6 text-gray-800"
-                >
+                <label className="block px-1 text-sm mb-[.2rem] pointer-events-none md:ml-[2.4vw] lg:ml-[1vw] leading-6 text-gray-800">
                   Account Number
                 </label>
                 <input
@@ -580,10 +535,7 @@ function PaymentForm() {
                   </>
                 ) : null}
 
-                <label
-                  // className="relative w-25 top-3 left-2 transition-all bg-white px-1 pointer-events-none text-gray-800"
-                  className="block text-sm mb-[.2rem] px-1 pointer-events-none md:ml-[2.4vw] lg:ml-[1vw] leading-6 text-gray-800"
-                >
+                <label className="block text-sm mb-[.2rem] px-1 pointer-events-none md:ml-[2.4vw] lg:ml-[1vw] leading-6 text-gray-800">
                   IFSC code
                 </label>
                 <input
@@ -615,10 +567,7 @@ function PaymentForm() {
                   </p>
                 ) : null}
 
-                <label
-                  //  className="relative w-20 top-3 left-2 transition-all bg-black px-1 box-border pointer-events-none text-gray-800"
-                  className="block text-sm mb-[.2rem] px-1 pointer-events-none md:ml-[2.4vw] lg:ml-[1vw] leading-6 text-gray-800"
-                >
+                <label className="block text-sm mb-[.2rem] px-1 pointer-events-none md:ml-[2.4vw] lg:ml-[1vw] leading-6 text-gray-800">
                   {" "}
                   Amount{" "}
                 </label>
@@ -642,11 +591,6 @@ function PaymentForm() {
                     </p>
                   </>
                 ) : null}
-                {/* {allInput ? (
-                  <p className="text-left text-sm text-red-600 mt-[.4rem]">
-                    Fill all input values
-                  </p>
-                ) : null} */}
               </div>
               <div className="w-full pt-0 sm:pt-[2rem] mt-[4vh] md:mt-0  min-h-[10%] box-border">
                 <input

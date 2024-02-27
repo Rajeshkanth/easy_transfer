@@ -8,12 +8,10 @@ import { MdArrowBackIos } from "react-icons/md";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { RiMenuUnfoldFill } from "react-icons/ri";
 import { useIdleTimer } from "react-idle-timer";
+import axios from "axios";
 
 function Transactions() {
   const {
-    initatedAmountSend,
-    setInitatedAmountSend,
-    connectionMode,
     socket,
     setRecentTransactionsLength,
     setIsProfileClicked,
@@ -161,6 +159,15 @@ function Transactions() {
   });
 
   useEffect(() => {
+    axios
+      .post("http://localhost:8080/transactionDetailsForTransactionPage", {
+        num: document.cookie,
+      })
+      .then((res) => {
+        setRecentTransactions(res.data);
+      })
+      .catch((err) => console.log(err));
+
     socket.emit("getTransactionDetails", {
       num: document.cookie,
     });
@@ -197,11 +204,6 @@ function Transactions() {
     fetchData();
   }, [socket]);
 
-  // useEffect(() => {
-  //   const transactions = sessionStorage.getItem("savedTransactions");
-  //   console.log(transactions);
-  //   setRecentTransactions(JSON.parse(transactions));
-  // }, []);
   useEffect(() => {
     return () => {
       setLogOut(false);
@@ -217,38 +219,7 @@ function Transactions() {
       ) : null}
       <div className="h-auto md:h-screen w-screen pt-0 md:pt-2 pb-[2rem] md:fixed font-poppins bg-gray-800 text-white">
         <Menu {...menuProps} onClickHandler={handleMenuClick} />
-        {/* <div className="w-full h-full md:w-[33%] md:h-[90vh] overflow-auto bg-white  font-poppins text-gray-700  mt-[0vh]">
-          <ul className="grid grid-cols-4 gap-0 w-full font-bold text-lg fixed top-[10%] md:sticky  md:top-0  p-3 pl-[3vw]  bg-gray-800 text-white">
-            <li>Date</li>
-            <li>Name</li>
-            <li>Amount</li>
-            <li>Status</li>
-          </ul>
-          <div className="space-y-0 h-auto  ">
-            {recentTransactions.map((item, index) => (
-              <ul
-                key={index}
-                className="text-gray-700 h-auto grid grid-cols-4 text-xs sm:text-sm md:text-lg lg:text-xl p-3 pl-[3vw] cursor-default bg-white "
-              >
-                {" "}
-                <li>{item.Date}</li>
-                <li className="">{item.Name}</li>
-                <li>{item.Amount}</li>
-                <li
-                  className={
-                    item.Status === "completed"
-                      ? "md:text-lg lg:text-xl text-green-600 capitalize "
-                      : item.Status === "canceled"
-                      ? "md:text-lg lg:text-xl text-red-800 capitalize "
-                      : "md:text-lg lg:text-xl text-yellow-400 capitalize "
-                  }
-                >
-                  {item.Status}
-                </li>
-              </ul>
-            ))}
-          </div>
-        </div> */}
+
         <div className=" grid  pt-[10vh] md:pt-0 md:grid-cols-2 gap-0 lg:gap-10 md:pl-[7vw] lg:pl-[6vw] md:mt-[4vh] box-border">
           <div className="h-[30vh] md:h-[30vh] lg:h-[30vh]  md:w-[35vw] lg:w-[35vw] xl:w-[40vw] border-b-2 md:border-b-0 overflow-y-auto    space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
             <div className="grid  md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-[6vh] pl-2 lg:pl-9 xl:pl-12 border-b-2 pt-2 items-center">

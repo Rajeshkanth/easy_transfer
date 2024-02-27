@@ -78,8 +78,8 @@ function Success() {
       const tabId = sessionStorage.getItem("tabId");
       try {
         const response = await axios.post(
-          `https://polling-server.onrender.com/success/${tabId}`
-          // `http://localhost:8080/success/${tabId}`
+          // `https://polling-server.onrender.com/success/${tabId}`
+          `http://localhost:8080/success/${tabId}`
         );
 
         if (response.status === 200) {

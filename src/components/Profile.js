@@ -13,6 +13,7 @@ import FailedTransactions from "./FailedTransactions";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { RiMenuUnfoldFill } from "react-icons/ri";
 import { useIdleTimer } from "react-idle-timer";
+import ProfileForm from "./ProfileForm";
 function Profile() {
   const {
     handleSocket,
@@ -21,25 +22,11 @@ function Profile() {
     setRecentTransactionsLength,
     recentTransactions,
     setRecentTransactions,
-    userName,
     userNameFromDb,
     setUserNameFromDb,
     setAgeFromDb,
     setAccFromDb,
     setDobFromDb,
-    setUserName,
-    age,
-    setAge,
-    dob,
-    setDob,
-    accNumber,
-    setAccNumber,
-    card,
-    setCard,
-    cvv,
-    setCvv,
-    expireDate,
-    setExpireDate,
     connectionMode,
     socket,
     setWindowWidth,
@@ -56,58 +43,16 @@ function Profile() {
     clearAll,
     recentActivity,
     setRecentActivity,
+    isEditProfile,
+    setIsEditProfile,
   } = useContext(store);
   const navigate = useNavigate();
   const location = useLocation();
   const prevPath = location.state?.prevPath;
-  const [isEditProfile, setIsEditProfile] = useState(false);
+
   // const [recentActivity, setRecentActivity] = useState([]);
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [img, setImg] = useState(null);
-
-  const handleUserName = (e) => {
-    setUserName(e.target.value);
-  };
-  const handleAge = (e) => {
-    const value = e.target.value;
-    if (value.length <= 2) {
-      const sanitizedValue = value.replace(/[^0-9]/g, "");
-      setAge(sanitizedValue);
-    }
-  };
-  const handleDob = (e) => {
-    const value = e.target.value;
-    setDob(value);
-  };
-  const handleAccNumber = (e) => {
-    const value = e.target.value;
-    if (value.length <= 16) {
-      const sanitizedValue = value.replace(/[^0-9]/g, "");
-      setAccNumber(sanitizedValue);
-    }
-  };
-
-  const handleCardNumber = (e) => {
-    const value = e.target.value;
-    if (value.length <= 16) {
-      const sanitizedValue = value.replace(/[^0-9]/g, "");
-      setCard(sanitizedValue);
-    }
-  };
-
-  const handleExpireDate = (e) => {
-    const enteredValue = e.target.value;
-    const sanitizedValue = enteredValue.replace(/[^0-9/]/g, "");
-    if (enteredValue.length <= 5) setExpireDate(sanitizedValue);
-  };
-
-  const handleCvv = (e) => {
-    const value = e.target.value;
-    if (value.length <= 3) {
-      const sanitizedValue = value.replace(/[^0-9]/g, "");
-      setCvv(sanitizedValue);
-    }
-  };
 
   const setProfilePic = (e) => {
     const value = e.target.files[0];
@@ -205,72 +150,7 @@ function Profile() {
   };
 
   const sideBarProps = getSideBarProps();
-  const updateProfile = async (e) => {
-    e.preventDefault();
-    if (connectionMode !== "socket") {
-      if (userName && age && accNumber && card && cvv && expireDate) {
-        const userData = document.cookie;
-        const response = await axios.post(
-          "https://polling-server.onrender.com/updateProfile",
-          {
-            data: userData,
-            name: userName,
-            Age: age,
-            DOB: dob,
-            AccNum: accNumber,
-            Card: card,
-            CVV: cvv,
-            ExpireDate: expireDate,
-          }
-        );
 
-        if (response.status === 200) {
-          console.log(response.data);
-          const { userName, age, dob, accNum } = response.data;
-
-          setUserNameFromDb(userName);
-          setAccFromDb(accNum);
-          setAgeFromDb(age);
-          setDobFromDb(dob);
-          setIsEditProfile(false);
-          setUserName("");
-          setAge("");
-        } else if (response.status === 500) {
-          console.log("userName not updated");
-        }
-      }
-    } else {
-      if (userName && age && accNumber && card && cvv && expireDate) {
-        const regNum = document.cookie;
-        socket.emit("updateProfile", {
-          num: regNum,
-          name: userName,
-          age: age,
-          DOB: dob,
-          AccNum: accNumber,
-          Card: card,
-          CVV: cvv,
-          ExpireDate: expireDate,
-        });
-
-        socket.on("profileUpdated", (data) => {
-          setUserNameFromDb(data.userName);
-          setAgeFromDb(data.age);
-          setDobFromDb(data.dob);
-          setAccFromDb(data.accNum);
-          setUserName("");
-          setAge("");
-          sessionStorage.setItem(
-            "userName",
-            data.userName ? data.userName : ""
-          );
-        });
-        setIsEditProfile(false);
-      } else {
-        alert("Enter your details");
-      }
-    }
-  };
   const logout = () => {
     setLoggedUser("");
     setSavedAcc([]);
@@ -294,17 +174,6 @@ function Profile() {
 
   const savedAccounts = () => {
     navigate("/Beneficiaries");
-  };
-
-  const cancelEdit = () => {
-    setIsEditProfile(false);
-    setUserName("");
-    // setAccNumber("");
-    setAge("");
-    // setDob("");
-    // setCard("");
-    // setExpireDate("");
-    // setCvv("");
   };
 
   const onIdle = () => {
@@ -332,7 +201,7 @@ function Profile() {
   useEffect(() => {
     if (connectionMode !== "socket") {
       axios
-        .post("https://polling-server.onrender.com/checkUserName", {
+        .post("http://localhost:8080/checkUserName", {
           regNumber: document.cookie,
         })
         .then((response) => {
@@ -370,11 +239,27 @@ function Profile() {
   }, [socket, connectionMode, setUserNameFromDb]);
 
   useEffect(() => {
-    socket.emit("getTransactionDetailsCount", {
-      num: document.cookie,
-    });
+    axios
+      .post("http://localhost:8080/getSavedAccountsForProfile", {
+        num: document.cookie,
+      })
+      .then((res) => {
+        console.log(res.data);
+        res.data ? setBeneficiaries(res.data) : setBeneficiaries([]);
+      })
+      .catch((err) => console.log(err));
 
-    socket.emit("getRecipientsForProfile", {
+    axios
+      .post("http://localhost:8080/getSavedTransactionsForProfile", {
+        num: document.cookie,
+      })
+      .then((res) => {
+        setRecentActivity(res.data.transactions);
+        setRecentTransactionsLength(res.data.count);
+      })
+      .catch((err) => console.log(err));
+
+    socket.emit("getTransactionDetailsCount", {
       num: document.cookie,
     });
 
@@ -382,8 +267,13 @@ function Profile() {
       num: document.cookie,
     });
 
+    console.log(recentActivity);
+
     return () => {
       socket.off();
+      setRecentActivity([]);
+      setRecentTransactionsLength(0);
+      setBeneficiaries([]);
     };
   }, []);
 
@@ -450,25 +340,6 @@ function Profile() {
       window.removeEventListener("resize", handleResize);
     };
   }, [windowWidth]);
-
-  // useEffect(() => {
-  //   const transactions = sessionStorage.getItem("savedTransactions");
-  //   const beneficiary = sessionStorage.getItem("savedAcc");
-  //   const recentTransactions = JSON.parse(transactions);
-  //   const beneficiaries = JSON.parse(beneficiary);
-  //   const canceledPaymentsCount = recentTransactions
-  //     ? recentTransactions.filter(
-  //         (transaction) => transaction.Status === "canceled"
-  //       ).length
-  //     : null;
-  //   console.log(canceledPaymentsCount);
-  //   setCanceledPaymentsCount(canceledPaymentsCount);
-  //   setRecentTransactionsLength(
-  //     recentTransactions ? recentTransactions.length : 0
-  //   );
-  //   setBeneficiaries(beneficiaries);
-  //   setRecentActivity(recentTransactions);
-  // }, []);
 
   return (
     <>
@@ -608,7 +479,7 @@ function Profile() {
                       : "grid   h-[50%] pt-[1vh]  md:h-[90%] lg:h-[90%] xl:h-full pl-[5vw] md:pl-[2vw] md:pt-[2vh] md:pb-[2vh]"
                   }
                 >
-                  {beneficiaries ? (
+                  {beneficiaries.length > 0 ? (
                     beneficiaries.slice(0, 6).map((item, index) => (
                       <div
                         key={index}
@@ -636,7 +507,7 @@ function Profile() {
                     Recent Activity
                   </h1>
                   <h1 className="text-xs  lg:text-xs xl:text-sm pl-2">
-                    {recentTransactions ? recentTransactions.length : 0}{" "}
+                    {recentTransactionsLength ? recentTransactionsLength : 0}{" "}
                     Transactions
                   </h1>
                   <h1
@@ -647,7 +518,7 @@ function Profile() {
                   </h1>
                 </div>
                 <div className="grid grid-cols-2 gap-5 lg:gap-5 xl:gap-6 p-1 space-y-0 items-center pl-[1.2vw] border-b-2 ">
-                  <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-4 md:gap-0 lg:gap-0 xl:gap-0 pl-[5vw] md:pl-0">
+                  <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-2 md:gap-0 lg:gap-0 xl:gap-0 pl-[5vw] md:pl-0">
                     <h1>Date</h1>
                     <h1>Description</h1>
                   </div>
@@ -657,8 +528,8 @@ function Profile() {
                     <h1>Status</h1>
                   </div>
                 </div>
-                {!recentActivity ? (
-                  <p className="flex items-center justify-center pt-[5rem]">
+                {recentActivity.length < 1 ? (
+                  <p className="flex items-center justify-center pt-[5rem] pb-[5rem]">
                     There is no recent transactions
                   </p>
                 ) : (
@@ -668,13 +539,13 @@ function Profile() {
                     .map((item, index) => (
                       <div
                         key={index}
-                        className="grid grid-cols-2 gap-5  lg:gap-7 xl:gap-12 p-1 space-y-0 items-center pl-[5vw] md:pl-[1.2vw] pr-[2vw] border-b-2"
+                        className="grid grid-cols-2 gap-5 md:gap-10  lg:gap-7 xl:gap-16 p-1 space-y-0 items-center pl-[5vw] md:pl-[1.2vw] pr-[2vw] border-b-2"
                       >
                         <div className="grid grid-cols-2 gap-0 md:gap-6 lg:gap-2 xl:gap-6 items-center text-xs md:text-sm lg:text-md ">
                           <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
-                          <h1 className="md:text-xs lg:text-md overflow-x-auto lg:w-[110px]">{`Sent to ${item.Name}`}</h1>
+                          <h1 className="md:text-xs lg:text-md overflow-x-auto md:w-[85px] lg:w-[110px]">{`Sent to ${item.Name}`}</h1>
                         </div>
-                        <div className="grid grid-cols-2 md:gap-5 lg:gap-10  text-xs md:text-sm lg:text-md  ">
+                        <div className="grid grid-cols-2 md:gap-5 lg:gap-5  text-xs md:text-sm lg:text-md  ">
                           <h1 className="md:text-xs lg:text-md">
                             {item.Amount}
                           </h1>
@@ -700,103 +571,7 @@ function Profile() {
 
         {/* profile edit section */}
 
-        {isEditProfile ? (
-          <form
-            action="submit"
-            onSubmit={updateProfile}
-            className="w-full lg:w-[60%] h-screen text-gray-800   m-auto bg-blue-650 sm:ml-[10vw] lg:ml-[25vw] p-5 box-border items-center flex flex-col  font-poppins justify-center sm:space-y-2 "
-          >
-            <div className="sm:flex flex-wrap  sm:space-x-2 w-3/4  sm:w-full md:w-[80%]">
-              <input
-                className="block w-full sm:w-1/2  px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
-                type="text"
-                value={userName}
-                onChange={handleUserName}
-                placeholder="Enter User Name"
-                required
-              />
-              <input
-                className="block  w-full sm:w-1/3 px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
-                type="tel"
-                value={age}
-                maxLength={3}
-                onChange={handleAge}
-                placeholder="Enter Age"
-                required
-              />
-            </div>
-            <div className="sm:flex flex-wrap  sm:space-x-2  w-3/4 sm:w-full md:w-[80%]">
-              <input
-                className="block w-full sm:w-1/3   px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
-                type="date"
-                value={dob}
-                onChange={handleDob}
-                placeholder="Date of Birth"
-                required
-              />
-
-              <input
-                type="tel"
-                value={accNumber}
-                onChange={handleAccNumber}
-                className="block px-4 py-2 mb-3  w-full sm:w-3/6  bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
-                placeholder="Enter Account Number"
-                required
-              />
-            </div>
-            <div className=" flex flex-wrap  sm:space-x-2  w-3/4 sm:w-full md:w-[80%]">
-              <input
-                type="tel"
-                readOnly
-                value={document.cookie}
-                required
-                className="block px-4 py-2 mb-3 w-full sm:w-1/3  bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
-              />
-              <input
-                type="tel"
-                value={card}
-                onChange={handleCardNumber}
-                required
-                placeholder="Enter Card Details"
-                className="block px-4 py-2 mb-3 w-full sm:w-1/2  bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
-              />
-            </div>
-            <div className=" sm:flex flex-wrap  sm:space-x-2 w-3/4 sm:w-full md:w-[80%]">
-              <input
-                type="tel"
-                value={cvv}
-                placeholder="CVV"
-                onChange={handleCvv}
-                required
-                className="block px-4 py-2 mb-3 w-full sm:w-1/3  bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
-              />
-              <input
-                type="text"
-                value={expireDate}
-                onChange={handleExpireDate}
-                placeholder="MM/YY"
-                required
-                className="block px-4 py-2 mb-3 w-full sm:w-1/2  bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
-              />
-            </div>
-            <div className=" w-3/4 sm:w-full  md:w-[80%] text-white space-x-2 flex">
-              <input
-                type="button"
-                value="Confirm"
-                required
-                onClick={updateProfile}
-                className="block  py-2 mb-3 w-1/2 sm:w-1/3 relative box-border  hover:cursor-pointer  bg-gray-800 border-2 border-white rounded-md focus:outline-none "
-              />
-
-              <button
-                onClick={cancelEdit}
-                className=" block px-4 py-2 mb-3 w-1/2 box-border      bg-gray-800 border-2 hover:border-white rounded-md focus:outline-none focus:border-white"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        ) : null}
+        {isEditProfile ? <ProfileForm /> : null}
       </div>
 
       {/* sidebar */}

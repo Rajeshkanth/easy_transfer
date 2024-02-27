@@ -30,7 +30,6 @@ function SignUp() {
     setPasswordError,
   } = useContext(store);
 
-  //   const [isLogin, setIsLogin] = useState(true);
   const [allInputAlert, setAllInputAlert] = useState(false);
   const [signUpFailed, setSignUpFailed] = useState(false);
   const [isAlreadyUser, setIsAlreadyUser] = useState(false);
@@ -68,37 +67,37 @@ function SignUp() {
 
   const signupUser = async (e) => {
     e.preventDefault();
-    if (
-      regMobileNumber &&
-      createPassword &&
-      confirmPassword &&
-      passwordError !== true
-    ) {
+    if (regMobileNumber && createPassword && confirmPassword) {
+      console.log("clicked");
       if (createPassword !== confirmPassword) {
         setSignUpFailed(true);
       } else {
         setSignUpFailed(false);
-        const response = await axios.post(
-          "https://polling-server.onrender.com/toDB",
-          {
-            Mobile: regMobileNumber,
-            Password: createPassword,
-          }
-        );
 
-        if (response.status === 201) {
-          setIsAlreadyUser(true);
-          setIsLogin(false);
-          console.log("user already");
-        } else if (response.status === 200) {
-          setIsLogin(true);
-          setAllInputAlert(false);
-          setRegMobileNumber("");
-          setCreatePassword("");
-          setConfirmPassword("");
-          setSignUpFailed(false);
-          setIsAlreadyUser(false);
-          console.log("signed");
+        try {
+          const response = await axios.post("http://localhost:8080/toDB", {
+            Mobile: regMobileNumber.slice(2),
+            Password: createPassword,
+          });
+
+          if (response.status === 201) {
+            setIsAlreadyUser(true);
+            setIsLogin(false);
+            console.log("user already");
+          } else if (response.status === 200) {
+            setIsLogin(true);
+            setAllInputAlert(false);
+            setRegMobileNumber("");
+            setCreatePassword("");
+            setConfirmPassword("");
+            setSignUpFailed(false);
+            setIsAlreadyUser(false);
+            alert("New user registered");
+            console.log("signed");
+          }
+        } catch (error) {
+          console.log(error);
+          setAllInputAlert(true);
         }
       }
 
@@ -107,7 +106,6 @@ function SignUp() {
       } else {
         setLoggedUser(userName);
       }
-      // }
     } else {
       setAllInputAlert(true);
     }
@@ -127,23 +125,6 @@ function SignUp() {
           Mobile: regMobileNumber.slice(2),
           Password: createPassword,
         });
-
-        socket.on("userRegisteredAlready", () => {
-          setIsAlreadyUser(true);
-          setIsLogin(false);
-          console.log("user already");
-        });
-
-        socket.on("userRegistered", () => {
-          setIsLogin(true);
-          setAllInputAlert(false);
-          setRegMobileNumber("");
-          setCreatePassword("");
-          setConfirmPassword("");
-          setSignUpFailed(false);
-          setIsAlreadyUser(false);
-          console.log("signed");
-        });
       }
 
       if (userName === "") {
@@ -158,6 +139,25 @@ function SignUp() {
 
   useEffect(() => {
     setPasswordError(false);
+  }, []);
+
+  useEffect(() => {
+    socket.on("userRegisteredAlready", () => {
+      setIsAlreadyUser(true);
+      setIsLogin(false);
+      console.log("user already");
+    });
+
+    socket.on("userRegistered", () => {
+      setIsLogin(true);
+      setAllInputAlert(false);
+      setRegMobileNumber("");
+      setCreatePassword("");
+      setConfirmPassword("");
+      setSignUpFailed(false);
+      setIsAlreadyUser(false);
+      console.log("signed");
+    });
   }, []);
 
   useEffect(() => {
