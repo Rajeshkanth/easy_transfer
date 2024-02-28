@@ -5,7 +5,9 @@
   height: 4vh;
   width: 14vw;
 }
-
+.country-list {
+  font-family: "Poppins", sans-serif;
+}
 /* 
 @media all and (max-width:1536px) {
   .flag-dropdown{

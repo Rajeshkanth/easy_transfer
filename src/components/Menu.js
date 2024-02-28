@@ -16,9 +16,6 @@ function Menu(props) {
       onClickHandler(item);
     }
   };
-  const profile = () => {
-    setIsProfileClicked(true);
-  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -39,7 +36,6 @@ function Menu(props) {
           className=" items-center object-contain  w-[40vw] md:w-[28vw] lg:w-[24vw] font-bold ml-[2rem] text-center  sm:ml-[0rem] xl:ml-[0rem] text-2xl lg:text-4xl  box-border   "
           onClick={() => navigate("/transferPage")}
         ></img>
-        {/* <div className="logo"></div> */}
       </div>
       {windowWidth > 640 ? (
         <ul className="flex w-auto  md:ml-[1rem] lg:ml-[6rem]  xl:ml-[14rem] xl:pl-[4vw] text-center   items-center md:space-x-0 xl:space-x-4 lg:space-x-2  font-bold text-md md:text-sm lg:text-lg">

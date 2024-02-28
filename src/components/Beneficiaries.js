@@ -295,14 +295,6 @@ function Beneficiaries() {
     };
   }, []);
 
-  // const storeDetailsInsession1 = (savedDetail) => {
-  //   setSavedAcc([savedDetail]);
-  // };
-
-  // const storeDetailsInsession2 = (savedDetail) => {
-  //   setSavedAcc((prev) => [...prev, savedDetail]);
-  // };
-
   useEffect(() => {
     if (connectionMode !== "socket") {
     } else {
@@ -330,7 +322,6 @@ function Beneficiaries() {
       })
       .then((res) => {
         console.log(res.data);
-
         setSavedAcc(res.data);
       })
       .catch((err) => {
@@ -351,7 +342,6 @@ function Beneficiaries() {
   useEffect(() => {
     const fetchData = async () => {
       await socket.on("allSavedAccounts", async (data) => {
-        // await console.log(data.emitted);
         const savedDetail = {
           beneficiaryName: data.beneficiaryName,
           accNum: data.accNum,
@@ -384,7 +374,6 @@ function Beneficiaries() {
             });
           }
         }
-        // console.log("event received");
       });
     };
 
@@ -418,9 +407,7 @@ function Beneficiaries() {
         <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
       ) : null}
       <div className="h-auto md:h-screen w-screen pb-[2rem] md:fixed  bg-gray-800 text-white">
-        {/* <div className="h-[10vh]  items-center    flex box-border z-[10] bg-gray-800 sticky top-0"> */}
         <Menu {...menuProps} onClickHandler={handleMenuClick} />
-        {/* </div> */}
 
         <div className="h-[80vh] md:h-screen   m-auto  bg-white block md:flex  md:pl-[0rem] box-border">
           <div className="m-auto h-screen sm:h-[100vh] md:h-[90vh] w-[100%]   text-gray-800   bg-white pt-[18vh] sm:pt-[10vh] md:pt-0 mt-[0rem] pb-[1rem] box-border overflow-x-auto space-y-2 lg:space-y-0">
@@ -493,84 +480,94 @@ function Beneficiaries() {
           </div>
 
           {plusIcon ? (
-            <div className=" fixed top-0 box-border z-[200] backdrop-blur-xl h-screen w-screen">
-              <div className=" w-3/4 m-auto   h-full pt-[10vh] md:pt-[20vh]  pb-[2vh] box-border">
-                <div className="relative top-[13vh] cursor-pointer text-gray-700 text-xl text-bold left-[63vw] md:left-[59vw] lg:left-[56vw] h-[10vh] w-[10vw]">
-                  <CgClose onClick={closeBeneficiaryAdding} />
-                </div>
+            <div
+              className=" fixed top-0 box-border z-[200] backdrop-blur-xl h-screen w-screen font-poppins"
+              onClick={closeBeneficiaryAdding}
+            >
+              <div className=" w-3/4 m-auto   pt-[10vh] md:pt-[20vh]  pb-[2vh] box-border">
                 <form
                   action=""
-                  className="w-auto md:w-[80%] lg:w-[60%] min-h-[40%]  pb-[7vh] m-auto pt-[6vh] border-2 bg-white shadow-lg shadow-ash-800  mt-[0rem] text-gray-600 rounded-lg border-white  box-border"
+                  onClick={(e) => e.stopPropagation()}
+                  className="w-auto md:w-[80%] lg:w-[60%] min-h-[40%]  pb-[7vh] m-auto pt-[6vh] border-2 bg-white shadow-md shadow-ash-800  mt-[0rem] text-gray-600 rounded-lg border-white  box-border text-[16px]"
                 >
+                  <div className="m-auto py-3 font-poppins sm:p-2 text-gray-200 relative bg-gray-700 w-[80%] sm:w-[80%] top-[-1vw]  rounded-md grid items-center justify-center">
+                    <h1 className="text-[16px]">Add Beneficiary</h1>
+                  </div>
                   <div
                     className={
                       allInputsAlert
-                        ? "w-[80%] m-auto space-y-1 sm:space-y-5 pt-[2vh] "
-                        : "w-[80%] m-auto space-y-5 sm:space-y-5 pt-[2vh] "
+                        ? "w-[80%] m-auto space-y-0 sm:space-y-2 pt-[1vh] "
+                        : "w-[80%] m-auto space-y-5 sm:space-y-5 pt-[1vh] "
                     }
                   >
-                    <input
-                      type="text"
-                      className={
-                        allInputsAlert && !savedBeneficiaryName
-                          ? "block  w-full px-4 py-2 border-red-500  outline-none rounded-lg bg-white  border-2 "
-                          : "block  w-full px-4 py-2 border-gray-300  outline-none rounded-lg bg-white  border-2 "
-                      }
-                      placeholder="Enter Beneficiary Name"
-                      value={savedBeneficiaryName}
-                      onChange={handleSavedBenificiaryName}
-                      required
-                    />
-                    {allInputsAlert && !savedBeneficiaryName ? (
-                      <p className=" sm:absolute  top-[-5vh] sm:top-[31.6vh] md:top-[41.8vh] lg:top-[41.8vh] xl:top-[41.2vh] text-xs text-red-600 pointer-events-none  box-border">
-                        Enter name
-                      </p>
-                    ) : null}
-                    <input
-                      type="tel"
-                      className={
-                        allInputsAlert && !savedAccNum
-                          ? "block w-full px-4 py-2   border-red-500  outline-none rounded-lg bg-white  border-2 "
-                          : "block w-full px-4 py-2   border-gray-300  outline-none rounded-lg bg-white  border-2 "
-                      }
-                      placeholder="Enter Account Number"
-                      value={savedAccNum}
-                      onChange={handleSavedAccNum}
-                      required
-                      minLength={16}
-                    />
-                    {savedAccNum.length < 16 && savedAccNum ? (
-                      <p className=" sm:absolute top-[-2vh] sm:top-[41vh] md:top-[51vh]  xl:top-[49.5vh] text-xs text-red-600 pointer-events-none  box-border">
-                        Account number should have 16 digits
-                      </p>
-                    ) : null}
-                    {allInputsAlert && !savedAccNum ? (
-                      <p className=" sm:absolute top-[-2vh] sm:top-[41vh] md:top-[51vh]  xl:top-[49.5vh] text-xs text-red-600 pointer-events-none  box-border">
-                        Enter account number
-                      </p>
-                    ) : null}
-                    <input
-                      type="text"
-                      className={
-                        allInputsAlert && !savedIfsc
-                          ? "block w-full px-4 py-2 border-red-500  outline-none rounded-lg bg-white border-2 "
-                          : "block w-full px-4 py-2 border-gray-300  outline-none rounded-lg bg-white border-2 "
-                      }
-                      placeholder="Enter IFSC Code"
-                      value={savedIfsc}
-                      onChange={handleSavedIfsc}
-                      required
-                    />
-                    {allInputsAlert && !savedIfsc ? (
-                      <p className=" sm:absolute top-[-2vh] sm:top-[50.4vh] md:top-[60.5vh] xl:top-[57.8vh]  text-xs text-red-600 pointer-events-none  box-border">
-                        Enter IFSC code
-                      </p>
-                    ) : null}
-                    {String(savedIfsc).length < 10 && savedIfsc ? (
-                      <p className=" sm:absolute top-[-2vh] sm:top-[50.4vh] md:top-[60.5vh]  xl:top-[57.8vh]  text-xs text-red-600 pointer-events-none  box-border">
-                        IFSC code should have 10 digits
-                      </p>
-                    ) : null}
+                    <div className="sapce-y-1">
+                      <input
+                        type="text"
+                        className={
+                          allInputsAlert && !savedBeneficiaryName
+                            ? "block  w-full px-4 py-2 border-red-500  outline-none rounded-lg bg-white  border"
+                            : "block  w-full px-4 py-2 border-gray-300  outline-none rounded-lg bg-white  border "
+                        }
+                        placeholder="Enter Beneficiary Name"
+                        value={savedBeneficiaryName}
+                        onChange={handleSavedBenificiaryName}
+                        required
+                      />
+                      {allInputsAlert && !savedBeneficiaryName ? (
+                        <span className="   text-xs text-red-600 pointer-events-none  box-border">
+                          Enter name
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="space-y-1">
+                      <input
+                        type="tel"
+                        className={
+                          allInputsAlert && !savedAccNum
+                            ? "block w-full px-4 py-2   border-red-500  outline-none rounded-lg bg-white  border "
+                            : "block w-full px-4 py-2   border-gray-300  outline-none rounded-lg bg-white  border "
+                        }
+                        placeholder="Enter Account Number"
+                        value={savedAccNum}
+                        onChange={handleSavedAccNum}
+                        required
+                        minLength={16}
+                      />
+                      {savedAccNum.length < 16 && savedAccNum ? (
+                        <span className="   text-xs text-red-600 pointer-events-none  box-border">
+                          Account number should have 16 digits
+                        </span>
+                      ) : null}
+                      {allInputsAlert && !savedAccNum ? (
+                        <span className=" text-xs text-red-600 pointer-events-none  box-border">
+                          Enter account number
+                        </span>
+                      ) : null}
+                    </div>
+                    <div className="space-y-1">
+                      <input
+                        type="text"
+                        className={
+                          allInputsAlert && !savedIfsc
+                            ? "block w-full px-4 py-2 border-red-500  outline-none rounded-lg bg-white border "
+                            : "block w-full px-4 py-2 border-gray-300  outline-none rounded-lg bg-white border "
+                        }
+                        placeholder="Enter IFSC Code"
+                        value={savedIfsc}
+                        onChange={handleSavedIfsc}
+                        required
+                      />
+                      {allInputsAlert && !savedIfsc ? (
+                        <span className="   text-xs text-red-600 pointer-events-none  box-border">
+                          Enter IFSC code
+                        </span>
+                      ) : null}
+                      {String(savedIfsc).length < 10 && savedIfsc ? (
+                        <span className="    text-xs text-red-600 pointer-events-none  box-border">
+                          IFSC code should have 10 digits
+                        </span>
+                      ) : null}
+                    </div>
                     <input
                       type="button"
                       value="Save"

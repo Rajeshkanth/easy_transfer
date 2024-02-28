@@ -20,13 +20,15 @@ function Profile() {
     setIsLoggedOut,
     recentTransactionsLength,
     setRecentTransactionsLength,
-    recentTransactions,
     setRecentTransactions,
     userNameFromDb,
     setUserNameFromDb,
     setAgeFromDb,
     setAccFromDb,
     setDobFromDb,
+    setCardFromDb,
+    setCvvFromDb,
+    setExpireDateFromDb,
     connectionMode,
     socket,
     setWindowWidth,
@@ -50,7 +52,6 @@ function Profile() {
   const location = useLocation();
   const prevPath = location.state?.prevPath;
 
-  // const [recentActivity, setRecentActivity] = useState([]);
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [img, setImg] = useState(null);
 
@@ -208,8 +209,10 @@ function Profile() {
           if (response.status === 200) {
             setUserNameFromDb(response.data.user);
             setAgeFromDb(response.data.age);
-            setAgeFromDb(response.data.age);
             setDobFromDb(response.data.dob);
+            setCardFromDb(response.data.card);
+            setCvvFromDb(response.data.cvv);
+            setExpireDateFromDb(response.data.expireDate);
             setAccFromDb(response.data.accNum);
           } else {
             setUserNameFromDb("");
@@ -227,9 +230,10 @@ function Profile() {
         setUserNameFromDb(data.user);
         setAgeFromDb(data.age);
         setDobFromDb(data.dob);
+        setCardFromDb(data.card);
+        setCvvFromDb(data.cvv);
+        setExpireDateFromDb(data.expireDate);
         setAccFromDb(data.accNum);
-        // setCard(data.card);
-        // setCvv()
       });
       socket.on("userNotFound", () => {
         setUserNameFromDb("");
@@ -274,6 +278,9 @@ function Profile() {
       setRecentActivity([]);
       setRecentTransactionsLength(0);
       setBeneficiaries([]);
+      setAccFromDb("");
+      setAgeFromDb("");
+      setDobFromDb("");
     };
   }, []);
 

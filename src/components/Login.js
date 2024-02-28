@@ -4,7 +4,6 @@ import { useNavigate } from "react-router";
 import { store } from "../App";
 import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
-import Loader from "./Loader";
 import logo from "./images/Greenwhitelogo2.png";
 
 import PhoneInput from "react-phone-input-2";
@@ -13,7 +12,6 @@ import { PhoneNumberUtil } from "google-libphonenumber";
 
 function Login() {
   const navigate = useNavigate();
-
   const [showPassword, setShowPassword] = useState(false);
   const [showCreatePassword, setShowCreatePassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -68,16 +66,6 @@ function Login() {
     const allowedPattern = /^[a-zA-Z0-9@$]*$/;
     if (allowedPattern.test(value)) {
       setPassword(value);
-    }
-  };
-
-  const handleChangeInput = (e) => {
-    // console.log(e.target.name);
-
-    if (e.target.name === "password") {
-      setInputValues((prev) => {
-        return { ...prev, [e.target.name]: e.target.value };
-      });
     }
   };
 
@@ -152,22 +140,11 @@ function Login() {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(inputValues);
-  };
-
   const loginToDashboardUsingSocket = async (e) => {
     e.preventDefault();
     console.log(mobileNumber);
     console.log(isValidIndianNumber);
-    if (
-      mobileNumber &&
-      password &&
-      mobileNumber.length > 7 &&
-      isValidIndianNumber
-      // isValidIndianNumber
-    ) {
+    if (mobileNumber && password && isValidIndianNumber) {
       console.log(mobileNumber, mobileNumber.slice(2).substring(0, 1));
       setIsValidIndianNumber(false);
       setLoader(true);
@@ -201,9 +178,7 @@ function Login() {
     } else {
       setIsLoggedOut(true);
       setLoginInputAlert(true);
-
       setLoader(false);
-      // alert("failed");
     }
   };
   useEffect(() => {
@@ -279,7 +254,6 @@ function Login() {
                   }
             }
             dialCodeEditable={false}
-            // onlyCountries={["in", "us", "ru", "sg"]}
             buttonStyle={
               loginInputAlert && !mobileNumber
                 ? {
@@ -289,9 +263,11 @@ function Login() {
                     border: "2px  solid rgb(220 38 38)",
                     borderColor: "rgb(220 38 38)",
                     borderRadius: " 0.5rem 0 0 0.5rem ",
+                    fontFamily: "poppins",
                   }
                 : isNewUser
                 ? {
+                    fontFamily: "poppins",
                     width: "14% ",
                     paddingLeft: "0px",
                     backgroundColor: "white",
@@ -301,12 +277,14 @@ function Login() {
                   }
                 : mobileNumber && !isValidIndianNumber
                 ? {
+                    fontFamily: "poppins",
                     width: "14% ",
                     paddingLeft: "0px",
                     backgroundColor: "white",
                     border: "2px  solid rgb(220 38 38)",
                     borderColor: "rgb(220 38 38)",
                     borderRadius: " 0.5rem 0 0 0.5rem ",
+                    fontFamily: "poppins",
                   }
                 : {
                     width: "14% ",
@@ -315,6 +293,7 @@ function Login() {
                     border: "2px  solid rgb(203 213 225)",
                     borderColor: "rgb(203 213 225)",
                     borderRadius: " 0.5rem 0 0 0.5rem ",
+                    fontFamily: "poppins",
                   }
             }
           />
@@ -359,8 +338,6 @@ function Login() {
             minLength={6}
             value={password}
             onChange={handlePassword}
-            // value={inputValues.password}
-            // onChange={handleChangeInput}
             placeholder="Enter Your Password"
           />
 
@@ -406,8 +383,7 @@ function Login() {
             onClick={
               connectionMode === "socket"
                 ? loginToDashboardUsingSocket
-                : // handleSubmit
-                  loginToDashboard
+                : loginToDashboard
             }
           >
             Log in

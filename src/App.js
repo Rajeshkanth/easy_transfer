@@ -1,10 +1,5 @@
 import { createContext, useState, useEffect, memo, useRef } from "react";
-import {
-  HashRouter as Router,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
+import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import { io } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 import Beneficiaries from "./components/Beneficiaries";
@@ -16,13 +11,9 @@ import Success from "./components/Success";
 import Transactions from "./components/Transactions";
 import { PhoneNumberUtil } from "google-libphonenumber";
 import PrivateRoutes from "./components/PrivateRoutes";
-import { useIdleTimer } from "react-idle-timer";
+
 export const store = createContext();
-// const socket = io.connect("https://polling-server.onrender.com", {
-//   query: {
-//     tabId: sessionStorage.getItem("tabId"),
-//   },
-// });
+
 const socket = io.connect("http://localhost:8080", {
   query: {
     tabId: sessionStorage.getItem("tabId"),
@@ -38,7 +29,6 @@ function getDate() {
 }
 
 function App() {
-  const idleTimerRef = useRef(null);
   const [recentActivity, setRecentActivity] = useState([]);
   const [currentDate, setCurrentDate] = useState(getDate());
   const [recentTransactions, setRecentTransactions] = useState([]);
@@ -74,6 +64,9 @@ function App() {
   const [accFromDb, setAccFromDb] = useState("");
   const [mobileFromDb, setMobileFromDb] = useState("");
   const [dobFromDb, setDobFromDb] = useState("");
+  const [cardFromDb, setCardFromDb] = useState("");
+  const [cvvFromDb, setCvvFromDb] = useState("");
+  const [expireDateFromDb, setExpireDateFromDb] = useState("");
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isLogin, setIsLogin] = useState(true);
   const [passwordError, setPasswordError] = useState(true);
@@ -117,6 +110,10 @@ function App() {
   };
 
   const clearAll = () => {
+    setAccFromDb("");
+    setCardFromDb("");
+    setCvvFromDb("");
+    setExpireDateFromDb("");
     setSavedAcc([]);
     setRecentTransactions([]);
     setIsLoggedOut(true);
@@ -130,7 +127,6 @@ function App() {
   };
 
   const handleRegMobileNumber = (value, country) => {
-    const dialCode = country.dialCode;
     try {
       const parsedNum = phoneNumber.parseAndKeepRawInput(
         `+${value}`,
@@ -188,12 +184,6 @@ function App() {
       setTabId(newTabId);
     }
 
-    // const socket = io.connect("https://polling-server.onrender.com", {
-    //   query: {
-    //     tabId: sessionStorage.getItem("tabId"),
-    //   },
-    // });
-
     socket.on("connection_type", (data) => {
       if (data.type === "socket") {
         setConnectionMode("socket");
@@ -211,16 +201,15 @@ function App() {
     };
   }, []);
 
-  // useEffect(() => {
-  //   socket.emit("fetchList", {
-  //     num: document.cookie,
-  //     emit: "emitted",
-  //   });
-  // }, []);
-
   return (
     <store.Provider
       value={{
+        cardFromDb,
+        cvvFromDb,
+        expireDateFromDb,
+        setCardFromDb,
+        setCvvFromDb,
+        setExpireDateFromDb,
         isEditProfile,
         setIsEditProfile,
         inputValues,

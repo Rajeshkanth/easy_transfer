@@ -14,11 +14,6 @@ function PaymentForm() {
   const {
     setInitatedAmountSend,
     currentDate,
-    setAgeFromDb,
-    setAccFromDb,
-    setDobFromDb,
-    userNameFromDb,
-    setUserNameFromDb,
     amount,
     setAmount,
     toAccountNumber,
@@ -52,9 +47,6 @@ function PaymentForm() {
   const location = useLocation();
 
   const [allInput, setAllInput] = useState(false);
-  // const clickable = toAccountNumber.length > 15;
-  const [accNumAlert, setAccNumAlert] = useState(false);
-  const [IFSCAlert, setIFSCAlert] = useState(false);
 
   const handleMenuClick = (menuItem) => {
     switch (menuItem) {
@@ -135,8 +127,6 @@ function PaymentForm() {
     setEnterAccountNumber(false);
     setEnterAmount(false);
     setEnterToIfscNumber(false);
-    setAccNumAlert(false);
-    setIFSCAlert(false);
   };
 
   const sendAmountBySocket = (e) => {
@@ -182,23 +172,6 @@ function PaymentForm() {
       handleAllInput();
       navigate("/success");
     } else if (
-      amount &&
-      toAccountNumber &&
-      toAccountHolderName &&
-      toIFSCNumber &&
-      toAccountNumber.length < 15
-    ) {
-      setAccNumAlert(true);
-      // setAllInput(true);
-    } else if (
-      amount &&
-      toAccountNumber &&
-      toAccountHolderName &&
-      toIFSCNumber &&
-      toIFSCNumber.length < 8
-    ) {
-      setIFSCAlert(true);
-    } else if (
       !amount &&
       toAccountNumber &&
       toAccountHolderName &&
@@ -210,37 +183,6 @@ function PaymentForm() {
       console.log("else part");
     }
   };
-
-  // const sendAmountByPolling = async (e) => {
-  //   try {
-  //     e.preventDefault();
-  //     if (amount && toAccountNumber && toAccountHolderName && toIFSCNumber) {
-  //       const newReceiver = {
-  //         Amount: amount,
-  //         AccNum: toAccountNumber,
-  //         AccHolder: toAccountHolderName,
-  //         Ifsc: toIFSCNumber,
-  //         tabId: sessionStorage.getItem("tabId"),
-  //         type: "polling",
-  //       };
-  //       console.log("hello");
-  //       navigate("/success");
-  //       handleAllInput();
-  //       const response = await axios.post(
-  //         "http://localhost:8080/fromPaymentAlert",
-
-  //         {
-  //           data: newReceiver,
-  //         }
-  //       );
-  //       setAllInput(false);
-  //     } else {
-  //       setAllInput(true);
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
 
   const sendAmountByPolling = async (e) => {
     try {
@@ -274,11 +216,8 @@ function PaymentForm() {
           Uid: uuid(),
         };
 
-        console.log(newTransactions);
-
         navigate("/success");
         handleAllInput();
-
         const response = await axios.post(
           "http://localhost:8080/fromPaymentAlert",
           {
@@ -287,26 +226,9 @@ function PaymentForm() {
             num: document.cookie,
           }
         );
-
         if (response.status === 200) {
           setAllInput(false);
         }
-      } else if (
-        amount &&
-        toAccountNumber &&
-        toAccountHolderName &&
-        toIFSCNumber &&
-        toAccountNumber.length < 15
-      ) {
-        setAccNumAlert(true);
-      } else if (
-        amount &&
-        toAccountNumber &&
-        toAccountHolderName &&
-        toIFSCNumber &&
-        toIFSCNumber.length < 8
-      ) {
-        setIFSCAlert(true);
       } else if (
         !amount &&
         toAccountNumber &&
@@ -320,7 +242,6 @@ function PaymentForm() {
       }
     } catch (err) {
       console.log(err);
-      // Handle error scenario, if needed
     }
   };
 
@@ -450,10 +371,6 @@ function PaymentForm() {
           <div className="w-[96vw]  flex  justify-evenly h-[90vh]  ">
             <div className="hidden sm:block sm:w-1/2 md:w-auto xl:w-[58%] xl:pl-[0vw] cursor-default">
               {" "}
-              {/* <h1 className="text-4xl font-sans  font-light mt-[12rem] ml-[0rem]  md:text-5xl lg:text-6xl ">
-                The Secure, <br /> easiest and fastest <br /> way to transfer
-                money.{" "}
-              </h1> */}
               <TextGenerateEffect
                 words={`The Secure,  \n easiest and fastest \n way to transfer money.`}
               />

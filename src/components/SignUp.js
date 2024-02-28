@@ -6,6 +6,7 @@ import { FaRegEyeSlash } from "react-icons/fa";
 import logo from "./images/Greenwhitelogo2.png";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
+import { useNavigate } from "react-router";
 
 function SignUp() {
   const {
@@ -28,6 +29,7 @@ function SignUp() {
     setIsLogin,
     passwordError,
     setPasswordError,
+    setIsLoggedOut,
   } = useContext(store);
 
   const [allInputAlert, setAllInputAlert] = useState(false);
@@ -36,6 +38,7 @@ function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showCreatePassword, setShowCreatePassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
 
   const login = () => {
     setIsLogin(true);
@@ -85,6 +88,9 @@ function SignUp() {
             setIsLogin(false);
             console.log("user already");
           } else if (response.status === 200) {
+            setIsLoggedOut(false);
+            navigate("/transferPage");
+            document.cookie = regMobileNumber.slice(2);
             setIsLogin(true);
             setAllInputAlert(false);
             setRegMobileNumber("");
@@ -92,7 +98,6 @@ function SignUp() {
             setConfirmPassword("");
             setSignUpFailed(false);
             setIsAlreadyUser(false);
-            alert("New user registered");
             console.log("signed");
           }
         } catch (error) {
@@ -151,6 +156,9 @@ function SignUp() {
     socket.on("userRegistered", () => {
       setIsLogin(true);
       setAllInputAlert(false);
+      setIsLoggedOut(false);
+      navigate("/transferPage");
+      document.cookie = regMobileNumber.slice(2);
       setRegMobileNumber("");
       setCreatePassword("");
       setConfirmPassword("");
@@ -164,9 +172,7 @@ function SignUp() {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
-
     window.addEventListener("resize", handleResize);
-
     return () => {
       window.removeEventListener("resize", handleResize);
     };

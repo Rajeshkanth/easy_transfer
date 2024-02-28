@@ -7,13 +7,11 @@ import { useNavigate } from "react-router";
 import Loader from "./Loader";
 
 function Success() {
-  const { socket, connectionMode, setRecentTransactions, setBalance, amount } =
-    useContext(store);
+  const { socket, connectionMode, setBalance, amount } = useContext(store);
   const [check, setCheck] = useState(false);
   const [fail, setFail] = useState(false);
   const navigate = useNavigate();
   const [room, setRoom] = useState(0);
-  const [uid, setUid] = useState("");
   const [socketRoom, setSocketRoom] = useState("");
   let sessionId;
 
@@ -25,10 +23,6 @@ function Success() {
 
     const handleSuccess = (data) => {
       if (typeof data === "boolean") {
-        // socket.on("transactionDetails", (data) => {
-        //   const { lastTransaction } = data;
-        //   setRecentTransactions((prev) => [...prev, lastTransaction]);
-        // });
         setBalance((prev) => prev - amount);
         setCheck(data);
         setFail(false);
@@ -53,13 +47,6 @@ function Success() {
     };
   }, [socket]);
 
-  // useEffect(() => {
-  //   socket.on("transactionDetails", (data) => {
-  //     const { lastTransaction } = data;
-  //     setRecentTransactions((prev) => [...prev, lastTransaction]);
-  //   });
-  // }, [socket]);
-
   useEffect(() => {
     if (connectionMode !== "socket") {
     } else {
@@ -78,7 +65,6 @@ function Success() {
       const tabId = sessionStorage.getItem("tabId");
       try {
         const response = await axios.post(
-          // `https://polling-server.onrender.com/success/${tabId}`
           `http://localhost:8080/success/${tabId}`
         );
 

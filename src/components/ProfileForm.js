@@ -10,6 +10,12 @@ function ProfileForm() {
     setAgeFromDb,
     setAccFromDb,
     setDobFromDb,
+    setCardFromDb,
+    setCvvFromDb,
+    setExpireDateFromDb,
+    cardFromDb,
+    cvvFromDb,
+    expireDateFromDb,
     setUserName,
     age,
     setAge,
@@ -73,12 +79,7 @@ function ProfileForm() {
   const cancelEdit = () => {
     setIsEditProfile(false);
     setUserName("");
-    // setAccNumber("");
     setAge("");
-    // setDob("");
-    // setCard("");
-    // setExpireDate("");
-    // setCvv("");
   };
 
   const updateProfile = async (e) => {
@@ -87,11 +88,11 @@ function ProfileForm() {
       if (
         userName &&
         age &&
-        (dob || dobFromDb) &&
+        dob &&
         (accNumber || accFromDb) &&
-        card &&
-        cvv &&
-        expireDate
+        (card || cardFromDb) &&
+        (cvv || cvvFromDb) &&
+        (expireDate || expireDateFromDb)
       ) {
         const userData = document.cookie;
         const response = await axios.post(
@@ -100,22 +101,26 @@ function ProfileForm() {
             data: userData,
             name: userName,
             Age: age,
-            DOB: dob,
-            AccNum: accNumber,
-            Card: card,
-            CVV: cvv,
-            ExpireDate: expireDate,
+            DOB: dob ? dob : dobFromDb,
+            AccNum: accNumber ? accNumber : accFromDb,
+            Card: card ? card : cardFromDb,
+            CVV: cvv ? cvv : cvvFromDb,
+            ExpireDate: expireDate ? expireDate : expireDateFromDb,
           }
         );
 
         if (response.status === 200) {
           console.log(response.data);
-          const { userName, age, dob, accNum } = response.data;
-
+          const { userName, age, dob, accNum, card, cvv, expireDate } =
+            response.data;
+          console.log(userName, age, dob, accNum, card, cvv, expireDate);
           setUserNameFromDb(userName);
           setAccFromDb(accNum);
           setAgeFromDb(age);
           setDobFromDb(dob);
+          setCardFromDb(card);
+          setCvvFromDb(cvv);
+          setExpireDateFromDb(expireDate);
           setIsEditProfile(false);
           setUserName("");
           setAge("");
@@ -144,6 +149,9 @@ function ProfileForm() {
           setAgeFromDb(data.age);
           setDobFromDb(data.dob);
           setAccFromDb(data.accNum);
+          setCardFromDb(card);
+          setCvvFromDb(cvv);
+          setExpireDateFromDb(expireDate);
           setUserName("");
           setAge("");
           sessionStorage.setItem(
@@ -195,9 +203,10 @@ function ProfileForm() {
           />
 
           <input
+            maxLength={16}
             type="tel"
-            disabled={setAccFromDb ? true : false}
-            value={setAccFromDb ? accFromDb : accNumber}
+            disabled={accFromDb ? true : false}
+            value={accFromDb ? accFromDb : accNumber}
             onChange={handleAccNumber}
             className="block px-4 py-2 mb-3  w-full sm:w-3/6  bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
             placeholder="Enter Account Number"
@@ -213,8 +222,10 @@ function ProfileForm() {
             className="block px-4 py-2 mb-3 w-full sm:w-1/3  bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
           />
           <input
+            maxLength={16}
             type="tel"
-            value={card}
+            value={cardFromDb ? cardFromDb : card}
+            disabled={cardFromDb ? true : false}
             onChange={handleCardNumber}
             required
             placeholder="Enter Card Details"
@@ -224,7 +235,8 @@ function ProfileForm() {
         <div className=" sm:flex flex-wrap  sm:space-x-2 w-3/4 sm:w-full md:w-[80%]">
           <input
             type="tel"
-            value={cvv}
+            value={cvvFromDb ? cvvFromDb : cvv}
+            disabled={cvvFromDb ? true : false}
             placeholder="CVV"
             onChange={handleCvv}
             required
@@ -232,7 +244,8 @@ function ProfileForm() {
           />
           <input
             type="text"
-            value={expireDate}
+            value={expireDateFromDb ? expireDateFromDb : expireDate}
+            disabled={expireDateFromDb ? true : false}
             onChange={handleExpireDate}
             placeholder="MM/YY"
             required

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { memo, useEffect } from "react";
 import { motion, stagger, useAnimate } from "framer-motion";
 import { cn } from "./utils/cn.js";
 
@@ -48,3 +48,5 @@ export const TextGenerateEffect = ({ words, className }) => {
     </div>
   );
 };
+
+export default memo(TextGenerateEffect);
