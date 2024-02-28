@@ -65,12 +65,9 @@ function ProfileForm() {
 
   const handleExpireDate = (e) => {
     let enteredValue = e.target.value;
-
     enteredValue = enteredValue.replace(/\D/g, "");
-
     let month = enteredValue.slice(0, 2);
     let year = enteredValue.slice(2);
-
     if (month.length === 2) {
       month = parseInt(month, 10);
       if (!isNaN(month) && month >= 1 && month <= 12) {
