@@ -58,7 +58,7 @@ function HomePage() {
             : "h-screen fixed w-screen bg-gray-800 text-white font-poppins"
         }
       >
-        {/* <Boxes /> */}
+        <Boxes />
         {isLogin ? (
           <div className="z-10 w-[80%] sm:w-[60%] md:w-[50%] lg:w-[36%] xl:w-[33%]  mx-auto    shadow-md shadow-black h-auto rounded-xl  mt-[15vh] ">
             {loader ? (

@@ -30,7 +30,6 @@ function Transactions() {
   const navigate = useNavigate();
   const location = useLocation();
   const prevPath = location.state?.prevPath;
-  // const [logout, setlogout] = useState(true);
 
   const handleMenuClick = (menuItem) => {
     switch (menuItem) {
@@ -75,7 +74,6 @@ function Transactions() {
         setIsLoggedOut(true);
         setIsProfileClicked(false);
         navigate("/");
-
         break;
       default:
         console.log(`Unknown menu item: ${menuItem}`);
@@ -136,7 +134,6 @@ function Transactions() {
 
   const onIdle = () => {
     console.log("user is idle");
-
     setTimeout(() => {
       handleSocket();
       setSavedAcc([]);

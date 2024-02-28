@@ -64,9 +64,26 @@ function ProfileForm() {
   };
 
   const handleExpireDate = (e) => {
-    const enteredValue = e.target.value;
-    const sanitizedValue = enteredValue.replace(/[^0-9/]/g, "");
-    if (enteredValue.length <= 5) setExpireDate(sanitizedValue);
+    let enteredValue = e.target.value;
+
+    enteredValue = enteredValue.replace(/\D/g, "");
+
+    let month = enteredValue.slice(0, 2);
+    let year = enteredValue.slice(2);
+
+    if (month.length === 2) {
+      month = parseInt(month, 10);
+      if (!isNaN(month) && month >= 1 && month <= 12) {
+        month = month.toString().padStart(2, "0");
+      } else {
+        month = "";
+      }
+    } else if (month.length === 1 && parseInt(month, 10) > 1) {
+      month = "0" + month;
+    }
+
+    let formattedValue = month + (year ? "/" + year : "");
+    if (enteredValue.length <= 4) setExpireDate(formattedValue);
   };
 
   const handleCvv = (e) => {
@@ -234,6 +251,7 @@ function ProfileForm() {
         </div>
         <div className=" sm:flex flex-wrap  sm:space-x-2 w-3/4 sm:w-full md:w-[80%]">
           <input
+            maxLength={5}
             type="tel"
             value={cvvFromDb ? cvvFromDb : cvv}
             disabled={cvvFromDb ? true : false}
