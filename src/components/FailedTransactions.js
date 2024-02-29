@@ -1,8 +1,8 @@
-import React, { memo, useContext } from "react";
-import { store } from "../App";
+import React, { memo } from "react";
 
-function FailedTransactions() {
-  const { recentActivity, setFailedTransaction } = useContext(store);
+function FailedTransactions(props) {
+  const { recentActivity, setFailedTransaction } = props.state;
+
   return (
     <>
       <div
@@ -36,7 +36,7 @@ function FailedTransactions() {
                   .map((item, index) => (
                     <ul
                       key={index}
-                      className="grid grid-cols-4  space-y-0 border-b-2  pl-[4vw] md:pl-[5vw] pb-2 text-center text-xs md:text-[16px] items-center capitalize "
+                      className="grid grid-cols-4  space-y-0 border-b-2  pl-[4vw] md:pl-[5vw] pb-2 text-center text-xs md:text-[1rem] items-center capitalize "
                     >
                       <li className=" items-center flex text-center">
                         {item.Date}

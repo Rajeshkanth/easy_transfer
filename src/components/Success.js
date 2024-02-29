@@ -6,23 +6,20 @@ import { useNavigate } from "react-router";
 import Loader from "./Loader";
 
 function Success() {
-  const { socket, connectionMode, setBalance, amount } = useContext(store);
+  const { socket, connectionMode } = useContext(store);
   const [check, setCheck] = useState(false);
   const [fail, setFail] = useState(false);
   const navigate = useNavigate();
-  const [room, setRoom] = useState(0);
-  const [socketRoom, setSocketRoom] = useState("");
   let sessionId;
 
   useEffect(() => {
     sessionId = sessionStorage.getItem("tabId");
-    socket.emit("join_success_room", {
-      SocketRoom: sessionId,
+    socket.emit("successPage", {
+      socketRoom: sessionId,
     });
 
     const handleSuccess = (data) => {
       if (typeof data === "boolean") {
-        setBalance((prev) => prev - amount);
         setCheck(data);
         setFail(false);
 
@@ -50,14 +47,12 @@ function Success() {
     if (connectionMode !== "socket") {
     } else {
       socket.on("paymentConfirmAlert", (data) => {
-        setRoom(data.UniqueId); // Use UniqueId
         const receivedRoom = data.socketRoom;
         console.log(receivedRoom);
-        setSocketRoom(receivedRoom);
         socket.join(receivedRoom);
       });
     }
-  }, [socket]);
+  }, [socket, connectionMode]);
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -91,7 +86,7 @@ function Success() {
         navigate("/transferPage");
       }, 3000);
     }
-  }, [check, fail]);
+  }, [check, fail, navigate]);
 
   return (
     <>
@@ -99,7 +94,7 @@ function Success() {
         <>
           {" "}
           <div className="loading font-poppins space-y-2">
-            <div class="wrapper">
+            <div class="wrapper  height-[10vh] width-screen flex justify-center items-center">
               <MdOutlineCancel className="fail-icon" />{" "}
             </div>
             <h3 className="text-white">Payment Transaction Failed!</h3>
@@ -110,7 +105,7 @@ function Success() {
         <>
           {check ? (
             <div className="loading font-poppins">
-              <div class="wrapper">
+              <div class="wrapper  height-[10vh] width-screen flex justify-center items-center">
                 {" "}
                 <svg
                   class="checkmark"

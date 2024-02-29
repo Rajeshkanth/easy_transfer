@@ -2,10 +2,8 @@ import React, { useContext, useState, useEffect, memo, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { store } from "../App";
-import { FaRegEye } from "react-icons/fa";
-import { FaRegEyeSlash } from "react-icons/fa";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import logo from "./images/Greenwhitelogo2.png";
-
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { PhoneNumberUtil } from "google-libphonenumber";
@@ -15,18 +13,10 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [showCreatePassword, setShowCreatePassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isValidIndianNumber, setIsValidIndianNumber] = useState(true);
+  const [isValidNumber, setIsValidNumber] = useState(true);
   const numberUtil = PhoneNumberUtil.getInstance();
-
   const {
-    inputValues,
-    setInputValues,
     setIsLoggedOut,
-    password,
-    setPassword,
-    setMobileNumber,
-    mobileNumber,
-    setKey,
     windowWidth,
     setWindowWidth,
     connectionMode,
@@ -41,26 +31,22 @@ function Login() {
     loginInputAlert,
     setLoginInputAlert,
   } = useContext(store);
-
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [password, setPassword] = useState("");
   const handleMobileNumber = (value, country) => {
-    const dialCode = country.dialCode;
     const countryCode = country.countryCode.toUpperCase();
-
     try {
       const parsedNum = numberUtil.parse(
         `+${value}`,
         countryCode.toLowerCase()
       );
       const isValid = numberUtil.isValidNumber(parsedNum);
-      setIsValidIndianNumber(isValid);
+      setIsValidNumber(isValid);
     } catch (err) {
-      console.log(err);
-      console.log("Value:", value);
-      console.log("Country Code:", countryCode);
+      return err;
     }
     setMobileNumber(value);
   };
-
   const handlePassword = (e) => {
     const value = e.target.value;
     const allowedPattern = /^[a-zA-Z0-9@$]*$/;
@@ -68,13 +54,11 @@ function Login() {
       setPassword(value);
     }
   };
-
   const signup = () => {
     setIsLogin(false);
     setMobileNumber("");
     setPassword("");
   };
-
   const handleShowPassword = (type) => {
     switch (type) {
       case "login":
@@ -87,27 +71,19 @@ function Login() {
         setShowConfirmPassword(!showConfirmPassword);
         break;
       default:
-        console.log("none");
         break;
     }
   };
-
   const loginToDashboard = async (e) => {
     e.preventDefault();
-
-    if (mobileNumber && password && isValidIndianNumber) {
-      setIsValidIndianNumber(false);
+    if (mobileNumber && password && isValidNumber) {
+      setIsValidNumber(false);
       setLoader(true);
-
       try {
-        const response = await axios.post(
-          "http://localhost:8080/loginRequest",
-          {
-            Mobile: mobileNumber.slice(2),
-            Password: password,
-          }
-        );
-
+        const response = await axios.post("http://localhost:8080/login", {
+          Mobile: mobileNumber.slice(2),
+          Password: password,
+        });
         if (response.status === 200) {
           setLoader(false);
           setIsLoggedOut(false);
@@ -115,7 +91,6 @@ function Login() {
           document.cookie = mobileNumber.slice(2);
           setMobileNumber("");
           setPassword("");
-          setKey(document.cookie);
           setLoginFailed(false);
           setLoginInputAlert(false);
         } else if (response.status === 201) {
@@ -128,7 +103,6 @@ function Login() {
           setLoginFailed(true);
         }
       } catch (error) {
-        console.log(error);
         setIsLoggedOut(true);
         setLoader(false);
         setLoginInputAlert(true);
@@ -142,15 +116,12 @@ function Login() {
 
   const loginToDashboardUsingSocket = async (e) => {
     e.preventDefault();
-    console.log(mobileNumber);
-    console.log(isValidIndianNumber);
-    if (mobileNumber && password && isValidIndianNumber) {
-      console.log(mobileNumber, mobileNumber.slice(2).substring(0, 1));
-      setIsValidIndianNumber(false);
+    if (mobileNumber && password && isValidNumber) {
+      setIsValidNumber(false);
       setLoader(true);
       await socket.emit("login", {
-        Mobile: mobileNumber.slice(2),
-        Password: password,
+        mobileNumber: mobileNumber.slice(2),
+        password: password,
       });
       socket.on("loginSuccess", () => {
         setLoader(false);
@@ -159,7 +130,6 @@ function Login() {
         document.cookie = mobileNumber.slice(2);
         setMobileNumber("");
         setPassword("");
-        setKey(document.cookie);
         setLoginFailed(false);
         setLoginInputAlert(false);
       });
@@ -167,12 +137,12 @@ function Login() {
         setNewUser(true);
         setIsLoggedOut(true);
         setLoader(false);
-        setIsValidIndianNumber(true);
+        setIsValidNumber(true);
       });
       socket.on("loginFailed", async () => {
         setIsLoggedOut(true);
         setLoader(false);
-        setIsValidIndianNumber(true);
+        setIsValidNumber(true);
         setLoginFailed(true);
       });
     } else {
@@ -185,13 +155,11 @@ function Login() {
     setLoginInputAlert(false);
   }, []);
 
-  useEffect(() => {}, []);
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
     window.addEventListener("resize", handleResize);
-
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -216,8 +184,8 @@ function Login() {
             : "flex flex-col items-center bg-white m-auto rounded-2xl h-auto w-full space-y-2 font-poppins "
         }
       >
-        <div className="flex flex-col space-y-[2px] w-[80%]">
-          <label htmlFor="" className="text-[14px] mb-[.1rem] ">
+        <div className="flex flex-col space-y-[0.125rem] w-[80%]">
+          <label htmlFor="" className="text-[0.875rem] mb-[.1rem] ">
             Mobile Number
           </label>
 
@@ -233,24 +201,24 @@ function Login() {
                 ? {
                     required: true,
                     className:
-                      "1 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                      "1 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[1rem] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
                   }
                 : isNewUser
                 ? {
                     required: true,
                     className:
-                      "4 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                      "4 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[1rem] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
                   }
-                : mobileNumber && !isValidIndianNumber
+                : mobileNumber && !isValidNumber
                 ? {
                     required: true,
                     className:
-                      "5 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                      "5 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[1rem] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
                   }
                 : {
                     required: true,
                     className:
-                      "6 outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[16px] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                      "6 outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[1rem] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
                   }
             }
             dialCodeEditable={false}
@@ -260,8 +228,8 @@ function Login() {
                     width: "14% ",
                     paddingLeft: "0px",
                     backgroundColor: "white",
-                    border: "2px  solid rgb(220 38 38)",
-                    borderColor: "rgb(220 38 38)",
+                    border: "0.125rem solid #DC2626",
+                    borderColor: "#DC2626",
                     borderRadius: " 0.5rem 0 0 0.5rem ",
                     fontFamily: "poppins",
                   }
@@ -271,18 +239,18 @@ function Login() {
                     width: "14% ",
                     paddingLeft: "0px",
                     backgroundColor: "white",
-                    border: "2px  solid rgb(220 38 38)",
-                    borderColor: "rgb(220 38 38)",
+                    border: "0.125rem solid #DC2626",
+                    borderColor: "#DC2626",
                     borderRadius: " 0.5rem 0 0 0.5rem ",
                   }
-                : mobileNumber && !isValidIndianNumber
+                : mobileNumber && !isValidNumber
                 ? {
                     fontFamily: "poppins",
                     width: "14% ",
                     paddingLeft: "0px",
                     backgroundColor: "white",
-                    border: "2px  solid rgb(220 38 38)",
-                    borderColor: "rgb(220 38 38)",
+                    border: "0.125rem solid #DC2626",
+                    borderColor: "#DC2626",
                     borderRadius: " 0.5rem 0 0 0.5rem ",
                     fontFamily: "poppins",
                   }
@@ -290,8 +258,8 @@ function Login() {
                     width: "14% ",
                     paddingLeft: "0px",
                     backgroundColor: "white",
-                    border: "2px  solid rgb(203 213 225)",
-                    borderColor: "rgb(203 213 225)",
+                    border: "0.125rem solid #CBD5E1",
+                    borderColor: "#CBD5E1",
                     borderRadius: " 0.5rem 0 0 0.5rem ",
                     fontFamily: "poppins",
                   }
@@ -300,7 +268,7 @@ function Login() {
 
           <div className="w-[80%] mb-2">
             {mobileNumber ? (
-              isValidIndianNumber ? null : (
+              isValidNumber ? null : (
                 <p className="text-xs w-[80%] mt-[.2rem]  text-red-500">
                   Invalid number
                 </p>
@@ -321,7 +289,7 @@ function Login() {
         <div className="flex flex-col space-y-1 w-[80%] ">
           <label
             htmlFor=""
-            className="block leading-6 text-left text-[14px] mb-[.1rem]  "
+            className="block leading-6 text-left text-[0.875rem] mb-[.1rem]  "
           >
             Password
           </label>
@@ -329,10 +297,10 @@ function Login() {
             name="password"
             className={
               loginInputAlert && !password
-                ? "outline-0 h-10 w-full rounded-lg  p-[1rem] pl-[.5rem] sm:p-[1rem] border-2 text-[16px] border-red-600  border-box  "
+                ? "outline-0 h-10 w-full rounded-lg  p-[1rem] pl-[.5rem] sm:p-[1rem] border-2 text-[1rem] border-red-600  border-box  "
                 : loginFailed
-                ? "outline-0 h-10 w-full rounded-lg  p-[1rem] pl.[.5rem] sm:p-[1rem] border-2 text-[16px] border-red-600  border-box  "
-                : "outline-0 h-10 w-full rounded-lg  p-[1rem] pl-[.5rem] sm:p-[1rem] border-2 text-[16px] border-slate-300  border-box "
+                ? "outline-0 h-10 w-full rounded-lg  p-[1rem] pl.[.5rem] sm:p-[1rem] border-2 text-[1rem] border-red-600  border-box  "
+                : "outline-0 h-10 w-full rounded-lg  p-[1rem] pl-[.5rem] sm:p-[1rem] border-2 text-[1rem] border-slate-300  border-box "
             }
             type={showPassword ? "text" : "password"}
             minLength={6}
@@ -391,12 +359,11 @@ function Login() {
         </div>
 
         <div className="flex flex-col justify-center  items-center">
-          {" "}
           <p className="text-xs mt-[2rem] text-gray-800 sm:mt-[3rem]  mb-[.4rem] underline cursor-pointer ">
             Forgot Password?
           </p>
           <p className="font-light text-xs text-gray-800 mt-[.5rem] mb-[2rem]">
-            Don't have an account?{" "}
+            Don't have an account?
             <strong
               className="font-bold text-gray-800 cursor-pointer"
               onClick={signup}

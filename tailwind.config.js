@@ -1,5 +1,3 @@
-const defaultTheme = require("tailwindcss/defaultTheme");
-const colors = require("tailwindcss/colors");
 const {
   default: flattenColorPalette,
 } = require("tailwindcss/lib/util/flattenColorPalette");
@@ -22,6 +20,7 @@ module.exports = {
       },
       animation: {
         expand: "expand 1s linear 1",
+        meteor: "meteor 5s linear infinite",
       },
     },
   },
@@ -29,14 +28,13 @@ module.exports = {
     function ({ addUtilities }) {
       const newUtilities = {
         ".loader": {
-          width: "60px",
+          width: "3.75rem",
           aspectRatio: "1.154",
           "--c": "#0000, #ffffff 2deg 59deg, #0000 61deg",
           "--c1": "conic-gradient(from 149deg at top, var(--c))",
           "--c2": "conic-gradient(from -31deg at bottom, var(--c))",
           background:
             "var(--c1) top, var(--c1) bottom right, var(--c2) bottom, var(--c1) bottom left",
-
           backgroundSize: "50% 50%",
           backgroundRepeat: "no-repeat",
           animation: "l37 1s infinite",
@@ -48,21 +46,10 @@ module.exports = {
           },
         },
         ".loading": {
-          backgroundColor: "rgb(75, 85, 99)",
-          height: "100vh",
-          width: "100vw",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
+          backgroundColor: "#4B5563",
         },
         ".wrapper": {
-          height: "10vh",
-          width: "100vw",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "rgb(75, 85, 99)",
+          backgroundColor: "#4B5563",
         },
         ".checkmark__circle": {
           strokeDasharray: 166,
@@ -74,8 +61,8 @@ module.exports = {
           animation: "stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards",
         },
         ".checkmark": {
-          width: "56px",
-          height: "56px",
+          width: "3.5rem",
+          height: "3.5rem",
           borderRadius: "50%",
           display: "block",
           strokeWidth: 2,
@@ -107,11 +94,11 @@ module.exports = {
         },
         "@keyframes fill": {
           "100%": {
-            boxShadow: "inset 0px 0px 0px 30px #7ac142",
+            boxShadow: "inset 0px 0px 0px 1.875rem #7ac142",
           },
         },
         ".fail-icon": {
-          fontSize: "44px",
+          fontSize: "2.75rem",
           color: "white",
         },
         mortar: {

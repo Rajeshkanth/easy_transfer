@@ -6,7 +6,7 @@ import { RiMenuFoldFill } from "react-icons/ri";
 function SideBar(props) {
   const { nav, onClickHandler } = props;
 
-  const { isProfileClicked, setIsProfileClicked } = useContext(store);
+  const { setIsProfileClicked } = useContext(store);
 
   const handleClick = (item) => {
     if (onClickHandler) {

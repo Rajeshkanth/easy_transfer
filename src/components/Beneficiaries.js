@@ -20,8 +20,6 @@ function Beneficiaries() {
     setLoggedUser,
     windowWidth,
     setWindowWidth,
-    userNameFromDb,
-    setUserNameFromDb,
     setToAccountNumber,
     setToIFSCNumber,
     setToAccountHolderName,
@@ -32,8 +30,6 @@ function Beneficiaries() {
     setIsProfileClicked,
     setLogOut,
     setNotify,
-    setPlusIcon,
-    plusIcon,
     setRecentTransactions,
     clearAll,
   } = useContext(store);
@@ -42,13 +38,11 @@ function Beneficiaries() {
   const [savedBeneficiaryName, setSavedBeneficiaryName] = useState("");
   const [savedIfsc, setSavedIfsc] = useState("");
   const [loader, setLoader] = useState(false);
-  const [newValueAdded, setNewValueAdded] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const prevPath = location.state?.prevPath;
   const [allInputsAlert, setAllInputsAlert] = useState(false);
-  const [newBeneficiarySended, setNewBeneficiarySended] = useState(false);
-
+  const [plusIcon, setPlusIcon] = useState(false);
   const clickable = savedAccNum.length > 15;
 
   const handleMenuClick = (menuItem) => {
@@ -73,11 +67,9 @@ function Beneficiaries() {
         setSavedAcc([]);
         break;
       case "Rewards":
-        console.log("Navigating to Rewards page");
         setIsProfileClicked(false);
         break;
       case "Contact":
-        console.log("Navigating to Contact page");
         setIsProfileClicked(false);
         break;
       case "Transactions":
@@ -91,7 +83,7 @@ function Beneficiaries() {
         navigate("/");
         break;
       default:
-        console.log(`Unknown menu item: ${menuItem}`);
+        return;
     }
   };
 
@@ -112,7 +104,6 @@ function Beneficiaries() {
       return {
         nav: [
           { icon: <MdKeyboardArrowLeft />, id: "Back" },
-          ,
           "Profile",
           "Transactions",
           "Rewards",
@@ -128,26 +119,19 @@ function Beneficiaries() {
       };
     }
   };
-
   const menuProps = getMenuProps();
-
   const getSideBarProps = () => {
     return {
       nav: ["Back", "Profile", "Transactions", "Rewards", "Contact", "Log Out"],
       onClickHandler: handleMenuClick,
     };
   };
-
   const sideBarProps = getSideBarProps();
-
   const logout = () => {
     setLoggedUser("");
     navigate("/");
   };
-
   const onIdle = () => {
-    console.log("user is idle");
-
     setTimeout(() => {
       handleSocket();
       setSavedAcc([]);
@@ -163,12 +147,10 @@ function Beneficiaries() {
     }, 3000);
     alert("Session expired! You will be redirected to login page");
   };
-
   useIdleTimer({
     timeout: 1000 * 60 * 5,
     onIdle,
   });
-
   const handleSavedAccNum = (e) => {
     const value = e.target.value;
     if (value.length <= 16) {
@@ -182,7 +164,6 @@ function Beneficiaries() {
       setSavedBeneficiaryName(value);
     }
   };
-
   const handleSavedIfsc = (e) => {
     const value = e.target.value;
     if (value.length <= 10) {
@@ -190,8 +171,6 @@ function Beneficiaries() {
     }
   };
   const sendMoney = (index) => {
-    console.log("clicked");
-    console.log(index);
     const selectedBeneficiary = savedAcc[index];
     setToAccountHolderName(selectedBeneficiary.beneficiaryName);
     setToAccountNumber(selectedBeneficiary.accNum);
@@ -208,54 +187,40 @@ function Beneficiaries() {
       String(savedAccNum).length > 15 &&
       String(savedIfsc).length > 9
     ) {
-      setNewValueAdded(true);
       if (connectionMode !== "socket") {
         const response = await axios.post(
-          "http://localhost:8080/saveNewBeneficiary",
+          "http://localhost:8080/addNewBeneficiary",
           {
             SavedBeneficiaryName: savedBeneficiaryName,
             SavedAccNum: savedAccNum,
             SavedIfsc: savedIfsc,
-            editable: false,
-            num: document.cookie,
+            mobileNumber: document.cookie,
           }
         );
-        setNewBeneficiarySended(true);
         setLoader(true);
         if (response.status === 200) {
-          console.log(response.data);
           const savedDetail = {
             beneficiaryName: response.data.beneficiaryName,
             accNum: response.data.accNum,
             ifsc: response.data.ifsc,
           };
-          console.log(savedAcc, "before");
           setSavedAcc((prev) => [...prev, savedDetail]);
-          console.log(savedAcc, "after");
-
           setLoader(false);
-          setNewBeneficiarySended(false);
-        } else {
-          console.error("Request failed with status:", response.status);
         }
       } else {
         socket.emit("saveNewBeneficiary", {
           SavedBeneficiaryName: savedBeneficiaryName,
           SavedAccNum: savedAccNum,
           SavedIfsc: savedIfsc,
-          editable: false,
-          num: document.cookie,
+          mobileNumber: document.cookie,
         });
-        setNewBeneficiarySended(true);
         setLoader(true);
       }
-
       clearAllInputs();
     } else {
       setAllInputsAlert(true);
     }
   };
-
   const clearAllInputs = () => {
     setSavedBeneficiaryName("");
     setSavedAccNum("");
@@ -270,7 +235,6 @@ function Beneficiaries() {
     clearAllInputs();
     setAllInputsAlert(false);
   };
-
   const handleSaveButtonClick = () => {
     if (
       clickable &&
@@ -289,30 +253,16 @@ function Beneficiaries() {
   };
 
   useEffect(() => {
-    return () => {
-      setSavedAcc([]);
-      setLogOut(false);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (connectionMode !== "socket") {
-    } else {
-      socket.on("getSavedBeneficiary", async (data) => {
-        const savedDetail = {
-          beneficiaryName: data.beneficiaryName,
-          accNum: data.accNum,
-          ifsc: data.ifsc,
-          editable: data.editable,
-        };
-        console.log(savedAcc, "before");
-        setSavedAcc((prev) => [...prev, savedDetail]);
-        console.log(savedAcc, "after");
-
-        setLoader(false);
-        setNewBeneficiarySended(false);
-      });
-    }
+    socket.on("getSavedBeneficiary", async (data) => {
+      const savedDetail = {
+        beneficiaryName: data.beneficiaryName,
+        accNum: data.accNum,
+        ifsc: data.ifsc,
+        editable: data.editable,
+      };
+      setSavedAcc((prev) => [...prev, savedDetail]);
+      setLoader(false);
+    });
   }, []);
 
   useEffect(() => {
@@ -321,21 +271,19 @@ function Beneficiaries() {
         num: document.cookie,
       })
       .then((res) => {
-        console.log(res.data);
         setSavedAcc(res.data);
       })
       .catch((err) => {
-        console.error("Error:", err);
+        return err;
       });
-
-    socket.emit("fetchList", {
-      num: document.cookie,
-      emit: "emitted from ben",
+    socket.emit("getSavedAccounts", {
+      mobileNumber: document.cookie,
     });
-    console.log("event emitted", document.cookie);
 
     return () => {
       socket.off();
+      setSavedAcc([]);
+      setLogOut(false);
     };
   }, []);
 
@@ -348,35 +296,17 @@ function Beneficiaries() {
           ifsc: data.ifsc,
           editable: data.editable,
         };
-
         if (String(savedDetail.accNum).length > 15) {
-          const isAlreadyStored = savedAcc
-            ? savedAcc.some((detail) => {
-                return (
-                  detail.beneficiaryName === savedDetail.beneficiaryName &&
-                  detail.accNum === savedDetail.accNum &&
-                  detail.ifsc === savedDetail.ifsc &&
-                  detail.editable === savedDetail.editable
-                );
-              })
-            : false;
-
-          if (!isAlreadyStored) {
-            setSavedAcc((prevSavedAcc) => {
-              const updatedSavedAcc = prevSavedAcc
-                ? [...prevSavedAcc, savedDetail]
-                : [savedDetail];
-              sessionStorage.setItem(
-                "savedAcc",
-                JSON.stringify(updatedSavedAcc)
-              );
-              return updatedSavedAcc;
-            });
-          }
+          setSavedAcc((prevSavedAcc) => {
+            const updatedSavedAcc = prevSavedAcc
+              ? [...prevSavedAcc, savedDetail]
+              : [savedDetail];
+            sessionStorage.setItem("savedAcc", JSON.stringify(updatedSavedAcc));
+            return updatedSavedAcc;
+          });
         }
       });
     };
-
     fetchData();
   }, []);
 
@@ -408,7 +338,6 @@ function Beneficiaries() {
       ) : null}
       <div className="h-auto md:h-screen w-screen pb-[2rem] md:fixed  bg-gray-800 text-white">
         <Menu {...menuProps} onClickHandler={handleMenuClick} />
-
         <div className="h-[80vh] md:h-screen   m-auto  bg-white block md:flex  md:pl-[0rem] box-border">
           <div className="m-auto h-screen sm:h-[100vh] md:h-[90vh] w-[100%]   text-gray-800   bg-white pt-[18vh] sm:pt-[10vh] md:pt-0 mt-[0rem] pb-[1rem] box-border overflow-x-auto space-y-2 lg:space-y-0">
             <div
@@ -430,7 +359,7 @@ function Beneficiaries() {
                 </h1>
               )}
               <h1
-                className="font-bold w-full md:w-[80%] py-2  lg:w-[60%] ml-[-3vw] md:ml-[-1.4vw] border-2 rounded-md cursor-pointer hover:bg-gray-100 hover:text-gray-800 text-center  text-[10px] md:text-sm xl:text-lg  bg-white text-gray-700"
+                className="font-bold w-full md:w-[80%] py-2  lg:w-[60%] ml-[-3vw] md:ml-[-1.4vw] border-2 rounded-md cursor-pointer hover:bg-gray-100 hover:text-gray-800 text-center  text-[0.625rem] md:text-sm xl:text-lg  bg-white text-gray-700"
                 onClick={addNewBeneficiary}
               >
                 + Add Beneficiary
@@ -448,22 +377,22 @@ function Beneficiaries() {
                         : "grid grid-cols-4    h-auto  z-10  pt-3 pb-3 text-gray-700  w-[100%] pl-[8vw] sm:pl-[10vw] pr-[4vw] md:pr-[9vw]"
                     }
                   >
-                    <h1 className="flex items-center capitalize text-xs md:text-sm   xl:text-[16px]">
+                    <h1 className="flex items-center capitalize text-xs md:text-sm   xl:text-[1rem]">
                       {" "}
                       {item.beneficiaryName}
                     </h1>
-                    <h1 className="flex items-center  text-xs md:text-sm xl:text-[16px] ml-[-9vw] sm:ml-[-6vw] md:ml-[-2vw]">
+                    <h1 className="flex items-center  text-xs md:text-sm xl:text-[1rem] ml-[-9vw] sm:ml-[-6vw] md:ml-[-2vw]">
                       {item.accNum}
                     </h1>
                     {windowWidth < 450 ? null : (
-                      <h1 className="flex items-center  text-xs uppercase  md:text-sm xl:text-[16px]  md:ml-[3vw]">
+                      <h1 className="flex items-center  text-xs uppercase  md:text-sm xl:text-[1rem]  md:ml-[3vw]">
                         {" "}
                         {item.ifsc}
                       </h1>
                     )}
                     <button
                       onClick={() => sendMoney(index)}
-                      className="text-xs px-4 py-3 md:text-[16px] lg:px-2 w-3/4 md:w-3/4 lg:w-1/2  ml-[4vw] md:ml-[7vw] border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                      className="text-xs px-4 py-3 md:text-[1rem] lg:px-2 w-3/4 md:w-3/4 lg:w-1/2  ml-[4vw] md:ml-[7vw] border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                     >
                       Send
                     </button>
@@ -488,10 +417,10 @@ function Beneficiaries() {
                 <form
                   action=""
                   onClick={(e) => e.stopPropagation()}
-                  className="w-auto md:w-[80%] lg:w-[60%] min-h-[40%]  pb-[7vh] m-auto pt-[6vh] border-2 bg-white shadow-md shadow-ash-800  mt-[0rem] text-gray-600 rounded-lg border-white  box-border text-[16px]"
+                  className="w-auto md:w-[80%] lg:w-[60%] min-h-[40%]  pb-[7vh] m-auto pt-[6vh] border-2 bg-white shadow-md shadow-ash-800  mt-[0rem] text-gray-600 rounded-lg border-white  box-border text-[1rem]"
                 >
                   <div className="m-auto py-3 font-poppins sm:p-2 text-gray-200 relative bg-gray-700 w-[80%] sm:w-[80%] top-[-1vw]  rounded-md grid items-center justify-center">
-                    <h1 className="text-[16px]">Add Beneficiary</h1>
+                    <h1 className="text-[1rem]">Add Beneficiary</h1>
                   </div>
                   <div
                     className={

@@ -6,17 +6,14 @@ import { useNavigate } from "react-router";
 
 function Menu(props) {
   const { nav, onClickHandler } = props;
-
   const { windowWidth, setWindowWidth, setIsProfileClicked, isProfileClicked } =
     useContext(store);
   const navigate = useNavigate();
-
   const handleClick = (item) => {
     if (onClickHandler) {
       onClickHandler(item);
     }
   };
-
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);

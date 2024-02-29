@@ -2,9 +2,7 @@ import React, { memo, useContext, useEffect } from "react";
 import { store } from "../App";
 import SignUp from "./SignUp";
 import Login from "./Login";
-import { useNavigate } from "react-router";
-import { Boxes } from "../BackgroundBox";
-import { cn } from "../utils/cn";
+import Meteors from "../Meteors";
 
 function HomePage() {
   const {
@@ -58,7 +56,6 @@ function HomePage() {
             : "h-screen fixed w-screen bg-gray-800 text-white font-poppins"
         }
       >
-        {/* <Boxes /> */}
         {isLogin ? (
           <div className="z-10 w-[80%] sm:w-[60%] md:w-[50%] lg:w-[36%] xl:w-[33%]  mx-auto    shadow-md shadow-black h-auto rounded-xl  mt-[15vh] ">
             {loader ? (
@@ -90,6 +87,7 @@ function HomePage() {
           </div>
         )}
       </div>
+      <Meteors number={20} />
     </>
   );
 }

@@ -1,8 +1,7 @@
-import React, { memo, useContext } from "react";
-import { store } from "../App";
+import React, { memo } from "react";
 import axios from "axios";
 
-function ProfileForm() {
+function ProfileForm(props) {
   const {
     setIsEditProfile,
     userName,
@@ -33,7 +32,7 @@ function ProfileForm() {
     socket,
     accFromDb,
     dobFromDb,
-  } = useContext(store);
+  } = props.states;
   const handleUserName = (e) => {
     setUserName(e.target.value);
   };
@@ -102,7 +101,7 @@ function ProfileForm() {
       if (
         userName &&
         age &&
-        dob &&
+        (dob || dobFromDb) &&
         (accNumber || accFromDb) &&
         (card || cardFromDb) &&
         (cvv || cvvFromDb) &&
@@ -114,20 +113,18 @@ function ProfileForm() {
           {
             data: userData,
             name: userName,
-            Age: age,
-            DOB: dob ? dob : dobFromDb,
-            AccNum: accNumber ? accNumber : accFromDb,
-            Card: card ? card : cardFromDb,
-            CVV: cvv ? cvv : cvvFromDb,
-            ExpireDate: expireDate ? expireDate : expireDateFromDb,
+            age: age,
+            dob: dob ? dob : dobFromDb,
+            accNum: accNumber ? accNumber : accFromDb,
+            card: card ? card : cardFromDb,
+            cvv: cvv ? cvv : cvvFromDb,
+            expireDate: expireDate ? expireDate : expireDateFromDb,
           }
         );
 
         if (response.status === 200) {
-          console.log(response.data);
           const { userName, age, dob, accNum, card, cvv, expireDate } =
             response.data;
-          console.log(userName, age, dob, accNum, card, cvv, expireDate);
           setUserNameFromDb(userName);
           setAccFromDb(accNum);
           setAgeFromDb(age);
@@ -138,24 +135,30 @@ function ProfileForm() {
           setIsEditProfile(false);
           setUserName("");
           setAge("");
-        } else if (response.status === 500) {
-          console.log("userName not updated");
         }
       } else {
         alert("Enter all details");
       }
     } else {
-      if (userName && age && accNumber && card && cvv && expireDate) {
+      if (
+        userName &&
+        age &&
+        (dob || dobFromDb) &&
+        (accNumber || accFromDb) &&
+        (card || cardFromDb) &&
+        (cvv || cvvFromDb) &&
+        (expireDate || expireDateFromDb)
+      ) {
         const regNum = document.cookie;
         socket.emit("updateProfile", {
           num: regNum,
           name: userName,
           age: age,
-          DOB: dob,
-          AccNum: accNumber,
-          Card: card,
-          CVV: cvv,
-          ExpireDate: expireDate,
+          dob: dob,
+          accNum: accNumber,
+          card: card,
+          cvv: cvv,
+          expireDate: expireDate,
         });
 
         socket.on("profileUpdated", (data) => {
@@ -163,16 +166,17 @@ function ProfileForm() {
           setAgeFromDb(data.age);
           setDobFromDb(data.dob);
           setAccFromDb(data.accNum);
-          setCardFromDb(card);
-          setCvvFromDb(cvv);
-          setExpireDateFromDb(expireDate);
-          setUserName("");
-          setAge("");
+          setCardFromDb(data.card);
+          setCvvFromDb(data.cvv);
+          setExpireDateFromDb(data.expireDate);
+
           sessionStorage.setItem(
             "userName",
             data.userName ? data.userName : ""
           );
         });
+        setUserName("");
+        setAge("");
         setIsEditProfile(false);
       } else {
         alert("Enter your details");
@@ -184,11 +188,11 @@ function ProfileForm() {
       <form
         action="submit"
         onSubmit={updateProfile}
-        className="w-full sm:w-[90%] lg:w-[60%] h-screen text-gray-800 text-[16px]  m-auto bg-blue-650 sm:ml-[10vw]  lg:ml-[25vw] p-5 box-border items-center flex flex-col  font-poppins justify-center sm:space-y-2 "
+        className="w-full sm:w-[90%] lg:w-[60%] h-screen text-gray-800 text-[1rem]  m-auto bg-blue-650 sm:ml-[10vw]  lg:ml-[25vw] p-5 box-border items-center flex flex-col  font-poppins justify-center sm:space-y-2 "
       >
         <div className="sm:flex flex-wrap  sm:space-x-2 w-3/4  sm:w-full md:w-[80%]">
           <input
-            className="block w-full sm:w-1/2 text-[16px] px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
+            className="block w-full sm:w-1/2 text-[1rem] px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
             type="text"
             value={userName}
             onChange={handleUserName}
@@ -278,7 +282,7 @@ function ProfileForm() {
 
           <button
             onClick={cancelEdit}
-            className=" block px-4 py-2 mb-3 w-1/2 box-border      bg-gray-800 border-2 hover:border-white rounded-md focus:outline-none focus:border-white"
+            className=" block px-4 py-2 mb-3 w-1/2 box-border bg-gray-800 border-2 hover:border-white rounded-md focus:outline-none focus:border-white"
           >
             Cancel
           </button>

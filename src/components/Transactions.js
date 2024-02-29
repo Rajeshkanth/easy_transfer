@@ -1,10 +1,9 @@
-import React, { memo, useContext, useEffect, useState } from "react";
+import React, { memo, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { store } from "../App";
 import Menu from "./Menu";
 import SideBar from "./SideBar";
 import { FaArrowLeftLong } from "react-icons/fa6";
-import { MdArrowBackIos } from "react-icons/md";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { RiMenuUnfoldFill } from "react-icons/ri";
 import { useIdleTimer } from "react-idle-timer";
@@ -36,7 +35,6 @@ function Transactions() {
       case "Menu":
         setIsProfileClicked(true);
         break;
-
       case "Profile":
         navigate("/Profile", { state: { prevPath: location.pathname } });
         setIsProfileClicked(false);
@@ -44,6 +42,7 @@ function Transactions() {
       case "Home":
         navigate("/transferPage", { state: { prevPath: location.pathname } });
         setIsProfileClicked(false);
+        break;
       case "Back":
         {
           prevPath ? navigate(prevPath) : navigate("/transferPage");
@@ -76,7 +75,7 @@ function Transactions() {
         navigate("/");
         break;
       default:
-        console.log(`Unknown menu item: ${menuItem}`);
+        return;
     }
   };
 
@@ -97,7 +96,6 @@ function Transactions() {
       return {
         nav: [
           { icon: <FaArrowLeftLong />, id: "Back" },
-          ,
           "Beneficiaries",
           "Profile",
           "Rewards",
@@ -133,7 +131,6 @@ function Transactions() {
   const sideBarProps = getSideBarProps();
 
   const onIdle = () => {
-    console.log("user is idle");
     setTimeout(() => {
       handleSocket();
       setSavedAcc([]);
@@ -150,6 +147,7 @@ function Transactions() {
     }, 3000);
     alert("Session expired! You will be redirected to login page");
   };
+
   useIdleTimer({
     timeout: 1000 * 60 * 5,
     onIdle,
@@ -158,15 +156,15 @@ function Transactions() {
   useEffect(() => {
     axios
       .post("http://localhost:8080/transactionDetailsForTransactionPage", {
-        num: document.cookie,
+        mobileNumber: document.cookie,
       })
       .then((res) => {
-        setRecentTransactions(res.data);
+        setRecentTransactions(res.data.transactions);
       })
       .catch((err) => console.log(err));
 
     socket.emit("getTransactionDetails", {
-      num: document.cookie,
+      mobileNumber: document.cookie,
     });
 
     return () => {
@@ -236,13 +234,13 @@ function Transactions() {
               </div>
             </div>
             {recentTransactions === null ? (
-              <div className="grid  items-center  h-[50%] text-gray-700 justify-center text-[16px]">
+              <div className="grid  items-center  h-[50%] text-gray-700 justify-center text-[1rem]">
                 <p className=" pt-[0rem]">There is no recent transactions</p>
               </div>
             ) : recentTransactions.filter((item) => item.Status === "Pending")
                 .length < 1 ? (
               <>
-                <div className="grid  items-center  h-[50%] text-gray-700 justify-center text-[16px]">
+                <div className="grid  items-center  h-[50%] text-gray-700 justify-center text-[1rem]">
                   <p className=" pt-[0rem]">There is no pending transactions</p>
                 </div>{" "}
               </>

@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, memo, useRef } from "react";
+import { createContext, useState, useEffect, memo } from "react";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import { io } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
@@ -9,11 +9,8 @@ import PaymentForm from "./components/PaymentForm";
 import Profile from "./components/Profile";
 import Success from "./components/Success";
 import Transactions from "./components/Transactions";
-import { PhoneNumberUtil } from "google-libphonenumber";
 import PrivateRoutes from "./components/PrivateRoutes";
-
 export const store = createContext();
-
 const socket = io.connect("http://localhost:8080", {
   query: {
     tabId: sessionStorage.getItem("tabId"),
@@ -34,12 +31,6 @@ function App() {
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [amount, setAmount] = useState("");
   const [logOut, setLogOut] = useState(false);
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [password, setPassword] = useState("");
-  const [regMobileNumber, setRegMobileNumber] = useState("");
-  const [createPassword, setCreatePassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [registeredUsers, setRegisteredUsers] = useState("");
   const [userName, setUserName] = useState("");
   const [age, setAge] = useState("");
   const [dob, setDob] = useState("");
@@ -52,10 +43,6 @@ function App() {
   const [toConfirmAccountNumber, setToConfirmAccountNumber] = useState("");
   const [toIFSCNumber, setToIFSCNumber] = useState("");
   const [toAccountHolderName, setToAccountHolderName] = useState("");
-  const [receiverAccounts, setReceiverAccounts] = useState([]);
-  const [confirmReceiver, setConfirmReceiver] = useState([]);
-  const [check, setCheck] = useState(false);
-  const [fail, setFail] = useState(false);
   const [tabId, setTabId] = useState("");
   const [connectionMode, setConnectionMode] = useState("");
   const [loggedUser, setLoggedUser] = useState("");
@@ -69,38 +56,25 @@ function App() {
   const [expireDateFromDb, setExpireDateFromDb] = useState("");
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isLogin, setIsLogin] = useState(true);
-  const [passwordError, setPasswordError] = useState(true);
   const [isProfileClicked, setIsProfileClicked] = useState(false);
   const [sendByBeneficiaries, setSendByBeneficiaries] = useState(false);
   const [savedAcc, setSavedAcc] = useState([]);
   const [loader, setLoader] = useState(false);
   const [notify, setNotify] = useState(true);
-  const [plusIcon, setPlusIcon] = useState(false);
   const [enterAccountNumber, setEnterAccountNumber] = useState(false);
   const [enterAccountHolderName, setEnterAccountHolderName] = useState(false);
   const [enterToIfscNumber, setEnterToIfscNumber] = useState(false);
   const [enterAmount, setEnterAmount] = useState(false);
-  const [balance, setBalance] = useState(1000);
   const [savedAccLength, setSavedAccLength] = useState("");
   const [recentTransactionsLength, setRecentTransactionsLength] = useState(0);
   const [canceledPayments, setCanceledPaymentsCount] = useState(0);
   const [isNewUser, setNewUser] = useState(false);
   const [loginFailed, setLoginFailed] = useState(false);
   const [loginInputAlert, setLoginInputAlert] = useState(false);
-  const [failedTransaction, setFailedTransaction] = useState(false);
   const [initatedAmountSend, setInitatedAmountSend] = useState(false);
-  const [hasLowerCase, setHasLowerCase] = useState(false);
-  const [hasUpperCase, setHasUpperCase] = useState(false);
-  const [hasSpecialChar, setHasSpecialChar] = useState(false);
-  const [hasMinLength, setHasMinLength] = useState(false);
-  const [indiaCode, setIndiaCode] = useState(false);
-  const [singaporeCode, setSingaporeCode] = useState(false);
-  const [usRussiaCode, setUsRussiaCode] = useState(false);
   const [isValidNumber, setIsValidNumber] = useState(true);
   const [isLoggedOut, setIsLoggedOut] = useState(false);
   const [isEditProfile, setIsEditProfile] = useState(false);
-  const phoneNumber = PhoneNumberUtil.getInstance();
-
   const [inputValues, setInputValues] = useState({});
 
   const handleSocket = () => {
@@ -119,52 +93,10 @@ function App() {
     setIsLoggedOut(true);
     const tabId = sessionStorage.getItem("tabId");
     sessionStorage.clear();
-
     if (tabId) {
       sessionStorage.setItem("tabId", tabId);
     }
     setIsProfileClicked(false);
-  };
-
-  const handleRegMobileNumber = (value, country) => {
-    try {
-      const parsedNum = phoneNumber.parseAndKeepRawInput(
-        `+${value}`,
-        country.countryCode
-      );
-      const isValid = phoneNumber.isValidNumber(parsedNum);
-      console.log(isValid);
-      setIsValidNumber(isValid);
-    } catch (err) {
-      console.log(err);
-    }
-    setRegMobileNumber(value);
-  };
-
-  const handleCreatePassword = (e) => {
-    const value = e.target.value;
-    const allowedPattern =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()-_+={}[\]:;'"<>,./?]).{8,}$/;
-    const testedValue = allowedPattern.test(value);
-    setCreatePassword(value);
-    if (testedValue) {
-      setPasswordError(false);
-    } else {
-      setPasswordError(true);
-    }
-  };
-
-  const handleConfirmPassword = (e) => {
-    const value = e.target.value;
-    const allowedPattern =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~`!@#$%^&*()-_+={}[\]:;'"<>,./?]).{8,}$/;
-    const testedValue = allowedPattern.test(value);
-    setConfirmPassword(value);
-    if (testedValue) {
-      setPasswordError(false);
-    } else {
-      setPasswordError(true);
-    }
   };
 
   const handleUserName = (e) => {
@@ -247,31 +179,8 @@ function App() {
         setToIFSCNumber,
         toAccountHolderName,
         setToAccountHolderName,
-        receiverAccounts,
-        setReceiverAccounts,
         socket,
-        confirmReceiver,
-        setConfirmReceiver,
-        check,
-        setCheck,
-        fail,
-        setFail,
         connectionMode,
-        mobileNumber,
-        setMobileNumber,
-        password,
-        setPassword,
-        regMobileNumber,
-        setRegMobileNumber,
-        setCreatePassword,
-        setConfirmPassword,
-        createPassword,
-        confirmPassword,
-        registeredUsers,
-        setRegisteredUsers,
-        handleConfirmPassword,
-        handleCreatePassword,
-        handleRegMobileNumber,
         setUserName,
         handleUserName,
         loggedUser,
@@ -305,22 +214,14 @@ function App() {
         setWindowWidth,
         isLogin,
         setIsLogin,
-        passwordError,
         isProfileClicked,
         setIsProfileClicked,
-        setPasswordError,
         sendByBeneficiaries,
         setSendByBeneficiaries,
         savedAcc,
         setSavedAcc,
         logOut,
         setLogOut,
-        loader,
-        setLoader,
-        notify,
-        setNotify,
-        setPlusIcon,
-        plusIcon,
         setEnterAccountHolderName,
         setEnterAccountNumber,
         setEnterToIfscNumber,
@@ -329,31 +230,17 @@ function App() {
         enterAccountNumber,
         enterToIfscNumber,
         enterAmount,
-        balance,
-        setBalance,
         savedAccLength,
         setSavedAccLength,
         recentTransactions,
         setRecentTransactions,
         currentDate,
         setCurrentDate,
-        failedTransaction,
-        setFailedTransaction,
-        setHasLowerCase,
-        setHasMinLength,
-        setHasSpecialChar,
-        setHasUpperCase,
-        hasLowerCase,
-        hasUpperCase,
-        hasSpecialChar,
-        hasMinLength,
-        indiaCode,
-        setIndiaCode,
-        singaporeCode,
-        setSingaporeCode,
-        usRussiaCode,
-        setUsRussiaCode,
         clearAll,
+        loader,
+        setLoader,
+        notify,
+        setNotify,
       }}
     >
       <Router>

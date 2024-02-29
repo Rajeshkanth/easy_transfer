@@ -159,10 +159,8 @@ function PaymentForm() {
         Name: toAccountHolderName,
         Uid: uuid(),
       };
-      console.log(newTransactions);
-
-      socket.emit("paymentPageConnected", {
-        num: document.cookie,
+      socket.emit("paymentPage", {
+        mobileNumber: document.cookie,
         connected: true,
         NewReceiver: newReceiver,
         NewTransactions: newTransactions,
@@ -180,14 +178,12 @@ function PaymentForm() {
       setAllInput(true);
     } else {
       setAllInput(true);
-      console.log("else part");
     }
   };
 
   const sendAmountByPolling = async (e) => {
     try {
       e.preventDefault();
-      console.log("clicked");
       if (
         amount &&
         toAccountNumber &&
@@ -206,7 +202,6 @@ function PaymentForm() {
           tabId: sessionStorage.getItem("tabId"),
           type: "polling",
         };
-
         const newTransactions = {
           Amount: amount,
           Date: currentDate,
@@ -215,7 +210,6 @@ function PaymentForm() {
           Name: toAccountHolderName,
           Uid: uuid(),
         };
-
         navigate("/success");
         handleAllInput();
         const response = await axios.post(
@@ -223,7 +217,7 @@ function PaymentForm() {
           {
             data: newReceiver,
             newTransaction: newTransactions,
-            num: document.cookie,
+            mobileNumber: document.cookie,
           }
         );
         if (response.status === 200) {
@@ -238,10 +232,9 @@ function PaymentForm() {
         setAllInput(true);
       } else {
         setAllInput(true);
-        console.log("else part");
       }
     } catch (err) {
-      console.log(err);
+      return err;
     }
   };
 
@@ -315,7 +308,6 @@ function PaymentForm() {
   };
 
   const onIdle = () => {
-    console.log("user is idle");
     setTimeout(() => {
       handleSocket();
       setSavedAcc([]);
@@ -341,9 +333,7 @@ function PaymentForm() {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
-
     window.addEventListener("resize", handleResize);
-
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -366,7 +356,6 @@ function PaymentForm() {
     <>
       <div className=" h-screen   bg-gray-800 text-white font-sans fixed w-screen ">
         <Menu {...menuProps} onClickHandler={handleMenuClick} />
-
         <div className="flex   w-full fixed top-[6%] md:top-[10%]  justify-center   ">
           <div className="w-[96vw]  flex  justify-evenly h-[90vh]  ">
             <div className="hidden sm:block sm:w-1/2 md:w-auto xl:w-[58%] xl:pl-[0vw] cursor-default">
@@ -378,7 +367,6 @@ function PaymentForm() {
                 send & receive money in minutes without paying extra charges.
               </p>
             </div>
-
             <form
               className={
                 sendByBeneficiaries
@@ -387,7 +375,7 @@ function PaymentForm() {
               }
             >
               <div className=" h-auto sm:h-1/6 pt-[1rem]  text-gray-800   w-full text-center flex justify-center  rounded-md rounded-b-none  ">
-                <h1 className="cursor-default  mt-2 sm:mt-4 md:mt-3 lg:mt-[1vh] sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-extrabold text-gray-600 text-[27px]">
+                <h1 className="cursor-default  mt-2 sm:mt-4 md:mt-3 lg:mt-[1vh] sm:text-2xl md:text-3xl lg:text-3xl xl:text-4xl font-extrabold text-gray-600 text-[1.688rem]">
                   Money Transfer
                 </h1>
               </div>
@@ -417,7 +405,6 @@ function PaymentForm() {
                     </p>
                   </>
                 ) : null}
-
                 <label className="block px-1 text-sm mb-[.2rem] pointer-events-none md:ml-[2.4vw] lg:ml-[1vw] leading-6 text-gray-800">
                   Account Number
                 </label>
@@ -451,7 +438,6 @@ function PaymentForm() {
                     </p>
                   </>
                 ) : null}
-
                 <label className="block text-sm mb-[.2rem] px-1 pointer-events-none md:ml-[2.4vw] lg:ml-[1vw] leading-6 text-gray-800">
                   IFSC code
                 </label>
@@ -483,7 +469,6 @@ function PaymentForm() {
                     IFSC code should have 10 digits
                   </p>
                 ) : null}
-
                 <label className="block text-sm mb-[.2rem] px-1 pointer-events-none md:ml-[2.4vw] lg:ml-[1vw] leading-6 text-gray-800">
                   {" "}
                   Amount{" "}
@@ -537,7 +522,6 @@ function PaymentForm() {
           </div>
         </div>
       </div>
-
       {windowWidth > 768 ? null : isProfileClicked ? (
         <>
           <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />

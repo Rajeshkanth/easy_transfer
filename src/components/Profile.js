@@ -5,12 +5,10 @@ import axios from "axios";
 import Menu from "./Menu";
 import SideBar from "./SideBar";
 import { FaRupeeSign } from "react-icons/fa";
-import { IoIosArrowForward } from "react-icons/io";
-import { IoIosWallet } from "react-icons/io";
-import { MdModeEdit } from "react-icons/md";
+import { IoIosArrowForward, IoIosWallet } from "react-icons/io";
+import { MdModeEdit, MdKeyboardArrowLeft } from "react-icons/md";
 import profileAlternate from "./images/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752-fotor-20240208155618.png";
 import FailedTransactions from "./FailedTransactions";
-import { MdKeyboardArrowLeft } from "react-icons/md";
 import { RiMenuUnfoldFill } from "react-icons/ri";
 import { useIdleTimer } from "react-idle-timer";
 import ProfileForm from "./ProfileForm";
@@ -37,27 +35,44 @@ function Profile() {
     isProfileClicked,
     setLoggedUser,
     setSavedAcc,
-    balance,
     setCanceledPaymentsCount,
     canceledPayments,
-    failedTransaction,
-    setFailedTransaction,
     clearAll,
     recentActivity,
     setRecentActivity,
     isEditProfile,
     setIsEditProfile,
+    userName,
+    cardFromDb,
+    cvvFromDb,
+    expireDateFromDb,
+    setUserName,
+    age,
+    setAge,
+    dob,
+    setDob,
+    accNumber,
+    setAccNumber,
+    card,
+    setCard,
+    cvv,
+    setCvv,
+    expireDate,
+    setExpireDate,
+    accFromDb,
+    dobFromDb,
   } = useContext(store);
   const navigate = useNavigate();
   const location = useLocation();
   const prevPath = location.state?.prevPath;
 
+  const [failedTransaction, setFailedTransaction] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState([]);
+
   const [img, setImg] = useState(null);
 
   const setProfilePic = (e) => {
     const value = e.target.files[0];
-
     setImg(URL.createObjectURL(value));
   };
 
@@ -89,7 +104,6 @@ function Profile() {
         setIsProfileClicked(false);
         break;
       case "Menu":
-        // setSavedAcc([]);
         setIsProfileClicked(true);
         break;
       case "Log Out":
@@ -118,7 +132,6 @@ function Profile() {
       return {
         nav: [
           { icon: <MdKeyboardArrowLeft />, id: "Back" },
-          ,
           "Beneficiaries",
           "Transactions",
           "Rewards",
@@ -161,24 +174,8 @@ function Profile() {
   const editProfile = () => {
     setIsEditProfile(true);
   };
-  const profile = () => {
-    setIsProfileClicked(true);
-  };
-
-  const closeProfile = () => {
-    setIsProfileClicked(false);
-  };
-
-  const gotoTransferPage = () => {
-    navigate("/transferPage");
-  };
-
-  const savedAccounts = () => {
-    navigate("/Beneficiaries");
-  };
 
   const onIdle = () => {
-    console.log("user is idle");
     setTimeout(() => {
       handleSocket();
       setSavedAcc([]);
@@ -225,7 +222,6 @@ function Profile() {
       socket.emit("checkUserName", {
         regNumber: document.cookie,
       });
-
       socket.on("userNameAvailable", (data) => {
         setUserNameFromDb(data.user);
         setAgeFromDb(data.age);
@@ -252,27 +248,21 @@ function Profile() {
         res.data ? setBeneficiaries(res.data) : setBeneficiaries([]);
       })
       .catch((err) => console.log(err));
-
     axios
-      .post("http://localhost:8080/getSavedTransactionsForProfile", {
-        num: document.cookie,
+      .post("http://localhost:8080/transactionDetailsForTransactionPage", {
+        mobileNumber: document.cookie,
       })
       .then((res) => {
         setRecentActivity(res.data.transactions);
         setRecentTransactionsLength(res.data.count);
       })
       .catch((err) => console.log(err));
-
-    socket.emit("getTransactionDetailsCount", {
-      num: document.cookie,
+    socket.emit("getTransactionDetails", {
+      mobileNumber: document.cookie,
     });
-
-    socket.emit("getSavedAccountsForProfile", {
-      num: document.cookie,
+    socket.emit("getSavedAccounts", {
+      mobileNumber: document.cookie,
     });
-
-    console.log(recentActivity);
-
     return () => {
       socket.off();
       setRecentActivity([]);
@@ -285,7 +275,7 @@ function Profile() {
   }, []);
 
   useEffect(() => {
-    socket.on("transactionsCountFromDB", async (data) => {
+    socket.on("transactionDetailsFromDb", async (data) => {
       const { count } = data;
       const transaction = {
         Date: data.Date,
@@ -293,35 +283,20 @@ function Profile() {
         Status: data.Status,
         Amount: data.Amount,
       };
-
-      const isAlreadyStored = recentActivity.some((detail) => {
-        return (
-          detail.Date === transaction.Date &&
-          detail.Name === transaction.Name &&
-          detail.Status === transaction.Status &&
-          detail.Amount === transaction.Amount
-        );
-      });
-      if (!isAlreadyStored) {
-        setRecentActivity((prev) => [...prev, transaction]);
-      }
-
+      setRecentActivity((prev) => [...prev, transaction]);
       await setRecentTransactionsLength(count);
     });
-
-    socket.on("savedAccountsFromDb", async (data) => {
+    socket.on("allSavedAccounts", async (data) => {
       const { count } = data;
       const account = {
         Name: data.beneficiaryName,
         Account: data.accNum,
       };
-
       const isAlreadyStored = beneficiaries.some((detail) => {
         return (
           detail.Name === account.Name && detail.Account === account.Account
         );
       });
-
       if (!isAlreadyStored) {
         setBeneficiaries((prev) => [...prev, account]);
       }
@@ -340,9 +315,7 @@ function Profile() {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
-
     window.addEventListener("resize", handleResize);
-
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -362,7 +335,7 @@ function Profile() {
           <div className="bg-slate-100  w-screen text-gray-700 h-auto flex flex-col  md:h-screen box-border md:grid md:grid-cols-4  md:gap-0 lg:gap-2 md:pb-2 md:pl-[3vw] lg:pl-[2vw] xl:pl-[3vw] md:pt-6 cursor-default">
             <>
               <div className="h-[50vh] md:h-[35vh] lg:h-[40vh] md:w-[20vw] border-b-2 md:border-b-0  items-center justify-center bg-white  md:md:shadow-md shadow-gray-300 rounded-md">
-                <div className=" h-[150px] w-[150px] md:h-[120px] md:w-[120px] lg:w-[120px] lg:h-[w-120px] xl:h-[200px] xl:w-[200px] bg-white  absolute lg:fixed top-[12vh]  md:top-[16vh] lg:top-[17vh] xl:top-[16vh] z-5 overflow-hidden shadow-lg left-[5vw] sm:left-[6vw] md:left-[6vw] lg:left-[6vw] xl:left-[6vw] rounded-full border-2 border-gray-600">
+                <div className=" h-[9.375rem] w-[9.375rem] md:h-[7.5rem] md:w-[7.5rem]  xl:h-[12.5rem] xl:w-[12.5rem] bg-white  absolute lg:fixed top-[12vh]  md:top-[16vh] lg:top-[17vh] xl:top-[16vh] z-5 overflow-hidden shadow-lg left-[5vw] sm:left-[6vw] md:left-[6vw] lg:left-[6vw] xl:left-[6vw] rounded-full border-2 border-gray-600">
                   {
                     <>
                       <img
@@ -461,7 +434,7 @@ function Profile() {
                     <IoIosWallet />
                   </h1>
                   <h1 className="flex  font-extrabold text-2xl items-center">
-                    <FaRupeeSign className="text-xl font-extrabold" /> {balance}
+                    <FaRupeeSign className="text-xl font-extrabold" /> 1000
                   </h1>
                   <h1 className=" text-sm">Available Balance</h1>
                 </div>
@@ -550,7 +523,7 @@ function Profile() {
                       >
                         <div className="grid grid-cols-2 gap-0 md:gap-6 lg:gap-2 xl:gap-6 items-center text-xs md:text-sm lg:text-md ">
                           <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
-                          <h1 className="md:text-xs lg:text-md overflow-x-auto md:w-[85px] lg:w-[110px]">{`Sent to ${item.Name}`}</h1>
+                          <h1 className="md:text-xs lg:text-md overflow-x-auto md:w-[5.313rem] lg:w-[6.875rem]">{`Sent to ${item.Name}`}</h1>
                         </div>
                         <div className="grid grid-cols-2 md:gap-5 lg:gap-5  text-xs md:text-sm lg:text-md  ">
                           <h1 className="md:text-xs lg:text-md">
@@ -576,12 +549,42 @@ function Profile() {
           </div>
         )}
 
-        {/* profile edit section */}
-
-        {isEditProfile ? <ProfileForm /> : null}
+        {isEditProfile ? (
+          <ProfileForm
+            states={{
+              setUserNameFromDb,
+              setAgeFromDb,
+              setAccFromDb,
+              setDobFromDb,
+              setCardFromDb,
+              setCvvFromDb,
+              setExpireDateFromDb,
+              setIsEditProfile,
+              connectionMode,
+              socket,
+              userName,
+              cardFromDb,
+              cvvFromDb,
+              expireDateFromDb,
+              setUserName,
+              age,
+              setAge,
+              dob,
+              setDob,
+              accNumber,
+              setAccNumber,
+              card,
+              setCard,
+              cvv,
+              setCvv,
+              expireDate,
+              setExpireDate,
+              accFromDb,
+              dobFromDb,
+            }}
+          />
+        ) : null}
       </div>
-
-      {/* sidebar */}
 
       {windowWidth > 768 ? null : isProfileClicked ? (
         <>
@@ -589,12 +592,11 @@ function Profile() {
         </>
       ) : null}
 
-      {/* failed transactions card */}
-
       {failedTransaction ? (
         <div className="fixed top-0 grid justify-center h-screen w-screen z-[100]">
-          {" "}
-          <FailedTransactions />
+          <FailedTransactions
+            state={{ recentActivity, setFailedTransaction }}
+          />
         </div>
       ) : null}
     </>
