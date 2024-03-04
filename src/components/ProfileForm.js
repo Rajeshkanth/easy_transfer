@@ -97,58 +97,33 @@ function ProfileForm(props) {
 
   const updateProfile = async (e) => {
     e.preventDefault();
-    if (connectionMode !== "socket") {
-      if (
-        userName &&
-        age &&
-        (dob || dobFromDb) &&
-        (accNumber || accFromDb) &&
-        (card || cardFromDb) &&
-        (cvv || cvvFromDb) &&
-        (expireDate || expireDateFromDb)
-      ) {
-        const userData = document.cookie;
-        const response = await axios.post(
-          "http://localhost:8080/updateProfile",
-          {
-            data: userData,
-            name: userName,
-            age: age,
-            dob: dob ? dob : dobFromDb,
-            accNum: accNumber ? accNumber : accFromDb,
-            card: card ? card : cardFromDb,
-            cvv: cvv ? cvv : cvvFromDb,
-            expireDate: expireDate ? expireDate : expireDateFromDb,
-          }
-        );
-
-        if (response.status === 200) {
-          const { userName, age, dob, accNum, card, cvv, expireDate } =
-            response.data;
-          setUserNameFromDb(userName);
-          setAccFromDb(accNum);
-          setAgeFromDb(age);
-          setDobFromDb(dob);
-          setCardFromDb(card);
-          setCvvFromDb(cvv);
-          setExpireDateFromDb(expireDate);
-          setIsEditProfile(false);
-          setUserName("");
-          setAge("");
-        }
+    const allFieldsFilled =
+      userName &&
+      age &&
+      (dob || dobFromDb) &&
+      (accNumber || accFromDb) &&
+      (card || cardFromDb) &&
+      (cvv || cvvFromDb) &&
+      (expireDate || expireDateFromDb);
+    if (!allFieldsFilled) {
+      alert("Enter all details");
+      return;
+    }
+    const userData = document.cookie;
+    try {
+      let response;
+      if (connectionMode !== "socket") {
+        response = await axios.post("http://localhost:8080/updateProfile", {
+          data: userData,
+          name: userName,
+          age: age,
+          dob: dob || dobFromDb,
+          accNum: accNumber || accFromDb,
+          card: card || cardFromDb,
+          cvv: cvv || cvvFromDb,
+          expireDate: expireDate || expireDateFromDb,
+        });
       } else {
-        alert("Enter all details");
-      }
-    } else {
-      if (
-        userName &&
-        age &&
-        (dob || dobFromDb) &&
-        (accNumber || accFromDb) &&
-        (card || cardFromDb) &&
-        (cvv || cvvFromDb) &&
-        (expireDate || expireDateFromDb)
-      ) {
         const regNum = document.cookie;
         socket.emit("updateProfile", {
           num: regNum,
@@ -161,38 +136,42 @@ function ProfileForm(props) {
           expireDate: expireDate,
         });
 
-        socket.on("profileUpdated", (data) => {
-          setUserNameFromDb(data.userName);
-          setAgeFromDb(data.age);
-          setDobFromDb(data.dob);
-          setAccFromDb(data.accNum);
-          setCardFromDb(data.card);
-          setCvvFromDb(data.cvv);
-          setExpireDateFromDb(data.expireDate);
-
-          sessionStorage.setItem(
-            "userName",
-            data.userName ? data.userName : ""
-          );
+        response = new Promise((resolve) => {
+          socket.on("profileUpdated", (data) => {
+            resolve({ data });
+          });
         });
+      }
+
+      if (response.status === 200) {
+        const { userName, age, dob, accNum, card, cvv, expireDate } =
+          response.data;
+        setUserNameFromDb(userName);
+        setAccFromDb(accNum);
+        setAgeFromDb(age);
+        setDobFromDb(dob);
+        setCardFromDb(card);
+        setCvvFromDb(cvv);
+        setExpireDateFromDb(expireDate);
+        setIsEditProfile(false);
         setUserName("");
         setAge("");
-        setIsEditProfile(false);
-      } else {
-        alert("Enter your details");
       }
+    } catch (error) {
+      console.error("Error updating profile:", error);
     }
   };
+
   return (
     <>
       <form
         action="submit"
         onSubmit={updateProfile}
-        className="w-full sm:w-[90%] lg:w-[60%] h-screen text-gray-800 text-[1rem]  m-auto bg-blue-650 sm:ml-[10vw]  lg:ml-[25vw] p-5 box-border items-center flex flex-col  font-poppins justify-center sm:space-y-2 "
+        className="w-full sm:w-custom-90 lg:w-3/5 h-screen text-gray-800 text-16  m-auto bg-blue-650 sm:ml-1  lg:ml-l-22 p-5 box-border items-center flex flex-col  font-poppins justify-center sm:space-y-2 "
       >
-        <div className="sm:flex flex-wrap  sm:space-x-2 w-3/4  sm:w-full md:w-[80%]">
+        <div className="sm:flex flex-wrap  sm:space-x-2 w-3/4  sm:w-full md:w-custom-80">
           <input
-            className="block w-full sm:w-1/2 text-[1rem] px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
+            className="block w-full sm:w-1/2 text-16 px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
             type="text"
             value={userName}
             onChange={handleUserName}
@@ -209,7 +188,7 @@ function ProfileForm(props) {
             required
           />
         </div>
-        <div className="sm:flex flex-wrap  sm:space-x-2  w-3/4 sm:w-full md:w-[80%]">
+        <div className="sm:flex flex-wrap  sm:space-x-2  w-3/4 sm:w-full md:w-custom-80">
           <input
             className="block w-full sm:w-1/3   px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
             type="date"
@@ -219,7 +198,6 @@ function ProfileForm(props) {
             placeholder="Date of Birth"
             required
           />
-
           <input
             maxLength={16}
             type="tel"
@@ -231,7 +209,7 @@ function ProfileForm(props) {
             required
           />
         </div>
-        <div className=" flex flex-wrap  sm:space-x-2  w-3/4 sm:w-full md:w-[80%]">
+        <div className=" flex flex-wrap  sm:space-x-2  w-3/4 sm:w-full md:w-custom-80">
           <input
             type="tel"
             readOnly
@@ -250,7 +228,7 @@ function ProfileForm(props) {
             className="block px-4 py-2 mb-3 w-full sm:w-1/2  bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
           />
         </div>
-        <div className=" sm:flex flex-wrap  sm:space-x-2 w-3/4 sm:w-full md:w-[80%]">
+        <div className=" sm:flex flex-wrap  sm:space-x-2 w-3/4 sm:w-full md:w-custom-80">
           <input
             maxLength={5}
             type="tel"
@@ -271,7 +249,7 @@ function ProfileForm(props) {
             className="block px-4 py-2 mb-3 w-full sm:w-1/2  bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
           />
         </div>
-        <div className=" w-3/4 sm:w-full  md:w-[80%] text-white space-x-2 flex">
+        <div className=" w-3/4 sm:w-full  md:w-custom-80 text-white space-x-2 flex">
           <input
             type="button"
             value="Confirm"

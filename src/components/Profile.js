@@ -171,6 +171,17 @@ function Profile() {
     navigate("/");
   };
 
+  const goTo = (path) => {
+    switch (path) {
+      case "Transactions":
+        navigate("/Transactions");
+        break;
+      case "Beneficiaries":
+        navigate("/Beneficiaries");
+        break;
+    }
+  };
+
   const editProfile = () => {
     setIsEditProfile(true);
   };
@@ -240,16 +251,21 @@ function Profile() {
 
   useEffect(() => {
     axios
-      .post("http://localhost:8080/getSavedAccountsForProfile", {
+      .post("http://localhost:8080/getBeneficiaryDetails", {
         num: document.cookie,
       })
       .then((res) => {
-        console.log(res.data);
-        res.data ? setBeneficiaries(res.data) : setBeneficiaries([]);
+        const beneficiaryDetails = res.data.map((detail) => ({
+          Name: detail.beneficiaryName,
+          Account: detail.accNum,
+        }));
+        beneficiaryDetails
+          ? setBeneficiaries(beneficiaryDetails)
+          : setBeneficiaries([]);
       })
       .catch((err) => console.log(err));
     axios
-      .post("http://localhost:8080/transactionDetailsForTransactionPage", {
+      .post("http://localhost:8080/transactionDetails", {
         mobileNumber: document.cookie,
       })
       .then((res) => {
@@ -287,7 +303,6 @@ function Profile() {
       await setRecentTransactionsLength(count);
     });
     socket.on("allSavedAccounts", async (data) => {
-      const { count } = data;
       const account = {
         Name: data.beneficiaryName,
         Account: data.accNum,
@@ -325,17 +340,17 @@ function Profile() {
     <>
       <div className=" w-screen  lg:fixed flex flex-col text-white font-poppins pt-2 h-screen sm:flex box-border bg-gray-800">
         {windowWidth < 768 ? (
-          <div className="fixed  bg-gray-800 h-[10vh] w-screen flex items-center top-0 z-10">
+          <div className="fixed  bg-gray-800 h-16 w-screen flex items-center top-0 z-10">
             <Menu {...menuProps} onClickHandler={handleMenuClick} />
           </div>
         ) : (
           <Menu {...menuProps} onClickHandler={handleMenuClick} />
         )}
         {isEditProfile ? null : (
-          <div className="bg-slate-100  w-screen text-gray-700 h-auto flex flex-col  md:h-screen box-border md:grid md:grid-cols-4  md:gap-0 lg:gap-2 md:pb-2 md:pl-[3vw] lg:pl-[2vw] xl:pl-[3vw] md:pt-6 cursor-default">
+          <div className="bg-slate-100  w-screen text-gray-700 h-auto flex flex-col  md:h-screen box-border md:grid md:grid-cols-4  md:gap-0 lg:gap-2 md:pb-2 md:pl-12 lg:pl-8 xl:pl-12 md:pt-6 cursor-default">
             <>
-              <div className="h-[50vh] md:h-[35vh] lg:h-[40vh] md:w-[20vw] border-b-2 md:border-b-0  items-center justify-center bg-white  md:md:shadow-md shadow-gray-300 rounded-md">
-                <div className=" h-[9.375rem] w-[9.375rem] md:h-[7.5rem] md:w-[7.5rem]  xl:h-[12.5rem] xl:w-[12.5rem] bg-white  absolute lg:fixed top-[12vh]  md:top-[16vh] lg:top-[17vh] xl:top-[16vh] z-5 overflow-hidden shadow-lg left-[5vw] sm:left-[6vw] md:left-[6vw] lg:left-[6vw] xl:left-[6vw] rounded-full border-2 border-gray-600">
+              <div className="h-50-v md:h-35-v lg:h-40-v md:w-20 border-b-2 md:border-b-0  items-center justify-center bg-white  md:md:shadow-md shadow-gray-300 rounded-md">
+                <div className=" h-9-r w-9 md:h-7-r md:w-7  xl:h-12-r xl:w-12 bg-white  absolute lg:fixed top-20  md:top-28 lg:top-32  z-5 overflow-hidden shadow-lg left-8 sm:left-12 md:left-16 lg:left-20 xl:left-24 rounded-full border-2 border-gray-600">
                   {
                     <>
                       <img
@@ -358,7 +373,7 @@ function Profile() {
                   }
                 </div>
                 {windowWidth < 640 ? (
-                  <div className="w-1/2 absolute h-[10vh]  top-[36vh] grid grid-rows-2  left-[10vw]">
+                  <div className="w-1/2 absolute h-10-v  top-64 grid grid-rows-2  left-12">
                     <h1 className="flex items-center   font-bold text-2xl">
                       {userNameFromDb} <MdModeEdit onClick={editProfile} />
                     </h1>
@@ -366,31 +381,30 @@ function Profile() {
                   </div>
                 ) : null}
                 {windowWidth > 640 ? (
-                  <div className=" lg:gap-8 h-[10%] w-[100%] justify-center    mt-[35vh] md:mt-[25vh] lg:mt-[28vh] xl:mt-[30vh] sm:ml-[-2%] md:ml-0 pl-[0vw] md:pl-[0vw] item-center m-auto text-gray-700">
-                    <div className="w-full m-auto sm:ml-[-6%] md:ml-0 md:mauto lg:m-auto h-auto flex  items-center  ">
+                  <div className=" lg:gap-8 h-custom-10 w-full justify-center  mt-mt-35v md:mt-mt-25v lg:mt-mt-28v xl:mt-mt-30v sm:ml-0  pl-0  item-center m-auto text-gray-700">
+                    <div className="w-full m-auto sm:ml-ml-minus-4 md:ml-0 md:mauto lg:m-auto h-auto flex  items-center  ">
                       {" "}
-                      <h1 className=" md:m-auto flex text-2xl sm:pl-[0vw] md:pl-0 sm:ml-[0vw]  lg:pl-0 xl:pl-[0vw]   items-center justify-center font-extrabold  w-[82%] sm:w-1/2 md:w-[60%]  lg:w-auto text-center sm:text-center">
+                      <h1 className=" md:m-auto flex text-2xl sm:pl-0  sm:ml-0 items-center justify-center font-extrabold  w-custom-82 sm:w-1/2 md:w-custom-60  lg:w-auto text-center sm:text-center">
                         {userNameFromDb}
-
                         <MdModeEdit
                           onClick={editProfile}
                           className="cursor-pointer text-2xl md:m-auto "
                         />
                       </h1>
                     </div>
-                    <div className="w-full m-auto sm:ml-[-4%] md:ml-0 h-auto flex justify-between">
-                      <h1 className=" text-lg font-lighter   w-[82%] sm:w-[47%] sm:ml-[-1vw] md:ml-0 md:w-full text-center sm:text-center">
+                    <div className="w-full m-auto sm:ml-ml-minus-2 md:ml-0 h-auto flex justify-between">
+                      <h1 className=" text-lg font-lighter   w-8/2 sm:w-custom-47 sm:ml-ml-minus-1 md:ml-0 md:w-full text-center sm:text-center">
                         {document.cookie}
                       </h1>
                     </div>
                   </div>
                 ) : null}
               </div>
-              <div className="h-[20vh]  grid md:block  md:w-[20vw] border-b-2 md:border-b-0 pb-2  md:pb-[8rem] xl:pb-0 bg-white hover:bg-gray-100 space-y-2 box-border pt-[3vh] pl-[10vw] md:pl-[2vw] pr-[2vw] md:items-center md:justify-center md:shadow-md shadow-gray-300 rounded-md grid-rows-3">
+              <div className="h-20-v  grid md:block  md:w-20 border-b-2 md:border-b-0 pb-2  md:pb-8 xl:pb-0 bg-white hover:bg-gray-100 space-y-2 box-border pt-4 pl-12 md:pl-4 pr-4 md:items-center md:justify-center md:shadow-md shadow-gray-300 rounded-md grid-rows-3">
                 <h1 className="text-4xl font-bold">
                   {recentTransactionsLength ? recentTransactionsLength : 0}
                 </h1>
-                <h1 className="md:border-b-2  md:text-sm lg:text-md pb-[2vh]">
+                <h1 className="md:border-b-2  md:text-sm lg:text-md pb-3">
                   Total Transactions
                 </h1>
                 <h1
@@ -400,35 +414,35 @@ function Profile() {
                   View Details <IoIosArrowForward />
                 </h1>
               </div>
-              <div className="h-[20vh]  grid grid-rows-3 md:block md:w-[20vw] border-b-2 md:border-b-0 pb-2  md:pb-[8rem] xl:pb-0 md:pb-0 bg-white hover:bg-gray-100 box-border md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-[3vh] pl-[10vw] md:pl-[2vw] pr-[2vw] md:items-center md:justify-center ">
+              <div className="h-20-v  grid grid-rows-3 md:block md:w-20 border-b-2 md:border-b-0 pb-2  md:pb-2 xl:pb-0  bg-white hover:bg-gray-100 box-border md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-4 pl-12 md:pl-4 pr-4 md:items-center md:justify-center ">
                 <h1 className="text-4xl font-bold">
                   {beneficiaries ? beneficiaries.length : 0}
                 </h1>
-                <h1 className="md:border-b-2  md:text-sm lg:text-md pb-[2vh]">
+                <h1 className="md:border-b-2  md:text-sm lg:text-md pb-3">
                   Total Recipients
                 </h1>
                 <h1
                   className="text-md flex items-center justify-between hover:cursor-pointer "
-                  onClick={() => navigate("/Beneficiaries")}
+                  onClick={() => goTo("Beneficiaries")}
                 >
                   View Details <IoIosArrowForward />
                 </h1>
               </div>
-              <div className="h-[20vh] grid grid-rows-3 md:block md:w-[20vw] border-b-2 md:border-b-0 pb-2 md:pb-[8rem]  xl:pb-0 box-border bg-white hover:bg-gray-100  md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-[3vh] pl-[10vw] md:pl-[2vw] pr-[2vw] items-left md:items-center md:justify-center">
+              <div className="h-20-v grid grid-rows-3 md:block md:w-20 border-b-2 md:border-b-0 pb-2 md:pb-8  xl:pb-0 box-border bg-white hover:bg-gray-100  md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-4 pl-12 md:pl-4 pr-4 items-left md:items-center md:justify-center">
                 <h1 className="text-4xl font-bold">
                   {canceledPayments ? canceledPayments : 0}
                 </h1>
-                <h1 className="md:border-b-2 md:text-sm lg:text-md pb-[2vh]">
+                <h1 className="md:border-b-2 md:text-sm lg:text-md pb-3">
                   Failed Transactions
                 </h1>
                 <h1
                   className="text-md flex items-center justify-between cursor-pointer "
-                  onClick={() => setFailedTransaction(true)}
+                  onClick={() => goTo("Transactions")}
                 >
                   View Details <IoIosArrowForward />
                 </h1>
               </div>
-              <div className="h-[31vh] md:h-[40vh] lg:h-[40vh]  border-b-2 pb-0 md:pb-0 md:w-[20vw] bg-white hover:bg-gray-100 space-y-4 md:space-y-[5rem] flex flex-col pt-[1rem] md:pt-[4rem] items-center md:shadow-md shadow-gray-300 rounded-md">
+              <div className="h-31-v md:h-40-v  border-b-2 pb-0 md:pb-0 md:w-20 bg-white hover:bg-gray-100 space-y-4 md:space-y-20 flex flex-col pt-4 md:pt-16 items-center md:shadow-md shadow-gray-300 rounded-md">
                 <div className="flex flex-col items-center space-y-2 justify-center">
                   <h1 className="m-0 text-4xl items-center flex justify-center border-2 rounded-full p-2 bg-slate-100">
                     <IoIosWallet />
@@ -438,16 +452,16 @@ function Profile() {
                   </h1>
                   <h1 className=" text-sm">Available Balance</h1>
                 </div>
-                <h1 className=" bg-slate-700 cursor-pointer hover:bg-gray-600 w-full md:w-[20%] lg:w-[20%] h-[6vh] md:h-[6.2vh] lg:h-[6vh] absolute top-[134vh] md:top-[78.5vh] lg:top-[80vh] xl:top-[81vh]  text-white text-center flex items-center justify-center md:rounded-tr-none md:rounded-tl-none md:rounded-md">
+                <h1 className=" bg-slate-700 cursor-pointer hover:bg-gray-600 w-full md:w-1/5  h-12 md:h-12 lg:h-12 absolute top-57.5 md:top-34  xl:top-39.5  text-white text-center flex items-center justify-center md:rounded-tr-none md:rounded-tl-none md:rounded-md">
                   Customer Support
                 </h1>
               </div>
-              <div className="h-[50vh] md:h-[55vh] lg:h-[60vh] xl:h-[60vh] border-b-2 md:border-b-0 md:w-[28vw] lg:w-[30vw] xl:w-[31vw] md:pl-0 md:mt-[-4.5rem] lg:mt-[-7.5rem] xl:mt-[-9.5rem] bg-white hover:bg-gray-100 space-y-2  md:space-y-1 pt-2 md:pt-4 md:shadow-md shadow-gray-300 rounded-md">
-                <div className="grid grid-cols-2 gap-[35vw] sm:gap-[45vw] md:gap-0 xl:gap-20  pl-4 md:pl-[2vw] ">
+              <div className="h-50-v md:h-55-v lg:h-60-v xl:h-60-v border-b-2 md:border-b-0 md:w-28 lg:w-30 xl:w-31 md:pl-0 md:mt-mt-4/5  lg:mt-mt-7/5 xl:mt-mt-9/5 md:ml-0 bg-white hover:bg-gray-100 space-y-2  md:space-y-1 pt-2 md:pt-4 md:shadow-md shadow-gray-300 rounded-md">
+                <div className="grid grid-cols-2 gap-32 sm:gap-80 md:gap-0 xl:gap-20  pl-4 md:pl-8">
                   <h1 className="text-lg md:text-sm lg:text-xl ">Recipients</h1>
                   <h1
-                    className="text-sm md:text-xs lg:text-md xl:text-sm ml-[4vw] md:ml-[2vw] lg:ml-[4vw] flex items-center text-gray-900 hover:cursor-pointer"
-                    onClick={() => navigate("/Beneficiaries")}
+                    className="text-sm md:text-xs lg:text-md xl:text-sm md:ml-4 lg:ml-8 flex items-center text-gray-900 hover:cursor-pointer"
+                    onClick={() => goTo("Beneficiaries")}
                   >
                     View more <IoIosArrowForward />
                   </h1>
@@ -455,19 +469,16 @@ function Profile() {
                 <div
                   className={
                     beneficiaries && beneficiaries.length < 5
-                      ? "space-y-10   h-[50%] pt-[1vh]  md:h-[90%] lg:h-[90%] xl:h-full pl-[5vw] md:pl-[2vw] md:pt-[2vh] md:pb-[2vh]"
-                      : "grid   h-[50%] pt-[1vh]  md:h-[90%] lg:h-[90%] xl:h-full pl-[5vw] md:pl-[2vw] md:pt-[2vh] md:pb-[2vh]"
+                      ? "space-y-10  h-1/2 pt-4  md:h-custom-90 lg:h-custom-90 xl:h-full pl-4 md:pl-4 lg:pl-8  md:pt-4 md:pb-4"
+                      : "grid  h-1/2 pt-4  md:h-custom-90 lg:h-custom-90 xl:h-full pl-4 md:pl-4 lg:pl-8 md:pt-4 md:pb-4"
                   }
                 >
                   {beneficiaries.length > 0 ? (
                     beneficiaries.slice(0, 6).map((item, index) => (
-                      <div
-                        key={index}
-                        className="space-y-0  xl:h-[3vh]    leading-0"
-                      >
+                      <div key={index} className="space-y-0 xl:h-12 leading-0">
                         <h1
                           key={index}
-                          className="text-md  md:text-sm lg:text-md   capitalize "
+                          className="text-md md:text-sm lg:text-md capitalize "
                         >
                           {item.Name}
                         </h1>
@@ -481,8 +492,8 @@ function Profile() {
                   )}
                 </div>
               </div>
-              <div className="h-auto md:h-[55vh] lg:h-[60vh]  md:w-[38vw] lg:w-[37vw] xl:w-[33vw] border-b-2 md:border-b-0 overflow-y-auto md:mt-[-4.5rem]  lg:mt-[-7.5rem] xl:mt-[-9.5rem] md:ml-[7vw] lg:ml-[8vw] xl:ml-[11vw] space-y-1 bg-white hover:bg-gray-100 md:shadow-md shadow-gray-300  md:rounded-md">
-                <div className="grid grid-cols-3 md:gap-0 sticky top-0 z-5 bg-slate-700 text-white h-[6vh] pl-4 border-b-2  items-center">
+              <div className="h-auto md:h-55-v lg:h-60-v  md:w-38 lg:w-37 xl:w-33 border-b-2 md:border-b-0 overflow-y-auto md:mt-mt-4/5  lg:mt-mt-7/5 xl:mt-mt-9/5 md:ml-16 lg:ml-24 xl:ml-l-10 space-y-1 bg-white hover:bg-gray-100 md:shadow-md shadow-gray-300  md:rounded-md">
+                <div className="grid grid-cols-3 md:gap-0 sticky top-0 z-5 bg-slate-700 text-white h-12 pl-4 border-b-2  items-center">
                   <h1 className="text-sm  md:text-xs lg:text-md xl:text-xl  md:pr-0 border-r-2">
                     Recent Activity
                   </h1>
@@ -491,14 +502,14 @@ function Profile() {
                     Transactions
                   </h1>
                   <h1
-                    className="text-xs md:text-xs xl:text-sm ml-[2vw] lg:ml-[4vw] flex items-center text-gray-200 hover:cursor-pointer"
-                    onClick={() => navigate("/Transactions")}
+                    className="text-xs md:text-xs xl:text-sm ml-4 lg:ml-8 flex items-center text-gray-200 hover:cursor-pointer"
+                    onClick={() => goTo("Transactions")}
                   >
                     View more <IoIosArrowForward />
                   </h1>
                 </div>
-                <div className="grid grid-cols-2 gap-5 lg:gap-5 xl:gap-6 p-1 space-y-0 items-center pl-[1.2vw] border-b-2 ">
-                  <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-2 md:gap-0 lg:gap-0 xl:gap-0 pl-[5vw] md:pl-0">
+                <div className="grid grid-cols-2 gap-5 lg:gap-5 xl:gap-6 p-1 space-y-0 items-center pl-4 border-b-2 ">
+                  <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-2 md:gap-0  pl-0 ">
                     <h1>Date</h1>
                     <h1>Description</h1>
                   </div>
@@ -509,7 +520,7 @@ function Profile() {
                   </div>
                 </div>
                 {recentActivity.length < 1 ? (
-                  <p className="flex items-center justify-center pt-[5rem] pb-[5rem]">
+                  <p className="flex items-center justify-center pt-20 pb-20">
                     There is no recent transactions
                   </p>
                 ) : (
@@ -519,11 +530,11 @@ function Profile() {
                     .map((item, index) => (
                       <div
                         key={index}
-                        className="grid grid-cols-2 gap-5 md:gap-10  lg:gap-7 xl:gap-16 p-1 space-y-0 items-center pl-[5vw] md:pl-[1.2vw] pr-[2vw] border-b-2"
+                        className="grid grid-cols-2 gap-5 md:gap-10  lg:gap-7 xl:gap-16 p-1 space-y-0 items-center pl-4 md:pl-4 lg:pl-4  pr-4 border-b-2"
                       >
                         <div className="grid grid-cols-2 gap-0 md:gap-6 lg:gap-2 xl:gap-6 items-center text-xs md:text-sm lg:text-md ">
                           <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
-                          <h1 className="md:text-xs lg:text-md overflow-x-auto md:w-[5.313rem] lg:w-[6.875rem]">{`Sent to ${item.Name}`}</h1>
+                          <h1 className="md:text-xs lg:text-md overflow-x-auto md:w-16 lg:w-24">{`Sent to ${item.Name}`}</h1>
                         </div>
                         <div className="grid grid-cols-2 md:gap-5 lg:gap-5  text-xs md:text-sm lg:text-md  ">
                           <h1 className="md:text-xs lg:text-md">
@@ -593,7 +604,7 @@ function Profile() {
       ) : null}
 
       {failedTransaction ? (
-        <div className="fixed top-0 grid justify-center h-screen w-screen z-[100]">
+        <div className="fixed top-0 grid justify-center h-screen w-screen z-100">
           <FailedTransactions
             state={{ recentActivity, setFailedTransaction }}
           />

@@ -4,6 +4,7 @@ import { store } from "../App";
 import { MdOutlineCancel } from "react-icons/md";
 import { useNavigate } from "react-router";
 import Loader from "./Loader";
+import ConfirmTick from "./images/ConfirmTick";
 
 function Success() {
   const { socket, connectionMode } = useContext(store);
@@ -17,26 +18,21 @@ function Success() {
     socket.emit("successPage", {
       socketRoom: sessionId,
     });
-
     const handleSuccess = (data) => {
       if (typeof data === "boolean") {
         setCheck(data);
         setFail(false);
-
         console.log("success");
       }
     };
-
     const handleFailure = (data) => {
       if (typeof data === "boolean") {
         setFail(data);
         setCheck(false);
       }
     };
-
     socket.on("success", handleSuccess);
     socket.on("failed", handleFailure);
-
     return () => {
       socket.off("success", handleSuccess);
       socket.off("failed", handleFailure);
@@ -93,8 +89,8 @@ function Success() {
       {fail ? (
         <>
           {" "}
-          <div className="loading font-poppins space-y-2">
-            <div class="wrapper  height-[10vh] width-screen flex justify-center items-center">
+          <div className="loading h-screen w-screen flex flex-col items-center justify-center font-poppins space-y-2">
+            <div class="wrapper width-screen flex justify-center items-center">
               <MdOutlineCancel className="fail-icon" />{" "}
             </div>
             <h3 className="text-white">Payment Transaction Failed!</h3>
@@ -104,30 +100,10 @@ function Success() {
       ) : (
         <>
           {check ? (
-            <div className="loading font-poppins">
-              <div class="wrapper  height-[10vh] width-screen flex justify-center items-center">
-                {" "}
-                <svg
-                  class="checkmark"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 52 52"
-                >
-                  {" "}
-                  <circle
-                    class="checkmark__circle"
-                    cx="26"
-                    cy="26"
-                    r="25"
-                    fill="none"
-                  />{" "}
-                  <path
-                    class="checkmark__check"
-                    fill="none"
-                    d="M14.1 27.2l7.1 7.2 16.7-16.8"
-                  />
-                </svg>
+            <div className="loading h-screen  w-screen flex flex-col items-center justify-center font-poppins">
+              <div class="wrapper width-screen flex justify-center items-center">
+                <ConfirmTick />
               </div>
-
               <h3 className="text-white">Payment Transaction Successful !</h3>
               <br />
             </div>

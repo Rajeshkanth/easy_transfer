@@ -80,9 +80,10 @@ function Login() {
       setIsValidNumber(false);
       setLoader(true);
       try {
-        const response = await axios.post("http://localhost:8080/login", {
+        const response = await axios.post(`http://localhost:8080/login/`, {
           Mobile: mobileNumber.slice(2),
           Password: password,
+          TabId: sessionStorage.getItem("tabId") + mobileNumber.slice(2),
         });
         if (response.status === 200) {
           setLoader(false);
@@ -122,6 +123,7 @@ function Login() {
       await socket.emit("login", {
         mobileNumber: mobileNumber.slice(2),
         password: password,
+        tabId: sessionStorage.getItem("tabId") + mobileNumber.slice(2),
       });
       socket.on("loginSuccess", () => {
         setLoader(false);
@@ -167,12 +169,12 @@ function Login() {
 
   return (
     <>
-      <div className="items-center justify-center pt-[2rem] text-gray-600 flex space-y-0 flex-col">
+      <div className="items-center justify-center pt-8 text-gray-600 flex space-y-0 flex-col">
         <img
-          className="font-extrabold text-xl sm:text-4xl object-cover h-[7vh] sm:h-[7vh] md:h-[9vh] lg:h-[9vh] xl:h-[11vh] w-[80%] md:w-[80%] lg:w-[24vw] xl:w-[22vw] text-center text-gray-700 items-center font-poppins"
+          className="object-cover min-h-8 min-w-40 max-w-56 sm:max-w-65  text-center text-gray-700 items-center font-poppins"
           src={logo}
         ></img>
-        <h1 className="text-center m-0 text-[4vw] sm:text-[3vh] md:text-2xl font-bold font-poppins    cursor-default ">
+        <h1 className="text-center m-0 text-md sm:text-lg md:text-xl font-bold font-poppins cursor-default ">
           Welcome Back
         </h1>
       </div>
@@ -184,8 +186,8 @@ function Login() {
             : "flex flex-col items-center bg-white m-auto rounded-2xl h-auto w-full space-y-2 font-poppins "
         }
       >
-        <div className="flex flex-col space-y-[0.125rem] w-[80%]">
-          <label htmlFor="" className="text-[0.875rem] mb-[.1rem] ">
+        <div className="flex flex-col space-y-1 w-custom-80 ">
+          <label htmlFor="" className="text-sm mb-1 ">
             Mobile Number
           </label>
 
@@ -201,120 +203,74 @@ function Login() {
                 ? {
                     required: true,
                     className:
-                      "1 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[1rem] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                      "outline-0 h-10  w-full border border-red-600 rounded-lg text-base pl-11 p-4 font-poppins  border-box ",
                   }
                 : isNewUser
                 ? {
                     required: true,
                     className:
-                      "4 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[1rem] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                      "outline-0 h-10  w-full border border-red-600 rounded-lg text-base pl-11 p-4 font-poppins  border-box ",
                   }
                 : mobileNumber && !isValidNumber
                 ? {
                     required: true,
                     className:
-                      "5 outline-0 h-10  w-full border-2 border-red-600 rounded-lg text-[1rem] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                      "outline-0 h-10  w-full border border-red-600 rounded-lg text-base pl-11 p-4 font-poppins  border-box ",
                   }
                 : {
                     required: true,
                     className:
-                      "6 outline-0 h-10  w-full border-2 border-slate-300 rounded-lg text-[1rem] pl-[10vw] sm:pl-[7vw] md:pl-[6vw] lg:pl-[4.5vw] xl:pl-[4vw]  p-[1rem] font-poppins  border-box ",
+                      "outline-0 h-10  w-full border  border-slate-300 rounded-lg text-base pl-11 p-4 font-poppins  border-box ",
                   }
             }
             dialCodeEditable={false}
-            buttonStyle={
-              loginInputAlert && !mobileNumber
-                ? {
-                    width: "14% ",
-                    paddingLeft: "0px",
-                    backgroundColor: "white",
-                    border: "0.125rem solid #DC2626",
-                    borderColor: "#DC2626",
-                    borderRadius: " 0.5rem 0 0 0.5rem ",
-                    fontFamily: "poppins",
-                  }
-                : isNewUser
-                ? {
-                    fontFamily: "poppins",
-                    width: "14% ",
-                    paddingLeft: "0px",
-                    backgroundColor: "white",
-                    border: "0.125rem solid #DC2626",
-                    borderColor: "#DC2626",
-                    borderRadius: " 0.5rem 0 0 0.5rem ",
-                  }
-                : mobileNumber && !isValidNumber
-                ? {
-                    fontFamily: "poppins",
-                    width: "14% ",
-                    paddingLeft: "0px",
-                    backgroundColor: "white",
-                    border: "0.125rem solid #DC2626",
-                    borderColor: "#DC2626",
-                    borderRadius: " 0.5rem 0 0 0.5rem ",
-                    fontFamily: "poppins",
-                  }
-                : {
-                    width: "14% ",
-                    paddingLeft: "0px",
-                    backgroundColor: "white",
-                    border: "0.125rem solid #CBD5E1",
-                    borderColor: "#CBD5E1",
-                    borderRadius: " 0.5rem 0 0 0.5rem ",
-                    fontFamily: "poppins",
-                  }
-            }
+            buttonClass="border-red-800 border-2 rounded bg-white "
           />
 
-          <div className="w-[80%] mb-2">
+          <div className="w-custom-80 mb-2">
             {mobileNumber ? (
               isValidNumber ? null : (
-                <p className="text-xs w-[80%] mt-[.2rem]  text-red-500">
+                <p className="text-xs w-custom-80 mt-minus-8  text-red-500">
                   Invalid number
                 </p>
               )
             ) : null}
             {!mobileNumber && loginInputAlert ? (
-              <p className="text-xs w-[80%] mt-[.2rem] text-red-500">
-                Enter Mobile Number
+              <p className="text-xs w-custom-80 mt-minus-8 text-red-500">
+                Enter mobile number
               </p>
             ) : null}
             {isNewUser ? (
-              <p className="text-xs mt-[.2rem] text-red-500">
-                Wrong Mobile Number
-              </p>
+              <p className="text-xs mt-1 text-red-500">Wrong mobile number</p>
             ) : null}
           </div>
         </div>
-        <div className="flex flex-col space-y-1 w-[80%] ">
-          <label
-            htmlFor=""
-            className="block leading-6 text-left text-[0.875rem] mb-[.1rem]  "
-          >
+        <div className="flex flex-col space-y-1 w-custom-80 ">
+          <label htmlFor="" className="block leading-6 text-left text-sm mb">
             Password
           </label>
           <input
             name="password"
             className={
               loginInputAlert && !password
-                ? "outline-0 h-10 w-full rounded-lg  p-[1rem] pl-[.5rem] sm:p-[1rem] border-2 text-[1rem] border-red-600  border-box  "
+                ? "outline-0 h-10 w-full rounded-lg  p-4 pl-2 sm:p-4 border text-base border-red-600  border-box  "
                 : loginFailed
-                ? "outline-0 h-10 w-full rounded-lg  p-[1rem] pl.[.5rem] sm:p-[1rem] border-2 text-[1rem] border-red-600  border-box  "
-                : "outline-0 h-10 w-full rounded-lg  p-[1rem] pl-[.5rem] sm:p-[1rem] border-2 text-[1rem] border-slate-300  border-box "
+                ? "outline-0 h-10 w-full rounded-lg  p-4 pl-2 sm:p-4 border text-base border-red-600  border-box  "
+                : "outline-0 h-10 w-full rounded-lg  p-4 pl-2 sm:p-4 border text-base border-slate-300  border-box "
             }
             type={showPassword ? "text" : "password"}
             minLength={6}
             value={password}
             onChange={handlePassword}
-            placeholder="Enter Your Password"
+            placeholder="Enter your password"
           />
 
           {showPassword ? (
             <FaRegEye
               className={
                 windowWidth < 640
-                  ? "cursor-pointer relative ml-[56.5vw] bottom-[2rem] text-zinc-400"
-                  : "cursor-pointer relative  sm:ml-[42vw] md:ml-[35vw] lg:ml-[25vw] xl:ml-[23.8vw] bottom-0 sm:bottom-[2rem] text-zinc-400"
+                  ? "cursor-pointer relative m-l-57 bottom-8 text-zinc-400"
+                  : "cursor-pointer relative  sm:m-l-42  md:m-l-35 lg:m-l-25 xl:m-l-23 bottom-0 sm:bottom-8 text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
@@ -322,32 +278,32 @@ function Login() {
             <FaRegEyeSlash
               className={
                 windowWidth < 640
-                  ? "cursor-pointer relative ml-[56.5vw] bottom-[2rem] text-zinc-400"
-                  : "cursor-pointer relative  sm:ml-[42vw]  md:ml-[35vw] lg:ml-[25vw] xl:ml-[23.8vw] bottom-[1rem] sm:bottom-[2rem] text-zinc-400"
+                  ? "cursor-pointer relative m-l-57 bottom-8 text-zinc-400"
+                  : "cursor-pointer relative  sm:m-l-42  md:m-l-35 lg:m-l-25 xl:m-l-23 bottom-4 sm:bottom-8 text-zinc-400"
               }
               onClick={() => handleShowPassword("login")}
             />
           )}
         </div>
 
-        <div className="w-[80%]">
+        <div className="w-custom-80">
           {loginInputAlert && !password ? (
-            <p className="relative top-[-3vh] md:top-[-3vh] lg::top-[-3vh] text-red-500 text-xs cursor-default ">
+            <p className="relative bottom-6  text-red-500 text-xs cursor-default ">
               Enter Password
             </p>
           ) : null}
           {loginFailed && !isNewUser ? (
-            <p className="relative top-[-3vh] md:top-[-3vh] lg:top-[-3vh] text-xs  text-red-500">
+            <p className="relative bottom-6  text-xs  text-red-500">
               Wrong password
             </p>
           ) : null}
         </div>
 
-        <div className="w-[80%] items-center flex justify-center">
+        <div className="w-custom-80 items-center flex justify-center">
           {" "}
           <button
             disabled={loader ? true : false}
-            className="w-full  border-0  outline-0  hover:bg-gray-600 bg-gray-800 text-white text-center p-[.5rem] font-bold  h-auto   rounded-md "
+            className="w-full  border-0  outline-0  hover:bg-gray-600 bg-gray-800 text-white text-center p-2 font-bold  h-auto   rounded-sm "
             onClick={
               connectionMode === "socket"
                 ? loginToDashboardUsingSocket
@@ -359,10 +315,10 @@ function Login() {
         </div>
 
         <div className="flex flex-col justify-center  items-center">
-          <p className="text-xs mt-[2rem] text-gray-800 sm:mt-[3rem]  mb-[.4rem] underline cursor-pointer ">
+          <p className="text-xs mt-8 text-gray-800 sm:mt-12  mb-2 underline cursor-pointer ">
             Forgot Password?
           </p>
-          <p className="font-light text-xs text-gray-800 mt-[.5rem] mb-[2rem]">
+          <p className="font-light text-xs text-gray-800 mt-2 mb-8">
             Don't have an account?
             <strong
               className="font-bold text-gray-800 cursor-pointer"

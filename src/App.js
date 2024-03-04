@@ -119,10 +119,8 @@ function App() {
     socket.on("connection_type", (data) => {
       if (data.type === "socket") {
         setConnectionMode("socket");
-        console.log("socket");
       } else {
         setConnectionMode("polling");
-        console.log("polling");
       }
     });
 

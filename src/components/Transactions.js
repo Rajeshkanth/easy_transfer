@@ -127,7 +127,6 @@ function Transactions() {
       onClickHandler: handleMenuClick,
     };
   };
-
   const sideBarProps = getSideBarProps();
 
   const onIdle = () => {
@@ -155,7 +154,7 @@ function Transactions() {
 
   useEffect(() => {
     axios
-      .post("http://localhost:8080/transactionDetailsForTransactionPage", {
+      .post("http://localhost:8080/transactionDetails", {
         mobileNumber: document.cookie,
       })
       .then((res) => {
@@ -212,18 +211,18 @@ function Transactions() {
           <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
         </>
       ) : null}
-      <div className="h-auto md:h-screen w-screen pt-0 md:pt-2 pb-[2rem] md:fixed font-poppins bg-gray-800 text-white">
+      <div className="h-auto md:h-screen w-screen pt-0 md:pt-2 pb-8 md:fixed font-poppins bg-gray-800 text-white">
         <Menu {...menuProps} onClickHandler={handleMenuClick} />
 
-        <div className=" grid  pt-[10vh] md:pt-0 md:grid-cols-2 gap-0 lg:gap-10 md:pl-[7vw] lg:pl-[6vw] md:mt-[4vh] box-border">
-          <div className="h-[30vh] md:h-[30vh] lg:h-[30vh]  md:w-[35vw] lg:w-[35vw] xl:w-[40vw] border-b-2 md:border-b-0 overflow-y-auto    space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
-            <div className="grid  md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-[6vh] pl-2 lg:pl-9 xl:pl-12 border-b-2 pt-2 items-center">
-              <h1 className="text-sm  md:text-xs lg:text-md xl:text-xl  md:pr-0 ">
+        <div className=" grid  pt-16 md:pt-0 md:grid-cols-2 gap-0 lg:gap-10 md:pl-20 lg:pl-24 md:mt-4 box-border">
+          <div className="h-custom-30 md:h-13-r lg:h-13-r xl:h-17-r md:w-7/8 lg:w-7/8 xl:w-8/8 border-b-2 md:border-b-0 overflow-y-auto space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
+            <div className="grid  md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-12 pl-2 lg:pl-9 xl:pl-12 border-b-2 pt-2 items-center">
+              <h1 className="text-sm  md:text-xs lg:text-md xl:text-16  md:pr-0 ">
                 Pending Transactions
               </h1>
             </div>
-            <div className="grid grid-cols-2 gap-10 lg:gap-5 text-gray-700  xl:gap-6 p-1 space-y-0 items-center md:pl-[1.5vw] lg:pl-[3.5vw] border-b-2 ">
-              <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-4 md:gap-0 lg:gap-0 xl:gap-0 pl-[5vw] md:pl-0">
+            <div className="grid grid-cols-2 gap-10 lg:gap-5 text-gray-700  xl:gap-6 p-1 space-y-0 items-center md:pl-4 lg:pl-8 border-b-2 ">
+              <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-4 md:gap-0 lg:gap-0 xl:gap-0 pl-4 sm:pl-8 md:pl-0 xl:pl-4  pr-4">
                 <h1>Date</h1>
                 <h1>Description</h1>
               </div>
@@ -234,14 +233,14 @@ function Transactions() {
               </div>
             </div>
             {recentTransactions === null ? (
-              <div className="grid  items-center  h-[50%] text-gray-700 justify-center text-[1rem]">
-                <p className=" pt-[0rem]">There is no recent transactions</p>
+              <div className="grid  items-center  h-1/2 text-gray-700 justify-center text-16">
+                <p className=" pt-0">There is no recent transactions</p>
               </div>
             ) : recentTransactions.filter((item) => item.Status === "Pending")
                 .length < 1 ? (
               <>
-                <div className="grid  items-center  h-[50%] text-gray-700 justify-center text-[1rem]">
-                  <p className=" pt-[0rem]">There is no pending transactions</p>
+                <div className="grid  items-center  h-1/2 text-gray-700 justify-center text-16">
+                  <p className=" pt-0">There is no pending transactions</p>
                 </div>{" "}
               </>
             ) : (
@@ -250,7 +249,7 @@ function Transactions() {
                 .map((item, index) => (
                   <div
                     key={index}
-                    className="grid grid-cols-2 gap-5  lg:gap-7 xl:gap-12 p-1 space-y-0 text-gray-700 items-center pl-[5vw] md:pl-[1.5vw] lg:pl-[3.5vw] pr-[2vw] border-b-2"
+                    className="grid grid-cols-2 gap-5  lg:gap-7 xl:gap-12 p-1 space-y-0 text-gray-700 items-center pl-4 sm:pl-8 md:pl-3 lg:pl-8 xl:pl-12 pr-4 border-b-2"
                   >
                     <div className="grid grid-cols-2 gap-6 lg:gap-2 xl:gap-10 items-center text-xs md:text-sm lg:text-md ">
                       <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
@@ -274,14 +273,14 @@ function Transactions() {
                 ))
             )}
           </div>
-          <div className="h-[50vh] md:h-[80vh] lg:h-[80vh]  md:w-[40vw] lg:w-[40vw] xl:w-[40vw] border-b-2 md:border-b-0 overflow-y-auto    space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
-            <div className="grid  md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-[6vh] pl-2 lg:pl-9 xl:pl-12 border-b-2 pt-2 items-center">
-              <h1 className="text-sm  md:text-xs lg:text-md xl:text-xl  md:pr-0">
+          <div className="h-custom-30 md:h-custom-35 xl:h-custom-40  min-w-80 md:w-8/1 lg:w-8/8  border-b-2 md:border-b-0 overflow-y-auto space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
+            <div className="grid  md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-12 pl-2 lg:pl-9 xl:pl-12 border-b-2 pt-2 items-center">
+              <h1 className="text-sm  md:text-xs lg:text-md xl:text-16  md:pr-0">
                 Completed Transactions
               </h1>
             </div>
-            <div className="grid grid-cols-2 gap-10 lg:gap-5 text-gray-700  xl:gap-6 p-1 space-y-0 items-center md:pl-[1.5vw] lg:pl-[3.5vw] border-b-2 ">
-              <div className="grid grid-cols-2 sticky top-20 text-sm md:text-sm lg:text-md gap-4 md:gap-0 lg:gap-0 xl:gap-0 pl-[5vw] md:pl-0">
+            <div className="grid grid-cols-2 gap-10 lg:gap-5 text-gray-700  xl:gap-6 p-1 space-y-0 items-center md:pl-4 lg:pl-8 border-b-2 ">
+              <div className="grid grid-cols-2 sticky top-20 text-sm md:text-sm lg:text-md gap-4 md:gap-0 lg:gap-0 xl:gap-0 pl-4 sm:pl-8 md:pl-0 xl:pl-4  pr-4">
                 <h1>Date</h1>
                 <h1>Description</h1>
               </div>
@@ -292,13 +291,13 @@ function Transactions() {
               </div>
             </div>
             {!recentTransactions ? (
-              <div className="grid  items-center h-[80%] text-gray-700 justify-center">
-                <p className=" pt-[0rem]">There is no recent transactions</p>
+              <div className="grid  items-center h-4/5 text-gray-700 justify-center">
+                <p className=" pt-0">There is no recent transactions</p>
               </div>
             ) : recentTransactions.filter((item) => item.Status === "completed")
                 .length < 1 ? (
-              <div className="grid  items-center h-[80%] text-gray-700 justify-center">
-                <p className=" pt-[0rem]">There is no completed transactions</p>
+              <div className="grid  items-center h-4/5 text-gray-700 justify-center">
+                <p className=" pt-0">There is no completed transactions</p>
               </div>
             ) : (
               recentTransactions
@@ -306,7 +305,7 @@ function Transactions() {
                 .map((item, index) => (
                   <div
                     key={index}
-                    className="grid grid-cols-2 gap-5  lg:gap-7 xl:gap-6 p-1 space-y-0 text-gray-700 items-center pl-[5vw] md:pl-[1.5vw] lg:pl-[3.5vw] pr-[2vw] border-b-2"
+                    className="grid grid-cols-2 gap-5  lg:gap-7 xl:gap-6 p-1 space-y-0 text-gray-700 items-center pl-4 sm:pl-8 md:pl-3 lg:pl-8 xl:pl-12 pr-4 border-b-2"
                   >
                     <div className="grid grid-cols-2 gap-6 lg:gap-2 xl:gap-10 items-center text-xs md:text-sm lg:text-md ">
                       <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
@@ -332,14 +331,14 @@ function Transactions() {
                 ))
             )}
           </div>
-          <div className="h-[50vh] md:h-[43vh] lg:h-[40vh]  md:w-[35vw] lg:w-[35vw] xl:w-[40vw] border-b-2 md:border-b-0 overflow-y-auto md:mt-[-43vh] lg:mt-[-47vh] xl:mt-[-25.5vw] space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
-            <div className="grid  md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-[6vh] pl-2 lg:pl-9 xl:pl-12 border-b-2 pt-2 items-center">
-              <h1 className="text-sm  md:text-xs lg:text-md xl:text-xl  md:pr-0 ">
+          <div className=" h-custom-30 md:max-h-80  md:w-7/8 lg:w-7/8 xl:w-8/8 border-b-2 md:border-b-0 overflow-y-auto md:mt-mt-20 lg:mt-mt-22  space-y-1 bg-white  md:shadow-md shadow-gray-300  md:rounded-md">
+            <div className="grid  md:gap-0 sticky top-0 z-10 bg-slate-700 text-white h-12 pl-2 lg:pl-9 xl:pl-12 border-b-2 pt-2 items-center">
+              <h1 className="text-sm  md:text-xs lg:text-md xl:text-16  md:pr-0 ">
                 Canceled Transactions
               </h1>
             </div>
-            <div className="grid grid-cols-2 gap-10 lg:gap-5 text-gray-700  xl:gap-0 p-1 space-y-0 items-center md:pl-[1.5vw] lg:pl-[3.5vw] border-b-2 overflow-y-auto">
-              <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-4 md:gap-0 lg:gap-0 xl:gap-0 pl-[5vw] md:pl-0">
+            <div className="grid grid-cols-2 gap-10 lg:gap-5 text-gray-700  xl:gap-0 p-1 space-y-0 items-center md:pl-4 lg:pl-8 border-b-2 overflow-y-auto">
+              <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-4 md:gap-0 pl-4 sm:pl-8 md:pl-0 xl:pl-4  pr-4">
                 <h1>Date</h1>
                 <h1>Description</h1>
               </div>
@@ -350,12 +349,12 @@ function Transactions() {
               </div>
             </div>
             {!recentTransactions ? (
-              <div className="grid  items-center h-[50%] text-gray-700 justify-center">
+              <div className="grid  items-center h-1/2 text-gray-700 justify-center">
                 <p className="">There is no recent transactions</p>
               </div>
             ) : recentTransactions.filter((item) => item.Status === "canceled")
                 .length < 1 ? (
-              <div className="grid  items-center h-[50%] text-gray-700 justify-center">
+              <div className="grid  items-center h-1/2 text-gray-700 justify-center">
                 <p className="">There is no canceled transactions</p>
               </div>
             ) : (
@@ -364,7 +363,7 @@ function Transactions() {
                 .map((item, index) => (
                   <div
                     key={index}
-                    className="grid grid-cols-2 gap-5  lg:gap-7 xl:gap-6 p-1 space-y-0 text-gray-700 items-center pl-[5vw] md:pl-[1.5vw] lg:pl-[3.5vw] pr-[2vw] border-b-2"
+                    className="grid grid-cols-2 gap-5  lg:gap-7 xl:gap-6 p-1 space-y-0 text-gray-700 items-center pl-4 sm:pl-8 md:pl-3 lg:pl-8 xl:pl-12 pr-4 border-b-2"
                   >
                     <div className="grid grid-cols-2 gap-6 lg:gap-2 xl:gap-10 items-center text-xs md:text-sm lg:text-md ">
                       <h1 className="md:text-xs lg:text-md">{item.Date}</h1>

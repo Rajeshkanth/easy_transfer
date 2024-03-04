@@ -1,12 +1,10 @@
 import React, { memo, useContext, useEffect, useState } from "react";
 import { store } from "../App";
 import axios from "axios";
-import { CgClose } from "react-icons/cg";
-import { json, useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import Menu from "./Menu";
 import SideBar from "./SideBar";
 import { RiMenuUnfoldFill } from "react-icons/ri";
-// import { MdKeyboardArrowLeft } from "react-icons/fa6";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import Loader from "./Loader";
 import { useIdleTimer } from "react-idle-timer";
@@ -44,6 +42,12 @@ function Beneficiaries() {
   const [allInputsAlert, setAllInputsAlert] = useState(false);
   const [plusIcon, setPlusIcon] = useState(false);
   const clickable = savedAccNum.length > 15;
+
+  const clearAllInputs = () => {
+    setSavedBeneficiaryName("");
+    setSavedAccNum("");
+    setSavedIfsc("");
+  };
 
   const handleMenuClick = (menuItem) => {
     switch (menuItem) {
@@ -188,24 +192,32 @@ function Beneficiaries() {
       String(savedIfsc).length > 9
     ) {
       if (connectionMode !== "socket") {
-        const response = await axios.post(
-          "http://localhost:8080/addNewBeneficiary",
-          {
-            SavedBeneficiaryName: savedBeneficiaryName,
-            SavedAccNum: savedAccNum,
-            SavedIfsc: savedIfsc,
-            mobileNumber: document.cookie,
+        try {
+          const response = await axios.post(
+            "http://localhost:8080/addNewBeneficiary",
+            {
+              SavedBeneficiaryName: savedBeneficiaryName,
+              SavedAccNum: savedAccNum,
+              SavedIfsc: savedIfsc,
+              mobileNumber: document.cookie,
+            }
+          );
+          setLoader(true);
+          if (response.status === 200) {
+            const savedDetail = {
+              beneficiaryName: response.data.beneficiaryName,
+              accNum: response.data.accNum,
+              ifsc: response.data.ifsc,
+            };
+            setSavedAcc((prev) => [...prev, savedDetail]);
+            setLoader(false);
+          } else if (response.status === 409) {
+            alert("Account number already saved");
+          } else {
+            return;
           }
-        );
-        setLoader(true);
-        if (response.status === 200) {
-          const savedDetail = {
-            beneficiaryName: response.data.beneficiaryName,
-            accNum: response.data.accNum,
-            ifsc: response.data.ifsc,
-          };
-          setSavedAcc((prev) => [...prev, savedDetail]);
-          setLoader(false);
+        } catch (err) {
+          return err;
         }
       } else {
         socket.emit("saveNewBeneficiary", {
@@ -221,11 +233,7 @@ function Beneficiaries() {
       setAllInputsAlert(true);
     }
   };
-  const clearAllInputs = () => {
-    setSavedBeneficiaryName("");
-    setSavedAccNum("");
-    setSavedIfsc("");
-  };
+
   const addNewBeneficiary = () => {
     setPlusIcon(true);
   };
@@ -263,7 +271,7 @@ function Beneficiaries() {
       setSavedAcc((prev) => [...prev, savedDetail]);
       setLoader(false);
     });
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     axios
@@ -271,6 +279,8 @@ function Beneficiaries() {
         num: document.cookie,
       })
       .then((res) => {
+        const { beneficiaryDetails } = res.data;
+
         setSavedAcc(res.data);
       })
       .catch((err) => {
@@ -294,7 +304,6 @@ function Beneficiaries() {
           beneficiaryName: data.beneficiaryName,
           accNum: data.accNum,
           ifsc: data.ifsc,
-          editable: data.editable,
         };
         if (String(savedDetail.accNum).length > 15) {
           setSavedAcc((prevSavedAcc) => {
@@ -308,13 +317,12 @@ function Beneficiaries() {
       });
     };
     fetchData();
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };
-
     window.addEventListener("resize", handleResize);
 
     return () => {
@@ -336,21 +344,21 @@ function Beneficiaries() {
       {isProfileClicked ? (
         <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
       ) : null}
-      <div className="h-auto md:h-screen w-screen pb-[2rem] md:fixed  bg-gray-800 text-white">
+      <div className="h-auto md:h-screen w-screen pb-8 md:fixed  bg-gray-800 text-white">
         <Menu {...menuProps} onClickHandler={handleMenuClick} />
-        <div className="h-[80vh] md:h-screen   m-auto  bg-white block md:flex  md:pl-[0rem] box-border">
-          <div className="m-auto h-screen sm:h-[100vh] md:h-[90vh] w-[100%]   text-gray-800   bg-white pt-[18vh] sm:pt-[10vh] md:pt-0 mt-[0rem] pb-[1rem] box-border overflow-x-auto space-y-2 lg:space-y-0">
+        <div className="h-4/5 md:h-screen   m-auto  bg-white block md:flex  md:pl-0 box-border">
+          <div className="m-auto h-screen  md:h-9/10 w-full   text-gray-800   bg-white pt-32 sm:pt-16 md:pt-0 mt-0 pb-4 box-border overflow-x-auto space-y-2 lg:space-y-0">
             <div
               className={
                 windowWidth < 450
-                  ? "grid grid-cols-3 gap-0 fixed sm:sticky top-[7vh] sm:top-0  h-auto  z-10 pt-[4vh] sm:pt-[4vh] md:pt-3 pb-5  text-white bg-gray-800 w-[100%] pl-[8vw] sm:pl-[10vw]"
-                  : "grid grid-cols-4 gap-0 fixed sm:sticky top-[7vh] sm:top-0  h-auto  z-10 pt-[4vh] sm:pt-[4vh] md:pt-3 pb-5  text-white bg-gray-800 w-[100%] pl-[8vw] sm:pl-[10vw]"
+                  ? "grid grid-cols-3 gap-0 fixed sm:sticky top-16 sm:top-0  h-auto  z-10 pt-4 md:pt-3 pb-5  text-white bg-gray-800 w-full pl-8 sm:pl-16"
+                  : "grid grid-cols-4 gap-0 fixed sm:sticky top-16 sm:top-0  h-auto  z-10 pt-4 md:pt-3 pb-5  text-white bg-gray-800 w-full pl-8 sm:pl-16 xl:pl-24"
               }
             >
               <h1 className="font-bold w-1/4 text-sm md:text-sm  xl:text-xl items-center flex">
                 Name
               </h1>
-              <h1 className="font-bold w-1/4 text-sm  md:text-sm xl:text-xl items-center flex ml-[-3.5vw] md:ml-[-2.5vw]">
+              <h1 className="font-bold w-1/4 text-sm  md:text-sm xl:text-xl items-center flex ml-ml-minus-2">
                 Account
               </h1>
               {windowWidth < 450 ? null : (
@@ -359,7 +367,7 @@ function Beneficiaries() {
                 </h1>
               )}
               <h1
-                className="font-bold w-full md:w-[80%] py-2  lg:w-[60%] ml-[-3vw] md:ml-[-1.4vw] border-2 rounded-md cursor-pointer hover:bg-gray-100 hover:text-gray-800 text-center  text-[0.625rem] md:text-sm xl:text-lg  bg-white text-gray-700"
+                className="font-bold w-full md:w-custom-80 py-2  lg:w-custom-60 ml-ml-minus-1 md:ml-ml-minus-8 border-2 rounded-md cursor-pointer hover:bg-gray-100 hover:text-gray-800 text-center  text-xs md:text-sm xl:text-lg  bg-white text-gray-700"
                 onClick={addNewBeneficiary}
               >
                 + Add Beneficiary
@@ -373,26 +381,26 @@ function Beneficiaries() {
                     key={index}
                     className={
                       windowWidth < 450
-                        ? "grid grid-cols-3    h-auto  z-10  pt-3 pb-3 text-gray-700  w-[100%] pl-[8vw] sm:pl-[10vw] pr-[4vw] md:pr-[9vw]"
-                        : "grid grid-cols-4    h-auto  z-10  pt-3 pb-3 text-gray-700  w-[100%] pl-[8vw] sm:pl-[10vw] pr-[4vw] md:pr-[9vw]"
+                        ? "grid grid-cols-3 h-auto  z-10  pt-5 pb-3 text-gray-700  w-full pl-8  pr-4"
+                        : "grid grid-cols-4 h-auto  z-10  pt-3 pb-3 text-gray-700  w-full pl-8 sm:pl-16 xl:pl-24 pr-4 md:pr-20 lg:pr-24 xl:pr-32"
                     }
                   >
-                    <h1 className="flex items-center capitalize text-xs md:text-sm   xl:text-[1rem]">
+                    <h1 className="flex items-center capitalize text-xs md:text-sm xl:text-16">
                       {" "}
                       {item.beneficiaryName}
                     </h1>
-                    <h1 className="flex items-center  text-xs md:text-sm xl:text-[1rem] ml-[-9vw] sm:ml-[-6vw] md:ml-[-2vw]">
+                    <h1 className="flex items-center  text-xs md:text-sm xl:text-16 ml-ml-minus-2">
                       {item.accNum}
                     </h1>
                     {windowWidth < 450 ? null : (
-                      <h1 className="flex items-center  text-xs uppercase  md:text-sm xl:text-[1rem]  md:ml-[3vw]">
+                      <h1 className="flex items-center  text-xs uppercase  md:text-sm xl:text-16 md:ml-4 lg:ml-8 xl:ml-12">
                         {" "}
                         {item.ifsc}
                       </h1>
                     )}
                     <button
                       onClick={() => sendMoney(index)}
-                      className="text-xs px-4 py-3 md:text-[1rem] lg:px-2 w-3/4 md:w-3/4 lg:w-1/2  ml-[4vw] md:ml-[7vw] border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
+                      className="text-xs px-4 py-3 md:text-16 lg:px-2 w-3/4 md:w-3/4 lg:w-1/2 ml-4 md:ml-16 lg:ml-20 xl:ml-ml-6 border border-gray-300  focus:outline-none rounded-lg  bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
                     >
                       Send
                     </button>
@@ -410,23 +418,23 @@ function Beneficiaries() {
 
           {plusIcon ? (
             <div
-              className=" fixed top-0 box-border z-[200] backdrop-blur-xl h-screen w-screen font-poppins"
+              className=" fixed top-0 box-border z-200 backdrop-blur-xl h-screen w-screen flex items-center font-poppins"
               onClick={closeBeneficiaryAdding}
             >
-              <div className=" w-3/4 m-auto   pt-[10vh] md:pt-[20vh]  pb-[2vh] box-border">
+              <div className=" w-3/4 m-auto box-border">
                 <form
                   action=""
                   onClick={(e) => e.stopPropagation()}
-                  className="w-auto md:w-[80%] lg:w-[60%] min-h-[40%]  pb-[7vh] m-auto pt-[6vh] border-2 bg-white shadow-md shadow-ash-800  mt-[0rem] text-gray-600 rounded-lg border-white  box-border text-[1rem]"
+                  className="w-auto md:w-custom-80 lg:w-custom-60 min-h-40   m-auto py-12 border-2 bg-white shadow-md shadow-ash-800  mt-0 text-gray-600 rounded-lg border-white  box-border text-base"
                 >
-                  <div className="m-auto py-3 font-poppins sm:p-2 text-gray-200 relative bg-gray-700 w-[80%] sm:w-[80%] top-[-1vw]  rounded-md grid items-center justify-center">
-                    <h1 className="text-[1rem]">Add Beneficiary</h1>
+                  <div className="m-auto py-3 font-poppins sm:p-2 text-gray-200 relative bg-gray-700 w-custom-80 sm:w-custom-80 mb-2  rounded-md grid items-center justify-center">
+                    <h1 className="text-lg">Add Beneficiary</h1>
                   </div>
                   <div
                     className={
                       allInputsAlert
-                        ? "w-[80%] m-auto space-y-0 sm:space-y-2 pt-[1vh] "
-                        : "w-[80%] m-auto space-y-5 sm:space-y-5 pt-[1vh] "
+                        ? "w-custom-80 m-auto space-y-2 sm:space-y-2 pt-4 "
+                        : "w-custom-80 m-auto space-y-5 sm:space-y-5 pt-4 "
                     }
                   >
                     <div className="sapce-y-1">
@@ -443,7 +451,7 @@ function Beneficiaries() {
                         required
                       />
                       {allInputsAlert && !savedBeneficiaryName ? (
-                        <span className="   text-xs text-red-600 pointer-events-none  box-border">
+                        <span className="text-xs text-red-600 pointer-events-none  box-border">
                           Enter name
                         </span>
                       ) : null}
@@ -453,8 +461,8 @@ function Beneficiaries() {
                         type="tel"
                         className={
                           allInputsAlert && !savedAccNum
-                            ? "block w-full px-4 py-2   border-red-500  outline-none rounded-lg bg-white  border "
-                            : "block w-full px-4 py-2   border-gray-300  outline-none rounded-lg bg-white  border "
+                            ? "block w-full px-4 py-2 border-red-500  outline-none rounded-lg bg-white  border "
+                            : "block w-full px-4 py-2 border-gray-300  outline-none rounded-lg bg-white  border "
                         }
                         placeholder="Enter Account Number"
                         value={savedAccNum}
@@ -463,7 +471,7 @@ function Beneficiaries() {
                         minLength={16}
                       />
                       {savedAccNum.length < 16 && savedAccNum ? (
-                        <span className="   text-xs text-red-600 pointer-events-none  box-border">
+                        <span className="text-xs text-red-600 pointer-events-none  box-border">
                           Account number should have 16 digits
                         </span>
                       ) : null}
@@ -487,12 +495,12 @@ function Beneficiaries() {
                         required
                       />
                       {allInputsAlert && !savedIfsc ? (
-                        <span className="   text-xs text-red-600 pointer-events-none  box-border">
+                        <span className="text-xs text-red-600 pointer-events-none  box-border">
                           Enter IFSC code
                         </span>
                       ) : null}
                       {String(savedIfsc).length < 10 && savedIfsc ? (
-                        <span className="    text-xs text-red-600 pointer-events-none  box-border">
+                        <span className="text-xs text-red-600 pointer-events-none  box-border">
                           IFSC code should have 10 digits
                         </span>
                       ) : null}

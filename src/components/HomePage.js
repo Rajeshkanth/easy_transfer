@@ -2,7 +2,6 @@ import React, { memo, useContext, useEffect } from "react";
 import { store } from "../App";
 import SignUp from "./SignUp";
 import Login from "./Login";
-import Meteors from "../Meteors";
 
 function HomePage() {
   const {
@@ -52,19 +51,16 @@ function HomePage() {
       <div
         className={
           passwordError && windowWidth < 640 && !isLogin
-            ? "h-screen pt-10 w-screen bg-gray-800 text-white font-poppins"
-            : "h-screen fixed w-screen bg-gray-800 text-white font-poppins"
+            ? "h-screen pt-10 w-screen bg-gray-800 text-white font-poppins flex items-center justify-center"
+            : "h-screen fixed w-screen bg-gray-800 text-white font-poppins flex items-center justify-center"
         }
       >
         {isLogin ? (
-          <div className="z-10 w-[80%] sm:w-[60%] md:w-[50%] lg:w-[36%] xl:w-[33%]  mx-auto    shadow-md shadow-black h-auto rounded-xl  mt-[15vh] ">
+          <div className="z-10 w-custom-80 sm:w-custom-60 md:w-1/2 lg:w-custom-36 xl:w-custom-33  mx-auto    shadow-md shadow-black h-auto rounded-xl  ">
             {loader ? (
-              <div className="fixed bg-transparent h-screen w-screen top-[0vh] left-[0vw] ">
+              <div className="fixed bg-transparent h-screen w-screen top-0 left-0 ">
                 <div className="h-screen w-screen flex flex-col justify-center items-center">
-                  <div className="loader "></div>
-                  <p>
-                    <strong className="text-white"></strong>{" "}
-                  </p>
+                  <div className="loader"></div>
                 </div>
               </div>
             ) : (
@@ -77,8 +73,8 @@ function HomePage() {
           <div
             className={
               passwordError && windowWidth < 640
-                ? "mx-auto w-[80%] sm:w-[60%] md:w-[50%] lg:w-[33%]  text-gray-800  bg-white  box-border  mt-[6vh] rounded-xl h-auto"
-                : "mx-auto w-[80%] sm:w-[60%] md:w-[50%] lg:w-[33%]  text-gray-800  bg-white  box-border  mt-[15vh] rounded-xl h-auto"
+                ? "mx-auto  w-custom-80 sm:w-custom-60 md:w-1/2 lg:w-custom-33  text-gray-800  bg-white  box-border   rounded-xl h-auto"
+                : "mx-auto  w-custom-80 sm:w-custom-60 md:w-1/2 lg:w-custom-33  text-gray-800  bg-white  box-border   rounded-xl h-auto"
             }
           >
             <div className="w-full border-2 bg-white text-gray-800 space-y-4 sm:space-y-5 lg:space-y-7 rounded-xl  shadow-md shadow-black">
@@ -87,7 +83,6 @@ function HomePage() {
           </div>
         )}
       </div>
-      <Meteors number={20} />
     </>
   );
 }

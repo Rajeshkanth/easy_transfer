@@ -26,11 +26,9 @@ export const TextGenerateEffect = ({ words, className }) => {
             <motion.span
               key={word + idx}
               className="dark:text-white text-white opacity-0"
-              // dangerouslySetInnerHTML={{ __html: word }}
             >
               {word}
               {idx !== wordsArray.length - 1 && <br />}{" "}
-              {/* Add <br /> except for the last word */}
             </motion.span>
           );
         })}
@@ -41,7 +39,7 @@ export const TextGenerateEffect = ({ words, className }) => {
   return (
     <div className={cn("font-bold", className)}>
       <div className="mt-4">
-        <div className=" dark:text-white text-white text-4xl leading-snug tracking-wide  font-sans  font-light mt-[12rem] ml-[0rem]  md:text-5xl lg:text-6xl">
+        <div className=" dark:text-white text-white text-4xl leading-snug tracking-wide  font-sans  font-light mt-48 ml-0  md:text-5xl lg:text-6xl">
           {renderWords()}
         </div>
       </div>
