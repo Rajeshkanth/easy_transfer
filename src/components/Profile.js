@@ -382,7 +382,7 @@ function Profile() {
                 ) : null}
                 {windowWidth > 640 ? (
                   <div className=" lg:gap-8 h-custom-10 w-full justify-center  mt-mt-35v md:mt-mt-25v lg:mt-mt-28v xl:mt-mt-30v sm:ml-0  pl-0  item-center m-auto text-gray-700">
-                    <div className="w-full m-auto sm:ml-ml-minus-4 md:ml-0 md:mauto lg:m-auto h-auto flex  items-center  ">
+                    <div className="w-full m-auto sm:ml-ml-minus-4 md:ml-0 md:m-auto lg:m-auto h-auto flex  items-center  ">
                       {" "}
                       <h1 className=" md:m-auto flex text-2xl sm:pl-0  sm:ml-0 items-center justify-center font-extrabold  w-custom-82 sm:w-1/2 md:w-custom-60  lg:w-auto text-center sm:text-center">
                         {userNameFromDb}
@@ -400,25 +400,25 @@ function Profile() {
                   </div>
                 ) : null}
               </div>
-              <div className="h-20-v  grid md:block  md:w-20 border-b-2 md:border-b-0 pb-2  md:pb-8 xl:pb-0 bg-white hover:bg-gray-100 space-y-2 box-border pt-4 pl-12 md:pl-4 pr-4 md:items-center md:justify-center md:shadow-md shadow-gray-300 rounded-md grid-rows-3">
+              <div className="h-20-v  grid md:block  md:w-20 border-b-2 md:border-b-0 pb-2  md:pb-8 xl:pb-0 bg-white hover:bg-gray-100 space-y-3 box-border pt-4 pl-12 md:pl-4 pr-4 md:items-center md:justify-center md:shadow-md shadow-gray-300 rounded-md grid-rows-3">
                 <h1 className="text-4xl font-bold">
                   {recentTransactionsLength ? recentTransactionsLength : 0}
                 </h1>
-                <h1 className="md:border-b-2  md:text-sm lg:text-md pb-3">
+                <h1 className="md:border-b-2  md:text-xs lg:text-md pb-3">
                   Total Transactions
                 </h1>
                 <h1
-                  className="text-md flex items-center justify-between cursor-pointer "
+                  className="text-md flex items-center  justify-between cursor-pointer "
                   onClick={() => navigate("/Transactions")}
                 >
                   View Details <IoIosArrowForward />
                 </h1>
               </div>
-              <div className="h-20-v  grid grid-rows-3 md:block md:w-20 border-b-2 md:border-b-0 pb-2  md:pb-2 xl:pb-0  bg-white hover:bg-gray-100 box-border md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-4 pl-12 md:pl-4 pr-4 md:items-center md:justify-center ">
+              <div className="h-20-v  grid grid-rows-3 md:block md:w-20 border-b-2 md:border-b-0 pb-2  md:pb-2 xl:pb-0  bg-white hover:bg-gray-100 box-border md:shadow-md shadow-gray-300 rounded-md space-y-3 pt-4 pl-12 md:pl-4 pr-4 md:items-center md:justify-center ">
                 <h1 className="text-4xl font-bold">
                   {beneficiaries ? beneficiaries.length : 0}
                 </h1>
-                <h1 className="md:border-b-2  md:text-sm lg:text-md pb-3">
+                <h1 className="md:border-b-2  md:text-xs lg:text-md pb-3">
                   Total Recipients
                 </h1>
                 <h1
@@ -432,11 +432,11 @@ function Profile() {
                 <h1 className="text-4xl font-bold">
                   {canceledPayments ? canceledPayments : 0}
                 </h1>
-                <h1 className="md:border-b-2 md:text-sm lg:text-md pb-3">
+                <h1 className="md:border-b-2 md:text-xs lg:text-md pb-3">
                   Failed Transactions
                 </h1>
                 <h1
-                  className="text-md flex items-center justify-between cursor-pointer "
+                  className="text-md flex items-center justify-between cursor-pointer mt-4"
                   onClick={() => goTo("Transactions")}
                 >
                   View Details <IoIosArrowForward />
@@ -513,7 +513,7 @@ function Profile() {
                     <h1>Date</h1>
                     <h1>Description</h1>
                   </div>
-                  <div className="grid grid-cols-2 text-sm md:text-md items-center gap-5 lg:gap-10 xl:gap-4">
+                  <div className="grid grid-cols-2 text-sm md:text-md items-center gap-5  lg:gap-10 xl:gap-4">
                     {" "}
                     <h1 className="">Amount</h1>
                     <h1>Status</h1>
@@ -536,7 +536,7 @@ function Profile() {
                           <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
                           <h1 className="md:text-xs lg:text-md overflow-x-auto md:w-16 lg:w-24">{`Sent to ${item.Name}`}</h1>
                         </div>
-                        <div className="grid grid-cols-2 md:gap-5 lg:gap-5  text-xs md:text-sm lg:text-md  ">
+                        <div className="grid grid-cols-2 pl-4 gap-3 md:gap-5 lg:gap-0  text-xs md:text-sm lg:text-md  ">
                           <h1 className="md:text-xs lg:text-md">
                             {item.Amount}
                           </h1>

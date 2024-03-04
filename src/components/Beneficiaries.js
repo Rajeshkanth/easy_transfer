@@ -141,11 +141,6 @@ function Beneficiaries() {
       setSavedAcc([]);
       setRecentTransactions([]);
       setIsLoggedOut(true);
-      const tabId = sessionStorage.getItem("tabId");
-      sessionStorage.clear();
-      if (tabId) {
-        sessionStorage.setItem("tabId", tabId);
-      }
       setIsProfileClicked(false);
       logout();
     }, 3000);

@@ -50,11 +50,9 @@ function Transactions() {
         setIsProfileClicked(false);
         break;
       case "Rewards":
-        console.log("Navigating to Rewards page");
         setIsProfileClicked(false);
         break;
       case "Contact":
-        console.log("Navigating to Contact page");
         setIsProfileClicked(false);
         break;
       case "Beneficiaries":
@@ -64,11 +62,6 @@ function Transactions() {
       case "Log Out":
         setSavedAcc([]);
         setRecentTransactions([]);
-        const tabId = sessionStorage.getItem("tabId");
-        sessionStorage.clear();
-        if (tabId) {
-          sessionStorage.setItem("tabId", tabId);
-        }
         setLogOut(true);
         setIsLoggedOut(true);
         setIsProfileClicked(false);
@@ -111,9 +104,7 @@ function Transactions() {
       };
     }
   };
-
   const menuProps = getMenuProps();
-
   const getSideBarProps = () => {
     return {
       nav: [
@@ -135,11 +126,6 @@ function Transactions() {
       setSavedAcc([]);
       setRecentTransactions([]);
       setIsLoggedOut(true);
-      const tabId = sessionStorage.getItem("tabId");
-      sessionStorage.clear();
-      if (tabId) {
-        sessionStorage.setItem("tabId", tabId);
-      }
       setIsProfileClicked(false);
       setLoggedUser("");
       navigate("/");
@@ -180,7 +166,6 @@ function Transactions() {
           Status: data.Status,
           Amount: data.Amount,
         };
-
         const isAlreadyStored = recentTransactions.some((detail) => {
           return (
             detail.Date === transaction.Date &&
@@ -222,7 +207,7 @@ function Transactions() {
               </h1>
             </div>
             <div className="grid grid-cols-2 gap-10 lg:gap-5 text-gray-700  xl:gap-6 p-1 space-y-0 items-center md:pl-4 lg:pl-8 border-b-2 ">
-              <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-4 md:gap-0 lg:gap-0 xl:gap-0 pl-4 sm:pl-8 md:pl-0 xl:pl-4  pr-4">
+              <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-4 md:gap-6 lg:gap-0 xl:gap-0 pl-4 sm:pl-8 md:pl-0 xl:pl-4  pr-4">
                 <h1>Date</h1>
                 <h1>Description</h1>
               </div>
@@ -251,11 +236,11 @@ function Transactions() {
                     key={index}
                     className="grid grid-cols-2 gap-5  lg:gap-7 xl:gap-12 p-1 space-y-0 text-gray-700 items-center pl-4 sm:pl-8 md:pl-3 lg:pl-8 xl:pl-12 pr-4 border-b-2"
                   >
-                    <div className="grid grid-cols-2 gap-6 lg:gap-2 xl:gap-10 items-center text-xs md:text-sm lg:text-md ">
+                    <div className="grid grid-cols-2 gap-3 md:gap-6 lg:gap-2 xl:gap-5 items-center text-xs md:text-sm lg:text-md ">
                       <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
                       <h1 className="md:text-xs lg:text-md">{item.Name}</h1>
                     </div>
-                    <div className="grid grid-cols-2 md:gap-5 lg:gap-8 pl-2 text-xs md:text-sm lg:text-md  ">
+                    <div className="grid grid-cols-2 gap-5 lg:gap-0  pl-2  md:pl-4 lg:pl-2 text-xs md:text-sm lg:text-md  ">
                       <h1 className="md:text-xs lg:text-md">{item.Amount}</h1>
                       <h1
                         className={
@@ -279,8 +264,8 @@ function Transactions() {
                 Completed Transactions
               </h1>
             </div>
-            <div className="grid grid-cols-2 gap-10 lg:gap-5 text-gray-700  xl:gap-6 p-1 space-y-0 items-center md:pl-4 lg:pl-8 border-b-2 ">
-              <div className="grid grid-cols-2 sticky top-20 text-sm md:text-sm lg:text-md gap-4 md:gap-0 lg:gap-0 xl:gap-0 pl-4 sm:pl-8 md:pl-0 xl:pl-4  pr-4">
+            <div className="grid grid-cols-2 gap-10 md:gap-5 text-gray-700  xl:gap-6 p-1 space-y-0 items-center md:pl-4 lg:pl-8 border-b-2 ">
+              <div className="grid grid-cols-2 sticky top-20 text-sm md:text-sm lg:text-md gap-4 md:gap-6 lg:gap-0 xl:gap-0 pl-4 sm:pl-8 md:pl-0 xl:pl-4  pr-4">
                 <h1>Date</h1>
                 <h1>Description</h1>
               </div>
@@ -307,13 +292,13 @@ function Transactions() {
                     key={index}
                     className="grid grid-cols-2 gap-5  lg:gap-7 xl:gap-6 p-1 space-y-0 text-gray-700 items-center pl-4 sm:pl-8 md:pl-3 lg:pl-8 xl:pl-12 pr-4 border-b-2"
                   >
-                    <div className="grid grid-cols-2 gap-6 lg:gap-2 xl:gap-10 items-center text-xs md:text-sm lg:text-md ">
+                    <div className="grid grid-cols-2 gap-3 md:gap-6 lg:gap-2 xl:gap-5 items-center text-xs md:text-sm lg:text-md ">
                       <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
                       <h1 className="md:text-xs lg:text-md flex items-center">
                         {item.Name}
                       </h1>
                     </div>
-                    <div className="grid grid-cols-2 md:gap-5 lg:gap-5 pl-2 md:pl-5  text-xs md:text-sm lg:text-md  ">
+                    <div className="grid grid-cols-2 gap-5  lg:gap-0  pl-2  md:pl-4 lg:pl-2 text-xs md:text-sm lg:text-md  ">
                       <h1 className="md:text-xs lg:text-md">{item.Amount}</h1>
                       <h1
                         className={
@@ -337,8 +322,8 @@ function Transactions() {
                 Canceled Transactions
               </h1>
             </div>
-            <div className="grid grid-cols-2 gap-10 lg:gap-5 text-gray-700  xl:gap-0 p-1 space-y-0 items-center md:pl-4 lg:pl-8 border-b-2 overflow-y-auto">
-              <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-4 md:gap-0 pl-4 sm:pl-8 md:pl-0 xl:pl-4  pr-4">
+            <div className="grid grid-cols-2 gap-10 md:gap-5  text-gray-700  xl:gap-0 p-1 space-y-0 items-center md:pl-4 lg:pl-8 border-b-2 overflow-y-auto">
+              <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-4 md:gap-6 pl-4 sm:pl-8 md:pl-0 xl:pl-4  pr-4">
                 <h1>Date</h1>
                 <h1>Description</h1>
               </div>
@@ -365,11 +350,11 @@ function Transactions() {
                     key={index}
                     className="grid grid-cols-2 gap-5  lg:gap-7 xl:gap-6 p-1 space-y-0 text-gray-700 items-center pl-4 sm:pl-8 md:pl-3 lg:pl-8 xl:pl-12 pr-4 border-b-2"
                   >
-                    <div className="grid grid-cols-2 gap-6 lg:gap-2 xl:gap-10 items-center text-xs md:text-sm lg:text-md ">
+                    <div className="grid grid-cols-2 gap-3 md:gap-6  xl:gap-5 items-center text-xs md:text-sm lg:text-md ">
                       <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
                       <h1 className="md:text-xs lg:text-md">{item.Name}</h1>
                     </div>
-                    <div className="grid grid-cols-2 md:gap-5 lg:gap-5 pl-3  text-xs md:text-sm lg:text-md  ">
+                    <div className="grid grid-cols-2 gap-5 lg:gap-0 pl-2 md:pl-4 lg:pl-2  text-xs md:text-sm lg:text-md  ">
                       <h1 className="md:text-xs lg:text-md">{item.Amount}</h1>
                       <h1
                         className={
