@@ -311,7 +311,7 @@ function Login() {
           {" "}
           <button
             disabled={loader ? true : false}
-            className="w-full  border-0  outline-0  hover:bg-gray-600 bg-gray-800 text-white text-center p-2 font-bold  h-auto   rounded-sm "
+            className="w-full  border-0  outline-0  hover:bg-gray-600 bg-gray-800 text-white text-center p-2 font-bold  h-auto   rounded-lg "
             onClick={
               connectionMode === "socket"
                 ? loginToDashboardUsingSocket
