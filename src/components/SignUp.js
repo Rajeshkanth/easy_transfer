@@ -239,44 +239,15 @@ function SignUp() {
                     }
               }
               countryCodeEditable={false}
-              buttonClass="rounded-lg bg-transparent"
-              // buttonStyle={
-              //   allInputAlert && !regMobileNumber
-              //     ? {
-              //         width: "14% ",
-              //         paddingLeft: "0px",
-              //         backgroundColor: "white",
-              //         border: "0.125rem  solid #DC2626",
-              //         borderColor: "#DC2626",
-              //         borderRadius: " 0.5rem 0 0 0.5rem ",
-              //       }
-              //     : isAlreadyUser
-              //     ? {
-              //         width: "14% ",
-              //         paddingLeft: "0px",
-              //         backgroundColor: "white",
-              //         border: "0.125rem  solid #DC2626",
-              //         borderColor: "#DC2626",
-              //         borderRadius: " 0.5rem 0 0 0.5rem ",
-              //       }
-              //     : !isValidNumber
-              //     ? {
-              //         width: "14% ",
-              //         paddingLeft: "0px",
-              //         backgroundColor: "white",
-              //         border: "0.125rem  solid #DC2626",
-              //         borderColor: "#DC2626",
-              //         borderRadius: " 0.5rem 0 0 0.5rem ",
-              //       }
-              //     : {
-              //         width: "14% ",
-              //         paddingLeft: "0px",
-              //         backgroundColor: "white",
-              //         border: "0.125rem  solid #CBD5E1",
-              //         borderColor: "#CBD5E1",
-              //         borderRadius: " 0.5rem 0 0 0.5rem ",
-              //       }
-              // }
+              buttonClass={
+                allInputAlert && !regMobileNumber
+                  ? "border-red-600  border-2 rounded-lg rounded-br-0 rounded-tr-0 bg-white font-poppins"
+                  : isAlreadyUser
+                  ? "border-red-600  border-2 rounded-lg rounded-br-0 rounded-tr-0 bg-white font-poppins"
+                  : !isValidNumber
+                  ? "border-red-600  border-2 rounded-lg rounded-br-0 rounded-tr-0 bg-white font-poppins"
+                  : "border-slate-300  border-2 rounded-lg rounded-br-0 rounded-tr-0 bg-white font-poppins"
+              }
             />
 
             {isValidNumber ? null : (

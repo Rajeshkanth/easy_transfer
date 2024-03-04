@@ -9,7 +9,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        poppins: ["Poppins", "sans-serif"],
+        poppins: ["Poppins", "sans-serif", "!important"],
       },
       spacing: {
         57.5: "57.5rem",
@@ -17,7 +17,17 @@ module.exports = {
         39.5: "39.5rem",
         "8/5": "85%",
       },
-
+      backgroundColor: {
+        white: "#ffffff !important",
+      },
+      colors: {
+        "red-600": "#DC2626 !important",
+      },
+      borderRadius: {
+        lg: "0.5rem !important",
+        "tr-0": "0.5rem 0 0 0.5rem !important",
+        "br-0": "0.5rem 0 0 0.5rem  !important",
+      },
       height: {
         "10-v": "10vh",
         "20-v": "20vh",

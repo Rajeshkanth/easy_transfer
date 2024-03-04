@@ -224,7 +224,15 @@ function Login() {
                   }
             }
             dialCodeEditable={false}
-            buttonClass="border-red-800 border-2 rounded bg-white "
+            buttonClass={
+              loginInputAlert && !mobileNumber
+                ? "border-red-600  border-2 rounded-lg rounded-br-0 rounded-tr-0 bg-white font-poppins"
+                : isNewUser
+                ? "border-red-600  border-2 rounded-lg rounded-br-0 rounded-tr-0 bg-white font-poppins"
+                : mobileNumber && !isValidNumber
+                ? "border-red-600  border-2 rounded-lg rounded-br-0 rounded-tr-0 bg-white font-poppins"
+                : "border-slate-300 border-2 rounded-lg rounded-tr-0 rounded-br-0  bg-white font-poppins"
+            }
           />
 
           <div className="w-custom-80 mb-2">
