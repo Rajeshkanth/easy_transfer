@@ -6,12 +6,13 @@ function Loader(props) {
   return (
     <>
       <div
-        className={`loading  h-screen w-screen flex flex-col items-center justify-center
+        className={`bg-gray-700 h-screen w-screen flex flex-col items-center justify-center
            font-poppins ${bg}`}
       >
-        <div className="loader "></div>
+        <div class="loader w-14 h-12 mb-4"></div>
+
         <p>
-          <strong className="text-white">{msg}</strong>{" "}
+          <strong className="text-white">{msg}</strong>
         </p>
       </div>
     </>

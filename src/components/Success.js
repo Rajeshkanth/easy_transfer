@@ -4,7 +4,7 @@ import { store } from "../App";
 import { MdOutlineCancel } from "react-icons/md";
 import { useNavigate } from "react-router";
 import Loader from "./Loader";
-import ConfirmTick from "./images/ConfirmTick";
+import ConfirmTick from "../images/ConfirmTick";
 
 function Success() {
   const { socket, connectionMode } = useContext(store);
@@ -89,26 +89,26 @@ function Success() {
       {fail ? (
         <>
           {" "}
-          <div className="loading h-screen w-screen flex flex-col items-center justify-center font-poppins space-y-2">
-            <div class="wrapper width-screen flex justify-center items-center">
-              <MdOutlineCancel className="fail-icon" />{" "}
+          <div className="bg-gray-700 h-screen w-screen text-white flex flex-col items-center justify-center font-poppins space-y-2">
+            <div class="bg-gray-700 width-screen flex justify-center items-center">
+              <MdOutlineCancel className="text-4xl" />
             </div>
-            <h3 className="text-white">Payment Transaction Failed!</h3>
-            <p className="text-white">Redirecting to the home page....</p>
+            <h3>Payment transaction failed!</h3>
+            <p>Redirecting to the home page....</p>
           </div>
         </>
       ) : (
         <>
           {check ? (
-            <div className="loading h-screen  w-screen flex flex-col items-center justify-center font-poppins">
-              <div class="wrapper width-screen flex justify-center items-center">
+            <div className="bg-gray-700 h-screen w-screen flex flex-col items-center justify-center text-white font-poppins">
+              <div class="bg-gray-700 width-screen flex justify-center items-center">
                 <ConfirmTick />
               </div>
-              <h3 className="text-white">Payment Transaction Successful !</h3>
+              <h3>Payment transaction successful!</h3>
               <br />
             </div>
           ) : (
-            <Loader msg={"Your Transaction is processing"} />
+            <Loader msg={"Your transaction is processing"} />
           )}
         </>
       )}

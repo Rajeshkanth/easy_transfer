@@ -1,17 +1,17 @@
 import React, { memo, useContext, useEffect, useState } from "react";
-import { store } from "../App";
 import { useLocation, useNavigate } from "react-router";
+import { store } from "../App";
 import axios from "axios";
 import Menu from "./Menu";
 import SideBar from "./SideBar";
+import ProfileForm from "./ProfileForm";
 import { FaRupeeSign } from "react-icons/fa";
 import { IoIosArrowForward, IoIosWallet } from "react-icons/io";
 import { MdModeEdit, MdKeyboardArrowLeft } from "react-icons/md";
-import profileAlternate from "./images/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752-fotor-20240208155618.png";
-import FailedTransactions from "./FailedTransactions";
 import { RiMenuUnfoldFill } from "react-icons/ri";
 import { useIdleTimer } from "react-idle-timer";
-import ProfileForm from "./ProfileForm";
+import profileAlternate from "../images/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752-fotor-20240208155618.png";
+
 function Profile() {
   const {
     handleSocket,
@@ -65,10 +65,7 @@ function Profile() {
   const navigate = useNavigate();
   const location = useLocation();
   const prevPath = location.state?.prevPath;
-
-  const [failedTransaction, setFailedTransaction] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState([]);
-
   const [img, setImg] = useState(null);
 
   const setProfilePic = (e) => {
@@ -107,7 +104,6 @@ function Profile() {
         setIsProfileClicked(true);
         break;
       case "Log Out":
-        clearAll();
         logout();
         break;
       default:
@@ -166,6 +162,7 @@ function Profile() {
   const sideBarProps = getSideBarProps();
 
   const logout = () => {
+    clearAll();
     setLoggedUser("");
     setSavedAcc([]);
     navigate("/");
@@ -192,11 +189,6 @@ function Profile() {
       setSavedAcc([]);
       setRecentTransactions([]);
       setIsLoggedOut(true);
-      const tabId = sessionStorage.getItem("tabId");
-      sessionStorage.clear();
-      if (tabId) {
-        sessionStorage.setItem("tabId", tabId);
-      }
       setIsProfileClicked(false);
       logout();
     }, 3000);
@@ -247,7 +239,7 @@ function Profile() {
         setAgeFromDb("");
       });
     }
-  }, [socket, connectionMode, setUserNameFromDb]);
+  }, [socket, connectionMode, setUserNameFromDb, isEditProfile]);
 
   useEffect(() => {
     axios
@@ -256,14 +248,14 @@ function Profile() {
       })
       .then((res) => {
         const beneficiaryDetails = res.data.map((detail) => ({
-          Name: detail.beneficiaryName,
-          Account: detail.accNum,
+          name: detail.beneficiaryName,
+          account: detail.accNum,
         }));
         beneficiaryDetails
           ? setBeneficiaries(beneficiaryDetails)
           : setBeneficiaries([]);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => err);
     axios
       .post("http://localhost:8080/transactionDetails", {
         mobileNumber: document.cookie,
@@ -322,7 +314,6 @@ function Profile() {
     const canceledPaymentsCount = recentActivity.filter(
       (transaction) => transaction.Status === "canceled"
     ).length;
-
     setCanceledPaymentsCount(canceledPaymentsCount);
   }, [recentActivity]);
 
@@ -338,19 +329,19 @@ function Profile() {
 
   return (
     <>
-      <div className=" w-screen  lg:fixed flex flex-col text-white font-poppins pt-2 h-screen sm:flex box-border bg-gray-800">
+      <div className="w-screen md:fixed flex flex-col text-white font-poppins pt-2 h-screen sm:flex box-border bg-gray-800">
         {windowWidth < 768 ? (
-          <div className="fixed  bg-gray-800 h-16 w-screen flex items-center top-0 z-10">
+          <div className="fixed bg-gray-800 h-16 w-screen flex items-center top-0 z-10">
             <Menu {...menuProps} onClickHandler={handleMenuClick} />
           </div>
         ) : (
           <Menu {...menuProps} onClickHandler={handleMenuClick} />
         )}
         {isEditProfile ? null : (
-          <div className="bg-slate-100  w-screen text-gray-700 h-auto flex flex-col  md:h-screen box-border md:grid md:grid-cols-4  md:gap-0 lg:gap-2 md:pb-2 md:pl-12 lg:pl-8 xl:pl-12 md:pt-6 cursor-default">
-            <>
-              <div className="h-50-v md:h-35-v lg:h-40-v md:w-20 border-b-2 md:border-b-0  items-center justify-center bg-white  md:md:shadow-md shadow-gray-300 rounded-md">
-                <div className=" h-9-r w-9 md:h-7-r md:w-7  xl:h-12-r xl:w-12 bg-white  absolute lg:fixed top-20  md:top-28 lg:top-32  z-5 overflow-hidden shadow-lg left-8 sm:left-12 md:left-16 lg:left-20 xl:left-24 rounded-full border-2 border-gray-600">
+          <div className="">
+            <div className="bg-slate-100 w-screen text-gray-700 h-auto flex flex-col md:h-screen box-border md:grid md:grid-cols-4 md:gap-2 lg:gap-0 md:pb-2 md:pl-8 lg:pl-8 xl:pl-12 md:pt-6 cursor-default">
+              <div className="relative h-60 mt-14 md:mt-0 md:w-4/5 lg:w-10/12 md:h-68 lg:h-68 xl:h-72 border-b-2 md:border-b-0 items-center justify-center bg-white md:md:shadow-md shadow-gray-300 rounded-md">
+                <div className="h-36 w-36 md:h-28 md:w-28 lg:w-40 lg:h-40 xl:h-40 xl:w-40 bg-white absolute lg:fixed top-4 md:top-12 lg:top-32 z-5 overflow-hidden shadow-lg left-4 sm:left-12 md:left-6 lg:left-16 xl:left-28 rounded-full border-2 border-gray-600">
                   {
                     <>
                       <img
@@ -373,18 +364,17 @@ function Profile() {
                   }
                 </div>
                 {windowWidth < 640 ? (
-                  <div className="w-1/2 absolute h-10-v  top-64 grid grid-rows-2  left-12">
-                    <h1 className="flex items-center   font-bold text-2xl">
+                  <div className="w-1/2 absolute top-44 left-4">
+                    <h1 className="flex items-center font-bold text-2xl">
                       {userNameFromDb} <MdModeEdit onClick={editProfile} />
                     </h1>
                     <h1>{document.cookie}</h1>
                   </div>
                 ) : null}
                 {windowWidth > 640 ? (
-                  <div className=" lg:gap-8 h-custom-10 w-full justify-center  mt-mt-35v md:mt-mt-25v lg:mt-mt-28v xl:mt-mt-30v sm:ml-0  pl-0  item-center m-auto text-gray-700">
-                    <div className="w-full m-auto sm:ml-ml-minus-4 md:ml-0 md:m-auto lg:m-auto h-auto flex  items-center  ">
-                      {" "}
-                      <h1 className=" md:m-auto flex text-2xl sm:pl-0  sm:ml-0 items-center justify-center font-extrabold  w-custom-82 sm:w-1/2 md:w-custom-60  lg:w-auto text-center sm:text-center">
+                  <div className="absolute top-44 md:top-48 lg:top-52 h-1/10 w-full justify-center sm:ml-0 pl-0 item-center m-auto text-gray-700">
+                    <div className="w-full m-auto md:ml-0 md:m-auto lg:m-auto h-auto flex items-center">
+                      <h1 className=" md:m-auto flex text-2xl sm:pl-0 sm:-ml-14 md-ml-0 items-center justify-center font-extrabold  w-8/2 sm:w-1/2 md:w-3/5  lg:w-auto text-center sm:text-center">
                         {userNameFromDb}
                         <MdModeEdit
                           onClick={editProfile}
@@ -392,43 +382,43 @@ function Profile() {
                         />
                       </h1>
                     </div>
-                    <div className="w-full m-auto sm:ml-ml-minus-2 md:ml-0 h-auto flex justify-between">
-                      <h1 className=" text-lg font-lighter   w-8/2 sm:w-custom-47 sm:ml-ml-minus-1 md:ml-0 md:w-full text-center sm:text-center">
+                    <div className="w-full m-auto sm:-ml-4 md:ml-0 h-auto flex justify-between">
+                      <h1 className="text-lg font-lighter w-auto sm:w-1/2 sm:-ml-8 md:ml-0 md:w-full text-center sm:text-center">
                         {document.cookie}
                       </h1>
                     </div>
                   </div>
                 ) : null}
               </div>
-              <div className="h-20-v  grid md:block  md:w-20 border-b-2 md:border-b-0 pb-2  md:pb-8 xl:pb-0 bg-white hover:bg-gray-100 space-y-3 box-border pt-4 pl-12 md:pl-4 pr-4 md:items-center md:justify-center md:shadow-md shadow-gray-300 rounded-md grid-rows-3">
+              <div className="h-40 grid md:block md:w-10/12 lg:w-4/5 border-b-2 md:border-b-0 pb-2 md:pb-8 xl:pb-0 bg-white hover:bg-gray-100 space-y-4 box-border pt-4 pl-4 sm:pl-16 md:pl-4 pr-4 md:items-center md:justify-center md:shadow-md shadow-gray-300 rounded-md grid-rows-3">
                 <h1 className="text-4xl font-bold">
                   {recentTransactionsLength ? recentTransactionsLength : 0}
                 </h1>
-                <h1 className="md:border-b-2  md:text-xs lg:text-md pb-3">
+                <h1 className="md:border-b-2 md:text-xs lg:text-md pb-3">
                   Total Transactions
                 </h1>
                 <h1
-                  className="text-md flex items-center  justify-between cursor-pointer "
-                  onClick={() => navigate("/Transactions")}
+                  className="text-md md:text-sm lg:text-md flex items-center justify-between cursor-pointer "
+                  onClick={() => goTo("Transactions")}
                 >
                   View Details <IoIosArrowForward />
                 </h1>
               </div>
-              <div className="h-20-v  grid grid-rows-3 md:block md:w-20 border-b-2 md:border-b-0 pb-2  md:pb-2 xl:pb-0  bg-white hover:bg-gray-100 box-border md:shadow-md shadow-gray-300 rounded-md space-y-3 pt-4 pl-12 md:pl-4 pr-4 md:items-center md:justify-center ">
+              <div className="h-40 grid grid-rows-3 md:block md:w-10/12 lg:w-4/5 border-b-2 md:border-b-0 pb-2 md:pb-2 xl:pb-0 bg-white hover:bg-gray-100 box-border md:shadow-md shadow-gray-300 rounded-md space-y-4 pt-4 pl-4 sm:pl-16 md:pl-4 pr-4 md:items-center md:justify-center">
                 <h1 className="text-4xl font-bold">
                   {beneficiaries ? beneficiaries.length : 0}
                 </h1>
-                <h1 className="md:border-b-2  md:text-xs lg:text-md pb-3">
+                <h1 className="md:border-b-2 md:text-xs lg:text-md pb-3">
                   Total Recipients
                 </h1>
                 <h1
-                  className="text-md flex items-center justify-between hover:cursor-pointer "
+                  className="text-md md:text-sm lg:text-md flex items-center justify-between hover:cursor-pointer "
                   onClick={() => goTo("Beneficiaries")}
                 >
                   View Details <IoIosArrowForward />
                 </h1>
               </div>
-              <div className="h-20-v grid grid-rows-3 md:block md:w-20 border-b-2 md:border-b-0 pb-2 md:pb-8  xl:pb-0 box-border bg-white hover:bg-gray-100  md:shadow-md shadow-gray-300 rounded-md space-y-2 pt-4 pl-12 md:pl-4 pr-4 items-left md:items-center md:justify-center">
+              <div className="h-40 grid grid-rows-3 md:block md:w-10/12 lg:w-4/5 border-b-2 md:border-b-0 pb-2 md:pb-8 xl:pb-0 box-border bg-white hover:bg-gray-100  md:shadow-md shadow-gray-300 rounded-md space-y-4 pt-4 pl-4 sm:pl-16 md:pl-4 pr-4 items-left md:items-center md:justify-center">
                 <h1 className="text-4xl font-bold">
                   {canceledPayments ? canceledPayments : 0}
                 </h1>
@@ -436,127 +426,131 @@ function Profile() {
                   Failed Transactions
                 </h1>
                 <h1
-                  className="text-md flex items-center justify-between cursor-pointer mt-4"
+                  className="text-md md:text-sm lg:text-md flex items-center justify-between cursor-pointer mt-4"
                   onClick={() => goTo("Transactions")}
                 >
                   View Details <IoIosArrowForward />
                 </h1>
               </div>
-              <div className="h-31-v md:h-40-v  border-b-2 pb-0 md:pb-0 md:w-20 bg-white hover:bg-gray-100 space-y-4 md:space-y-20 flex flex-col pt-4 md:pt-16 items-center md:shadow-md shadow-gray-300 rounded-md">
-                <div className="flex flex-col items-center space-y-2 justify-center">
-                  <h1 className="m-0 text-4xl items-center flex justify-center border-2 rounded-full p-2 bg-slate-100">
-                    <IoIosWallet />
+              <div className="w-screen md:grid grid-cols-3 gap-0">
+                <div className="relative h-60 md:h-60 lg:h-68 xl:h-3/4 md:w-3/5 lg:w-3/5 lg:mt-4 xl:-mt-4 border-b-2 pb-0 md:pb-0 bg-white hover:bg-gray-100 space-y-4 md:space-y-20 flex flex-col pt-4 md:pt-16 items-center md:shadow-md shadow-gray-300 rounded-md">
+                  <div className="flex flex-col items-center space-y-2 justify-center ">
+                    <h1 className="m-0 text-4xl items-center flex justify-center border-2 rounded-full p-2 bg-slate-100">
+                      <IoIosWallet />
+                    </h1>
+                    <h1 className="flex font-extrabold text-2xl items-center">
+                      <FaRupeeSign className="text-xl font-extrabold" /> 1000
+                    </h1>
+                    <h1 className="text-sm">Available Balance</h1>
+                  </div>
+                  <h1 className="bg-slate-700 cursor-pointer hover:bg-gray-600 w-full h-12 absolute bottom-0 md:-bottom-2  text-white text-center flex items-center justify-center md:rounded-tr-none md:rounded-tl-none md:rounded-md">
+                    Customer Support
                   </h1>
-                  <h1 className="flex  font-extrabold text-2xl items-center">
-                    <FaRupeeSign className="text-xl font-extrabold" /> 1000
-                  </h1>
-                  <h1 className=" text-sm">Available Balance</h1>
-                </div>
-                <h1 className=" bg-slate-700 cursor-pointer hover:bg-gray-600 w-full md:w-1/5  h-12 md:h-12 lg:h-12 absolute top-57.5 md:top-34  xl:top-39.5  text-white text-center flex items-center justify-center md:rounded-tr-none md:rounded-tl-none md:rounded-md">
-                  Customer Support
-                </h1>
-              </div>
-              <div className="h-50-v md:h-55-v lg:h-60-v xl:h-60-v border-b-2 md:border-b-0 md:w-28 lg:w-30 xl:w-31 md:pl-0 md:mt-mt-4/5  lg:mt-mt-7/5 xl:mt-mt-9/5 md:ml-0 bg-white hover:bg-gray-100 space-y-2  md:space-y-1 pt-2 md:pt-4 md:shadow-md shadow-gray-300 rounded-md">
-                <div className="grid grid-cols-2 gap-32 sm:gap-80 md:gap-0 xl:gap-20  pl-4 md:pl-8">
-                  <h1 className="text-lg md:text-sm lg:text-xl ">Recipients</h1>
-                  <h1
-                    className="text-sm md:text-xs lg:text-md xl:text-sm md:ml-4 lg:ml-8 flex items-center text-gray-900 hover:cursor-pointer"
-                    onClick={() => goTo("Beneficiaries")}
+                </div>{" "}
+                <div className="h-1/2 md:h-5/6 lg:h-full md:-ml-20 lg:-ml-24 xl:-ml-32 md:-mt-20 lg:-mt-24 xl:-mt-28 md:w-64 lg:w-10/12 border-b-2 md:border-b-0 bg-white hover:bg-gray-100 space-y-2 md:space-y-1  md:shadow-md shadow-gray-300 rounded-md pt-4 pb-8">
+                  <div className="grid grid-cols-2 gap-32 sm:gap-80 md:gap-0 xl:gap-20 pl-4 lg:pl-8">
+                    <h1 className="text-lg md:text-sm lg:text-xl ">
+                      Recipients
+                    </h1>
+                    <h1
+                      className="text-sm md:text-xs lg:text-md xl:text-sm md:ml-4 lg:ml-8 flex items-center text-gray-900 hover:cursor-pointer"
+                      onClick={() => goTo("Beneficiaries")}
+                    >
+                      View more <IoIosArrowForward />
+                    </h1>
+                  </div>
+                  <div
+                    className={
+                      beneficiaries && beneficiaries.length < 5
+                        ? "space-y-10 h-1/2 pt-4 xl:h-full pl-4 md:pl-4 lg:pl-8 md:pt-4 md:pb-4"
+                        : "grid  h-1/2 pt-0 xl:h-full pl-4 md:pl-4 lg:pl-8 md:pt-4 md:pb-4"
+                    }
                   >
-                    View more <IoIosArrowForward />
-                  </h1>
-                </div>
-                <div
-                  className={
-                    beneficiaries && beneficiaries.length < 5
-                      ? "space-y-10  h-1/2 pt-4  md:h-custom-90 lg:h-custom-90 xl:h-full pl-4 md:pl-4 lg:pl-8  md:pt-4 md:pb-4"
-                      : "grid  h-1/2 pt-4  md:h-custom-90 lg:h-custom-90 xl:h-full pl-4 md:pl-4 lg:pl-8 md:pt-4 md:pb-4"
-                  }
-                >
-                  {beneficiaries.length > 0 ? (
-                    beneficiaries.slice(0, 6).map((item, index) => (
-                      <div key={index} className="space-y-0 xl:h-12 leading-0">
-                        <h1
+                    {beneficiaries.length > 0 ? (
+                      beneficiaries.slice(0, 6).map((item, index) => (
+                        <div
                           key={index}
-                          className="text-md md:text-sm lg:text-md capitalize "
+                          className="space-y-0 xl:h-12 leading-0"
                         >
-                          {item.Name}
-                        </h1>
-                        <h1 className="text-sm md:text-sm">{item.Account}</h1>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="grid items-center w-full justify-center h-full">
-                      You don't have any saved accounts, yet.
+                          <h1
+                            key={index}
+                            className="text-md md:text-sm lg:text-md capitalize "
+                          >
+                            {item.name}
+                          </h1>
+                          <h1 className="text-sm md:text-sm">{item.account}</h1>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="grid items-center w-full justify-center h-full">
+                        You don't have any saved accounts, yet.
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="h-1/2 md:h-5/6 lg:h-full md:w-full md:-ml-16 lg:-ml-20 xl:-ml-28 md:-mt-20 lg:-mt-24 xl:-mt-28 border-b-2 md:border-b-0 overflow-y-auto space-y-1 bg-white hover:bg-gray-100 md:shadow-md shadow-gray-300 md:rounded-md">
+                  <div className="flex justify-between md:gap-0 sticky top-0 z-5 bg-slate-700 text-white h-12 pl-4 border-b-2  items-center">
+                    <h1 className="text-sm md:text-xs lg:text-xl xl:text-xl md:pr-0 ">
+                      Recent Activity
+                    </h1>
+                    <h1
+                      className="text-xs md:text-xs xl:text-sm mr-12 flex items-center text-gray-200 hover:cursor-pointer"
+                      onClick={() => goTo("Transactions")}
+                    >
+                      View more <IoIosArrowForward />
+                    </h1>
+                  </div>
+                  <div className="grid grid-cols-2 gap-5 lg:gap-5 xl:gap-6 p-1 space-y-0 items-center pl-2 border-b-2">
+                    <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-2 md:gap-0 pl-2 md:pl-0 lg:pl-2">
+                      <h1>Date</h1>
+                      <h1>Description</h1>
+                    </div>
+                    <div className="grid grid-cols-2 text-sm md:text-md items-center gap-5 lg:gap-10 xl:gap-4">
+                      <h1 className="">Amount</h1>
+                      <h1>Status</h1>
+                    </div>
+                  </div>
+                  {recentActivity.length < 1 ? (
+                    <p className="flex items-center justify-center pt-20 pb-20">
+                      There is no recent transactions
                     </p>
+                  ) : (
+                    recentActivity
+                      .slice(-13)
+                      .reverse()
+                      .map((item, index) => (
+                        <div
+                          key={index}
+                          className="grid grid-cols-2 gap-5 md:gap-3 lg:gap-7 xl:gap-16 p-1 space-y-0 items-center pl-4 md:pl-2 lg:pl-4 pr-4 border-b-2 text-xs md:text-xs lg:text-md"
+                        >
+                          <div className="grid grid-cols-2 gap-0 lg:gap-2 xl:gap-6 items-cente">
+                            <h1 className="">{item.Date}</h1>
+                            {windowWidth > 767 && windowWidth < 1000 ? (
+                              <h1 className=" overflow-x-auto md:pl-2 md:w-28 lg:w-24">{`To ${item.Name}`}</h1>
+                            ) : (
+                              <h1 className=" overflow-x-auto w-28 lg:w-24">{`Sent to ${item.Name}`}</h1>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-2 pl-4 md:pl-4 lg:pl-2 xl:pl-0 gap-0">
+                            <h1 className="">{item.Amount}</h1>
+                            <h1
+                              className={
+                                item.Status === "completed"
+                                  ? " text-green-600 capitalize"
+                                  : item.Status === "canceled"
+                                  ? " text-red-800 capitalize"
+                                  : " text-yellow-400 capitalize"
+                              }
+                            >
+                              {item.Status}
+                            </h1>
+                          </div>
+                        </div>
+                      ))
                   )}
                 </div>
               </div>
-              <div className="h-auto md:h-55-v lg:h-60-v  md:w-38 lg:w-37 xl:w-33 border-b-2 md:border-b-0 overflow-y-auto md:mt-mt-4/5  lg:mt-mt-7/5 xl:mt-mt-9/5 md:ml-16 lg:ml-24 xl:ml-l-10 space-y-1 bg-white hover:bg-gray-100 md:shadow-md shadow-gray-300  md:rounded-md">
-                <div className="grid grid-cols-3 md:gap-0 sticky top-0 z-5 bg-slate-700 text-white h-12 pl-4 border-b-2  items-center">
-                  <h1 className="text-sm  md:text-xs lg:text-md xl:text-xl  md:pr-0 border-r-2">
-                    Recent Activity
-                  </h1>
-                  <h1 className="text-xs  lg:text-xs xl:text-sm pl-2">
-                    {recentTransactionsLength ? recentTransactionsLength : 0}{" "}
-                    Transactions
-                  </h1>
-                  <h1
-                    className="text-xs md:text-xs xl:text-sm ml-4 lg:ml-8 flex items-center text-gray-200 hover:cursor-pointer"
-                    onClick={() => goTo("Transactions")}
-                  >
-                    View more <IoIosArrowForward />
-                  </h1>
-                </div>
-                <div className="grid grid-cols-2 gap-5 lg:gap-5 xl:gap-6 p-1 space-y-0 items-center pl-4 border-b-2 ">
-                  <div className="grid grid-cols-2 sticky top-20 text-sm md:text-md gap-2 md:gap-0  pl-0 ">
-                    <h1>Date</h1>
-                    <h1>Description</h1>
-                  </div>
-                  <div className="grid grid-cols-2 text-sm md:text-md items-center gap-5  lg:gap-10 xl:gap-4">
-                    {" "}
-                    <h1 className="">Amount</h1>
-                    <h1>Status</h1>
-                  </div>
-                </div>
-                {recentActivity.length < 1 ? (
-                  <p className="flex items-center justify-center pt-20 pb-20">
-                    There is no recent transactions
-                  </p>
-                ) : (
-                  recentActivity
-                    .slice(-13)
-                    .reverse()
-                    .map((item, index) => (
-                      <div
-                        key={index}
-                        className="grid grid-cols-2 gap-5 md:gap-10  lg:gap-7 xl:gap-16 p-1 space-y-0 items-center pl-4 md:pl-4 lg:pl-4  pr-4 border-b-2"
-                      >
-                        <div className="grid grid-cols-2 gap-0 md:gap-6 lg:gap-2 xl:gap-6 items-center text-xs md:text-sm lg:text-md ">
-                          <h1 className="md:text-xs lg:text-md">{item.Date}</h1>
-                          <h1 className="md:text-xs lg:text-md overflow-x-auto md:w-16 lg:w-24">{`Sent to ${item.Name}`}</h1>
-                        </div>
-                        <div className="grid grid-cols-2 pl-4 gap-3 md:gap-5 lg:gap-0  text-xs md:text-sm lg:text-md  ">
-                          <h1 className="md:text-xs lg:text-md">
-                            {item.Amount}
-                          </h1>
-                          <h1
-                            className={
-                              item.Status === "completed"
-                                ? "md:text-xs lg:text-md text-green-600 capitalize"
-                                : item.Status === "canceled"
-                                ? "md:text-xs lg:text-md text-red-800 capitalize"
-                                : "md:text-xs lg:text-md text-yellow-400 capitalize"
-                            }
-                          >
-                            {item.Status}
-                          </h1>
-                        </div>
-                      </div>
-                    ))
-                )}
-              </div>
-            </>
+            </div>
           </div>
         )}
 
@@ -601,14 +595,6 @@ function Profile() {
         <>
           <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
         </>
-      ) : null}
-
-      {failedTransaction ? (
-        <div className="fixed top-0 grid justify-center h-screen w-screen z-100">
-          <FailedTransactions
-            state={{ recentActivity, setFailedTransaction }}
-          />
-        </div>
       ) : null}
     </>
   );

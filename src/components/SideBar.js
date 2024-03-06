@@ -23,7 +23,7 @@ function SideBar(props) {
               <RiMenuFoldFill />
             </p>
           </div>
-          <div className="space-y-2 flex text-white w-custom-80 justify-center pl-6 flex-col items-left  pt-5 border-box text-lg    cursor-pointer ">
+          <div className="space-y-2 flex text-white w-4/5 justify-center pl-6 flex-col items-left  pt-5 border-box text-lg    cursor-pointer ">
             {nav.map((item, index) => (
               <h1
                 key={index}
