@@ -1,6 +1,6 @@
 import React, { memo, useContext, useEffect } from "react";
 import { store } from "../App";
-import logo from "../images/Greenwhitelogo2.png";
+import logo from "../assets/images/Greenwhitelogo2.png";
 import { RiMenuUnfoldFill } from "react-icons/ri";
 import { useNavigate } from "react-router";
 

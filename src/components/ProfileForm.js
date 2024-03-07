@@ -33,9 +33,11 @@ function ProfileForm(props) {
     accFromDb,
     dobFromDb,
   } = props.states;
+
   const handleUserName = (e) => {
     setUserName(e.target.value);
   };
+
   const handleAge = (e) => {
     const value = e.target.value;
     if (value.length <= 2) {
@@ -43,10 +45,12 @@ function ProfileForm(props) {
       setAge(sanitizedValue);
     }
   };
+
   const handleDob = (e) => {
     const value = e.target.value;
     setDob(value);
   };
+
   const handleAccNumber = (e) => {
     const value = e.target.value;
     if (value.length <= 16) {
@@ -54,6 +58,7 @@ function ProfileForm(props) {
       setAccNumber(sanitizedValue);
     }
   };
+
   const handleCardNumber = (e) => {
     const value = e.target.value;
     if (value.length <= 16) {
@@ -87,6 +92,7 @@ function ProfileForm(props) {
       setCvv(sanitizedValue);
     }
   };
+
   const cancelEdit = () => {
     setIsEditProfile(false);
     setUserName("");
@@ -107,7 +113,8 @@ function ProfileForm(props) {
       alert("Enter all details");
       return;
     }
-    const mobileNumber = document.cookie;
+
+    const mobileNumber = sessionStorage.getItem("mobileNumber");
     try {
       if (connectionMode !== "socket") {
         await axios
@@ -168,7 +175,7 @@ function ProfileForm(props) {
   return (
     <>
       <form
-        action="submit"
+        onSubmit={(e) => updateProfile(e)}
         className="w-full sm:w-11/12 lg:w-3/5 h-screen text-gray-800 text-16 m-auto bg-blue-650 sm:ml-14 lg:ml-92 p-5 box-border items-center flex flex-col font-poppins justify-center sm:space-y-2 "
       >
         <div className="sm:flex flex-wrap sm:space-x-2 w-3/4 sm:w-full md:w-4/5">
@@ -215,7 +222,7 @@ function ProfileForm(props) {
           <input
             type="tel"
             readOnly
-            value={document.cookie}
+            value={sessionStorage.getItem("mobileNumber")}
             required
             className="block px-4 py-2 mb-3 w-full sm:w-1/3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
           />
@@ -255,7 +262,6 @@ function ProfileForm(props) {
           <input
             type="submit"
             value="Confirm"
-            onClick={updateProfile}
             required
             className="block py-2 mb-3 w-1/2 sm:w-1/3 relative box-border hover:cursor-pointer bg-gray-800 border-2 border-white rounded-md focus:outline-none "
           />

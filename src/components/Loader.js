@@ -10,7 +10,6 @@ function Loader(props) {
            font-poppins ${bg}`}
       >
         <div class="loader w-14 h-12 mb-4"></div>
-
         <p>
           <strong className="text-white">{msg}</strong>
         </p>

@@ -4,13 +4,13 @@ import { io } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 import Beneficiaries from "./components/Beneficiaries";
 import HomePage from "./components/HomePage";
-import "./App.css";
-import PaymentForm from "./components/PaymentForm";
 import Profile from "./components/Profile";
 import Success from "./components/Success";
 import Transactions from "./components/Transactions";
 import PrivateRoutes from "./components/PrivateRoutes";
+import PaymentPage from "./components/PaymentPage";
 export const store = createContext();
+
 const socket = io.connect("http://localhost:8080", {
   query: {
     tabId: sessionStorage.getItem("tabId"),
@@ -101,7 +101,7 @@ function App() {
     }
   };
 
-  useEffect(() => {
+  const clearSession = () => {
     const storedTabId = sessionStorage.getItem("tabId");
     if (storedTabId) {
       setTabId(storedTabId);
@@ -110,7 +110,10 @@ function App() {
       sessionStorage.setItem("tabId", newTabId);
       setTabId(newTabId);
     }
+  };
 
+  useEffect(() => {
+    clearSession();
     socket.on("connection_type", (data) => {
       if (data.type === "socket") {
         setConnectionMode("socket");
@@ -129,6 +132,7 @@ function App() {
   return (
     <store.Provider
       value={{
+        clearSession,
         cardFromDb,
         cvvFromDb,
         expireDateFromDb,
@@ -239,11 +243,11 @@ function App() {
       <Router>
         <Routes>
           <Route element={<PrivateRoutes />}>
-            <Route path="/transferPage" element={<PaymentForm />}></Route>
+            <Route path="/transferPage" element={<PaymentPage />}></Route>
             <Route path="/success" element={<Success />}></Route>
-            <Route path="/Profile" element={<Profile />}></Route>
-            <Route path="/Beneficiaries" element={<Beneficiaries />}></Route>
-            <Route path="/Transactions" element={<Transactions />}></Route>
+            <Route path="/profile" element={<Profile />}></Route>
+            <Route path="/beneficiaries" element={<Beneficiaries />}></Route>
+            <Route path="/transactions" element={<Transactions />}></Route>
           </Route>
           <Route path="/" element={<HomePage />}></Route>
         </Routes>

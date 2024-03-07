@@ -5,14 +5,17 @@ import { RiMenuFoldFill } from "react-icons/ri";
 function SideBar(props) {
   const { nav, onClickHandler } = props;
   const { setIsProfileClicked } = useContext(store);
+
   const handleClick = (item) => {
     if (onClickHandler) {
       onClickHandler(item);
     }
   };
+
   const closeProfile = () => {
     setIsProfileClicked(false);
   };
+
   return (
     <>
       <div className="w-4/6  sm:w-1/2 bg-gray-800 backdrop-blur-xl h-screen z-200 text-white font-sans fixed top-0  ">

@@ -1,9 +1,9 @@
-import React, { useContext, useState, useEffect, memo } from "react";
+import React, { useContext, useState, useEffect, memo, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { store } from "../App";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import logo from "../images/Greenwhitelogo2.png";
+import logo from "../assets/images/Greenwhitelogo2.png";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { PhoneNumberUtil } from "google-libphonenumber";
@@ -12,6 +12,8 @@ function Login() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isValidNumber, setIsValidNumber] = useState(true);
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [password, setPassword] = useState("");
   const numberUtil = PhoneNumberUtil.getInstance();
   const {
     setIsLoggedOut,
@@ -29,8 +31,7 @@ function Login() {
     loginInputAlert,
     setLoginInputAlert,
   } = useContext(store);
-  const [mobileNumber, setMobileNumber] = useState("");
-  const [password, setPassword] = useState("");
+
   const handleMobileNumber = (value, country) => {
     const countryCode = country.countryCode.toUpperCase();
     try {
@@ -94,14 +95,14 @@ function Login() {
       setLoader(true);
       try {
         const response = await axios.post(`http://localhost:8080/login/`, {
-          Mobile: mobileNumber.slice(2),
-          Password: password,
+          mobile: "+" + mobileNumber,
+          password: password,
         });
         if (response.status === 200) {
           setLoader(false);
           setIsLoggedOut(false);
           navigate("/transferPage");
-          document.cookie = mobileNumber.slice(2);
+          sessionStorage.setItem("mobileNumber", "+" + mobileNumber);
           clearInputs();
           setLoginFailed(false);
           setLoginInputAlert(false);
@@ -126,7 +127,7 @@ function Login() {
       setIsValidNumber(false);
       setLoader(true);
       await socket.emit("login", {
-        mobileNumber: mobileNumber.slice(2),
+        mobileNumber: "+" + mobileNumber,
         password: password,
       });
     } else {
@@ -136,11 +137,11 @@ function Login() {
 
   useEffect(() => {
     setLoginInputAlert(false);
-    socket.on("loginSuccess", () => {
+    socket.on("loginSuccess", (data) => {
       setLoader(false);
       setIsLoggedOut(false);
+      sessionStorage.setItem("mobileNumber", data.mobileNumber);
       navigate("/transferPage");
-      document.cookie = mobileNumber.slice(2);
       clearInputs();
       setLoginFailed(false);
       setLoginInputAlert(false);
@@ -191,7 +192,7 @@ function Login() {
           <PhoneInput
             name="mobileNumber"
             country={"in"}
-            countryCodeEditable={false}
+            countryCodeEditable={true}
             placeholder="Enter mobile number"
             value={mobileNumber}
             onChange={handleMobileNumber}
@@ -200,7 +201,7 @@ function Login() {
                 ? {
                     required: true,
                     className:
-                      "outline-0 h-10  w-full border border-red-600 rounded-lg text-base pl-11 p-4 font-poppins border-box",
+                      "outline-0 h-10 w-full border border-red-600 rounded-lg text-base pl-11 p-4 font-poppins border-box",
                   }
                 : isNewUser
                 ? {
@@ -231,6 +232,7 @@ function Login() {
                 : "border-slate-300 border-2 rounded-lg rounded-tr-0 rounded-br-0 !bg-transparent font-poppins hover:rounded-br-0 hover:rounded-tr-0"
             }
           />
+
           <div className="w-4/5 mb-2">
             {mobileNumber ? (
               isValidNumber ? null : (
@@ -239,11 +241,13 @@ function Login() {
                 </p>
               )
             ) : null}
+
             {!mobileNumber && loginInputAlert ? (
               <p className="text-xs w-4/5 relative bottom-0 text-red-500">
                 Enter mobile number
               </p>
             ) : null}
+
             {isNewUser ? (
               <p className="text-xs mt-1 text-red-500">Wrong mobile number</p>
             ) : null}
@@ -267,6 +271,7 @@ function Login() {
             onChange={handlePassword}
             placeholder="Enter your password"
           />
+
           {showPassword ? (
             <FaRegEye
               className={
@@ -294,6 +299,7 @@ function Login() {
               Enter Password
             </p>
           ) : null}
+
           {loginFailed && !isNewUser ? (
             <p className="relative bottom-1  text-xs  text-red-500">
               Wrong password

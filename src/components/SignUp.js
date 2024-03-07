@@ -3,7 +3,7 @@ import { store } from "../App";
 import axios from "axios";
 import { FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
-import logo from "../images/Greenwhitelogo2.png";
+import logo from "../assets/images/Greenwhitelogo2.png";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { PhoneNumberUtil } from "google-libphonenumber";
@@ -37,6 +37,7 @@ function SignUp() {
     setIsLogin(true);
     clearInputs();
   };
+
   const handleRegMobileNumber = (value, country) => {
     try {
       const parsedNum = phoneNumber.parseAndKeepRawInput(
@@ -105,8 +106,8 @@ function SignUp() {
         setSignUpFailed(false);
         try {
           const response = await axios.post("http://localhost:8080/signUp", {
-            Mobile: regMobileNumber.slice(2),
-            Password: createPassword,
+            mobile: "+" + regMobileNumber,
+            password: createPassword,
           });
 
           if (response.status === 201) {
@@ -115,7 +116,7 @@ function SignUp() {
           } else if (response.status === 200) {
             setIsLoggedOut(false);
             navigate("/transferPage");
-            document.cookie = regMobileNumber.slice(2);
+            sessionStorage.setItem("mobileNumber", "+" + regMobileNumber);
             setIsLogin(true);
             setAllInputAlert(false);
             setRegMobileNumber("");
@@ -141,7 +142,7 @@ function SignUp() {
       } else {
         setSignUpFailed(false);
         socket.emit("signUp", {
-          mobileNumber: regMobileNumber.slice(2),
+          mobileNumber: "+" + regMobileNumber,
           password: createPassword,
         });
       }
@@ -160,12 +161,12 @@ function SignUp() {
       setIsLogin(false);
     });
 
-    socket.on("userRegistered", () => {
+    socket.on("userRegistered", (data) => {
       setIsLogin(true);
       setAllInputAlert(false);
       setIsLoggedOut(false);
       navigate("/transferPage");
-      document.cookie = regMobileNumber.slice(2);
+      sessionStorage.setItem("mobileNumber", data.mobileNumber);
       setRegMobileNumber("");
       setCreatePassword("");
       setConfirmPassword("");
@@ -224,15 +225,14 @@ function SignUp() {
                 ? {
                     required: true,
                     className:
-                      "outline-0 h-10  w-full border border-red-600 rounded-lg text-base  pl-11  p-4 font-poppins border-box ",
+                      "outline-0 h-10 w-full border border-red-600 rounded-lg text-base pl-11 p-4 font-poppins border-box ",
                   }
                 : {
                     required: true,
                     className:
-                      "outline-0 h-10  w-full border border-slate-300 rounded-lg text-base  pl-11  p-4 font-poppins border-box ",
+                      "outline-0 h-10 w-full border border-slate-300 rounded-lg text-base pl-11 p-4 font-poppins border-box ",
                   }
             }
-            countryCodeEditable={false}
             buttonClass={
               allInputAlert && !regMobileNumber
                 ? "border-red-600 border-2 rounded-lg rounded-br-0 rounded-tr-0 bg-white font-poppins"
@@ -260,20 +260,17 @@ function SignUp() {
           ) : null}
         </div>
 
-        <div className="flex flex-col w-4/5 mt-1 relative ">
-          <label
-            htmlFor=""
-            className="block leading-6 text-left text-sm mb-1  "
-          >
+        <div className="flex flex-col w-4/5 mt-1 relative">
+          <label htmlFor="" className="block leading-6 text-left text-sm mb-1">
             Create Password
           </label>
           <input
             className={
               passwordError
-                ? "outline-0 h-10 w-full  rounded-lg text-base pl-2 sm:p-4 border border-red-500  border-box "
+                ? "outline-0 h-10 w-full rounded-lg text-base pl-2 sm:p-4 border border-red-500 border-box "
                 : signUpFailed || (allInputAlert && !createPassword)
-                ? "outline-0 h-10 w-full  rounded-lg text-base pl-2 sm:p-4 border border-red-500  border-box "
-                : "outline-0 h-10 w-full  rounded-lg text-base pl-2 sm:p-4 border border-slate-300  border-box "
+                ? "outline-0 h-10 w-full rounded-lg text-base pl-2 sm:p-4 border border-red-500 border-box "
+                : "outline-0 h-10 w-full rounded-lg text-base pl-2 sm:p-4 border border-slate-300 border-box "
             }
             type={showCreatePassword ? "text" : "password"}
             max={10}
@@ -283,6 +280,7 @@ function SignUp() {
             placeholder="Enter Your Password"
             required
           />
+
           {showCreatePassword ? (
             <FaRegEye
               className="cursor-pointer absolute right-4 bottom-1 -translate-y-2/4 text-zinc-400"
@@ -295,11 +293,13 @@ function SignUp() {
             />
           )}
         </div>
+
         {allInputAlert && !createPassword ? (
           <span className="w-4/5 text-xs text-red-500 mb-0">
             Enter password
           </span>
         ) : null}
+
         {passwordError && (
           <p className="w-4/5 md:w-4/5 text-red-500 text-xs mb-2 ">
             {!/[A-Z]/.test(createPassword) && <p>Must have 1 upper case. </p>}
