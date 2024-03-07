@@ -1,10 +1,6 @@
-# Getting Started with Create React App
+# Easy Transfer Overview
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-# Payment Application Overview
-
-This document provides an overview of the payment application's frontend and backend structure.
+This document provides an overview of the payment application's frontend structure.
 
 ## Frontend (React)
 
@@ -12,25 +8,31 @@ This document provides an overview of the payment application's frontend and bac
 
 The `App` component serves as the entry point of the application. It manages the state and context using React hooks and creates a context for sharing data between components. It also initializes the socket connection and sets up routing for different pages using React Router.
 
-### Payment Form Component (`PaymentForm.js`)
+### Login & SignUp Component
+
+These components handles the user to login or sign up to use their respective accounts to send money from one bank account to another `mock`.
+
+### PaymentPage Component (`PaymentPage.js`)
 
 The `PaymentForm` component handles user input for transferring amounts and recipient details. It uses context to access and update state values like amounts, account numbers, and the socket connection. It emits a `paymentPageConnected` event upon form submission, triggering a transaction confirmation.
 
 ### Success Component (`Success.js`)
 
-The `Success` component displays the transaction status after submission. It listens for socket events like `success` and `failed`, updating the UI based on transaction outcomes. Additionally, it handles confirmation alerts and redirects users based on transaction success or failure.
+The `Success` component displays the transaction status after submission. It listens for socket/http events like `success` and `failed`, updating the UI based on transaction outcomes. Additionally, it handles confirmation alerts and redirects users based on transaction success or failure.
 
 ## Backend (Socket.io with Express)
 
-The backend uses Socket.io with Express to manage real-time communication.
+The backend uses Socket.io and http request/response with Express to manage real-time communication and ejs view engine is used to create ui for the confirmation/cancelation page.
+
+The backend code is deployed here in the repository named as `easy_transfer_server`
 
 ### Socket.io Server (`server.js`)
 
 The Socket.io server handles various events like `paymentPageConnected`, `join_success_room`, `clicked`, and `canceled`. It manages rooms for different tabs, emits confirmation alerts, and handles success/failure events for transactions.
 
----
+### Polling
 
-This Markdown file outlines the structure and functionality of the payment application's frontend (built with React) and backend (Socket.io with Express).
+The polling is another configuration for confirm/cancel the alerts initiated from `easy_transfer` webpage. It handles multiple endpoints to login authentication, saving accounts, verifying the payment transactions.
 
 ---to run the application
 
@@ -48,6 +50,12 @@ to install all the required dependencies.
 In the project directory, you can run:
 
 ### `npm start`
+
+This command for use the polling configuration
+
+### `npm run start:socket`
+
+This command for use the socket configuration
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.

@@ -10,7 +10,7 @@ import { IoIosArrowForward, IoIosWallet } from "react-icons/io";
 import { MdModeEdit, MdKeyboardArrowLeft } from "react-icons/md";
 import { RiMenuUnfoldFill } from "react-icons/ri";
 import { useIdleTimer } from "react-idle-timer";
-import profileAlternate from "../assets/images/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752-fotor-20240208155618.png";
+import profileAlternate from "../assets/images/user-profile.png";
 import SavedAccounts from "./SavedAccounts";
 import RecentTransactions from "./RecentTransactions";
 
@@ -389,7 +389,7 @@ function Profile() {
                 {windowWidth > 640 ? (
                   <div className="absolute top-44 md:top-48 lg:top-52 h-1/10 w-full justify-center sm:ml-0 pl-0 item-center m-auto text-gray-700">
                     <div className="w-full m-auto md:ml-0 md:m-auto lg:m-auto h-auto flex items-center">
-                      <h1 className=" md:m-auto flex md:text-xl lg:text-2xl sm:pl-0 sm:-ml-14 md-ml-0 items-center justify-center font-extrabold w-8/2 sm:w-1/2 md:w-3/5 lg:w-auto text-center sm:text-center">
+                      <h1 className=" md:m-auto flex text-xl md:text-xl lg:text-2xl sm:pl-0 sm:-ml-14 md-ml-0 items-center justify-center font-extrabold w-8/2 sm:w-1/2 md:w-3/5 lg:w-auto text-center sm:text-center">
                         {userNameFromDb}
                         <MdModeEdit
                           onClick={editProfile}

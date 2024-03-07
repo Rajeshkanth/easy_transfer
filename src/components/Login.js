@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router";
 import { store } from "../App";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import logo from "../assets/images/Greenwhitelogo2.png";
+import logo from "../assets/images/green-white-logo.png";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { PhoneNumberUtil } from "google-libphonenumber";
