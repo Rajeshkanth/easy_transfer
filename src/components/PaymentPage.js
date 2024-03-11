@@ -4,12 +4,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import axios from "axios";
 import { store } from "../App";
-import Menu from "./Menu";
-import SideBar from "./SideBar";
-import { TextGenerateEffect } from "./TextGenerate";
+import Menu from "./utils/Menu";
+import SideBar from "./utils/SideBar";
+import { TextGenerateEffect } from "./utils/TextGenerate";
 import { RiMenuUnfoldFill } from "react-icons/ri";
 import { useIdleTimer } from "react-idle-timer";
-import PaymentForm from "./PaymentForm";
+import PaymentForm from "../components/forms/PaymentForm";
 
 function PaymentPage() {
   const {
@@ -204,7 +204,7 @@ function PaymentPage() {
       handleAllInput();
 
       const response = await axios.post(
-        "http://localhost:8080/fromPaymentAlert",
+        "http://localhost:8080/api/transaction/fromPaymentAlert",
         {
           data: newReceiver,
           newTransaction: newTransactions,

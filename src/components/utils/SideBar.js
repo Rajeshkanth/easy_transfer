@@ -1,5 +1,5 @@
 import React, { memo, useContext } from "react";
-import { store } from "../App";
+import { store } from "../../App";
 import { RiMenuFoldFill } from "react-icons/ri";
 
 function SideBar(props) {

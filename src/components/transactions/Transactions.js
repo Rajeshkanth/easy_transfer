@@ -1,8 +1,8 @@
 import React, { memo, useContext, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { store } from "../App";
-import Menu from "./Menu";
-import SideBar from "./SideBar";
+import { store } from "../../App";
+import Menu from "../utils/Menu";
+import SideBar from "../utils/SideBar";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { RiMenuUnfoldFill } from "react-icons/ri";
@@ -148,7 +148,7 @@ function Transactions() {
 
   useEffect(() => {
     axios
-      .post("http://localhost:8080/transactionDetails", {
+      .post("http://localhost:8080/api/transaction/transactionDetails", {
         mobileNumber: sessionStorage.getItem("mobileNumber"),
       })
       .then((res) => {
@@ -168,6 +168,7 @@ function Transactions() {
   useEffect(() => {
     const fetchData = async () => {
       socket.on("transactionDetailsFromDb", (data) => {
+        console.log(data.transactions);
         const transaction = {
           date: data.date,
           name: data.name,

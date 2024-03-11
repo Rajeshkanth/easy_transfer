@@ -1,5 +1,5 @@
 import React, { memo, useContext, useEffect } from "react";
-import { store } from "../App";
+import { store } from "../../App";
 import SignUp from "./SignUp";
 import Login from "./Login";
 

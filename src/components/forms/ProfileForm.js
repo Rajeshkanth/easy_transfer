@@ -118,7 +118,7 @@ function ProfileForm(props) {
     try {
       if (connectionMode !== "socket") {
         await axios
-          .post("http://localhost:8080/updateProfile", {
+          .post("http://localhost:8080/api/user/updateProfile", {
             mobileNumber: mobileNumber,
             name: userName,
             age: age,

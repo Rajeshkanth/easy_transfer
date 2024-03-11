@@ -2,17 +2,17 @@ import React, { memo, useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { store } from "../App";
 import axios from "axios";
-import Menu from "./Menu";
-import SideBar from "./SideBar";
-import ProfileForm from "./ProfileForm";
+import Menu from "./utils/Menu";
+import SideBar from "./utils/SideBar";
+import ProfileForm from "../components/forms/ProfileForm";
 import { FaRupeeSign } from "react-icons/fa";
 import { IoIosArrowForward, IoIosWallet } from "react-icons/io";
 import { MdModeEdit, MdKeyboardArrowLeft } from "react-icons/md";
 import { RiMenuUnfoldFill } from "react-icons/ri";
 import { useIdleTimer } from "react-idle-timer";
 import profileAlternate from "../assets/images/user-profile.png";
-import SavedAccounts from "./SavedAccounts";
-import RecentTransactions from "./RecentTransactions";
+import SavedAccounts from "./accounts/SavedAccounts";
+import RecentTransactions from "./transactions/RecentTransactions";
 
 function Profile() {
   const {
@@ -207,12 +207,12 @@ function Profile() {
     const loggedNumber = sessionStorage.getItem("mobileNumber");
     if (connectionMode !== "socket") {
       axios
-        .post("http://localhost:8080/checkUserName", {
+        .post("http://localhost:8080/api/user/checkUserName", {
           regNumber: loggedNumber,
         })
         .then((response) => {
           if (response.status === 200) {
-            setUserNameFromDb(response.data.user);
+            setUserNameFromDb(response.data.userName);
             setAgeFromDb(response.data.age);
             setDobFromDb(response.data.dob);
             setCardFromDb(response.data.card);
@@ -251,7 +251,7 @@ function Profile() {
   useEffect(() => {
     const loggedNumber = sessionStorage.getItem("mobileNumber");
     axios
-      .post("http://localhost:8080/getBeneficiaryDetails", {
+      .post("http://localhost:8080/api/user/getBeneficiaryDetails", {
         mobileNumber: loggedNumber,
       })
       .then((res) => {
@@ -266,7 +266,7 @@ function Profile() {
       .catch((err) => err);
 
     axios
-      .post("http://localhost:8080/transactionDetails", {
+      .post("http://localhost:8080/api/transaction/transactionDetails", {
         mobileNumber: loggedNumber,
       })
       .then((res) => {
@@ -448,7 +448,7 @@ function Profile() {
                 </h1>
               </div>
               <div className="w-screen md:grid grid-cols-3 gap-0">
-                <div className="relative h-60 md:h-68 lg:h-64 xl:h-3/4 md:w-3/5 lg:w-3/5 md:-mt-8 lg:-mt-12 xl:-mt-6 border-b-2 pb-0 md:pb-0 bg-white space-y-4 md:space-y-20 flex flex-col pt-4 md:pt-16 items-center md:shadow-md shadow-gray-300 rounded-md">
+                <div className="relative h-60 md:h-68 lg:h-64 xl:h-3/4 md:w-3/5 lg:w-3/5 md:-mt-16 lg:-mt-12 xl:-mt-4 border-b-2 pb-0 md:pb-0 bg-white space-y-4 md:space-y-20 flex flex-col pt-4 md:pt-16 items-center md:shadow-md shadow-gray-300 rounded-md">
                   <div className="flex flex-col items-center space-y-2 justify-center ">
                     <h1 className="m-0 text-4xl items-center flex justify-center border-2 rounded-full p-2 bg-slate-100">
                       <IoIosWallet />

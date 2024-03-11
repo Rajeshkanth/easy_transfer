@@ -5,9 +5,7 @@ function RecentTransactions(props) {
   return (
     <div
       className={
-        recentActivity.length < 4
-          ? "h-1/2 md:h-full md:w-full md:-ml-16 lg:-ml-20 xl:-ml-28 md:-mt-20 lg:-mt-28 border-b-2 md:border-b-0 overflow-y-auto space-y-1 bg-white hover:bg-gray-100 md:shadow-md shadow-gray-300 md:rounded-md"
-          : "h-1/2 md:h-full md:w-full md:-ml-16 lg:-ml-20 xl:-ml-28 md:-mt-20 lg:-mt-28 border-b-2 md:border-b-0 overflow-y-auto space-y-1 bg-white hover:bg-gray-100 md:shadow-md shadow-gray-300 md:rounded-md"
+        "h-1/2 md:h-80 lg:h-96 xl:h-96 md:w-full md:-ml-16 lg:-ml-20 xl:-ml-28 md:-mt-28 lg:-mt-44 xl:-mt-28 border-b-2 md:border-b-0 overflow-y-auto space-y-1 bg-white hover:bg-gray-100 md:shadow-md shadow-gray-300 md:rounded-md"
       }
     >
       <div className="flex justify-between md:gap-0 sticky top-0 z-5 bg-slate-700 text-white h-12 pl-4 border-b-2  items-center">

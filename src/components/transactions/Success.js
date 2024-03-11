@@ -1,9 +1,9 @@
 import React, { memo, useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { store } from "../App";
+import { store } from "../../App";
 import { MdOutlineCancel } from "react-icons/md";
 import { useNavigate } from "react-router";
-import Loader from "./Loader";
+import Loader from "../utils/Loader";
 
 function Success() {
   const { socket, connectionMode } = useContext(store);
@@ -58,7 +58,7 @@ function Success() {
       const paymentConfirmed = () => {};
       try {
         const response = await axios.post(
-          `http://localhost:8080/success/${tabId}`
+          `http://localhost:8080/api/transaction/transactionStatus/${tabId}`
         );
 
         if (response.status === 200) {

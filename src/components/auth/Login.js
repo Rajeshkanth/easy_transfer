@@ -1,9 +1,9 @@
 import React, { useContext, useState, useEffect, memo, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
-import { store } from "../App";
+import { store } from "../../App";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
-import logo from "../assets/images/green-white-logo.png";
+import logo from "../../assets/images/green-white-logo.png";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { PhoneNumberUtil } from "google-libphonenumber";
@@ -94,10 +94,13 @@ function Login() {
       setIsValidNumber(false);
       setLoader(true);
       try {
-        const response = await axios.post(`http://localhost:8080/login/`, {
-          mobile: "+" + mobileNumber,
-          password: password,
-        });
+        const response = await axios.post(
+          `http://localhost:8080/api/auth/login/`,
+          {
+            mobileNumber: "+" + mobileNumber,
+            password: password,
+          }
+        );
         if (response.status === 200) {
           setLoader(false);
           setIsLoggedOut(false);
@@ -152,7 +155,7 @@ function Login() {
     socket.on("loginFailed", async () => {
       wrongPassword();
     });
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
     const handleResize = () => {

@@ -1,14 +1,14 @@
 import React, { memo, useContext, useEffect, useState } from "react";
-import { store } from "../App";
+import { store } from "../../App";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router";
-import Menu from "./Menu";
-import SideBar from "./SideBar";
+import Menu from "../utils/Menu";
+import SideBar from "../utils/SideBar";
 import { RiMenuUnfoldFill } from "react-icons/ri";
 import { MdKeyboardArrowLeft } from "react-icons/md";
-import Loader from "./Loader";
+import Loader from "../utils/Loader";
 import { useIdleTimer } from "react-idle-timer";
-import SaveAccountForm from "./SaveAccountForm";
+import SaveAccountForm from "../forms/SaveAccountForm";
 
 function Beneficiaries() {
   const {
@@ -160,6 +160,7 @@ function Beneficiaries() {
       setSavedBeneficiaryName(value);
     }
   };
+
   const handleSavedIfsc = (e) => {
     const value = e.target.value;
     if (value.length <= 10) {
@@ -177,59 +178,48 @@ function Beneficiaries() {
   };
 
   const saveBeneficiary = async () => {
-    if (
-      savedBeneficiaryName &&
-      savedAccNum &&
-      savedIfsc &&
-      String(savedAccNum).length > 15 &&
-      String(savedIfsc).length > 9
-    ) {
-      try {
-        if (connectionMode !== "socket") {
-          await axios
-            .post("http://localhost:8080/addNewBeneficiary", {
-              savedBeneficiaryName: savedBeneficiaryName,
-              savedAccNum: savedAccNum,
-              savedIfsc: savedIfsc,
-              mobileNumber: sessionStorage.getItem("mobileNumber"),
-            })
-            .then((res) => {
-              switch (res.status) {
-                case 200:
-                  const savedDetail = {
-                    beneficiaryName: res.data.beneficiaryName,
-                    accNum: res.data.accNum,
-                    ifsc: res.data.ifsc,
-                  };
-                  setSavedAcc((prev) => [...prev, savedDetail]);
-                  break;
-                case 409:
-                  alert("Account number already saved");
-                  break;
-                default:
-                  break;
-              }
-            });
-        } else {
-          socket.emit("saveNewBeneficiary", {
+    try {
+      if (connectionMode !== "socket") {
+        await axios
+          .post("http://localhost:8080/api/user/addNewBeneficiary", {
             savedBeneficiaryName: savedBeneficiaryName,
             savedAccNum: savedAccNum,
             savedIfsc: savedIfsc,
             mobileNumber: sessionStorage.getItem("mobileNumber"),
+          })
+          .then((res) => {
+            switch (res.status) {
+              case 200:
+                const savedDetail = {
+                  beneficiaryName: res.data.beneficiaryName,
+                  accNum: res.data.accNum,
+                  ifsc: res.data.ifsc,
+                };
+                setSavedAcc((prev) => [...prev, savedDetail]);
+                break;
+              case 409:
+                alert("Account number already saved");
+                break;
+              default:
+                break;
+            }
           });
-          return;
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setPlusIcon(false);
-        setAllInputsAlert(false);
-        setLoader(false);
+      } else {
+        socket.emit("saveNewBeneficiary", {
+          savedBeneficiaryName: savedBeneficiaryName,
+          savedAccNum: savedAccNum,
+          savedIfsc: savedIfsc,
+          mobileNumber: sessionStorage.getItem("mobileNumber"),
+        });
       }
-      clearAllInputs();
-    } else {
-      setAllInputsAlert(true);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setPlusIcon(false);
+      setAllInputsAlert(false);
+      setLoader(false);
     }
+    clearAllInputs();
   };
 
   const addNewBeneficiary = () => {
@@ -291,7 +281,7 @@ function Beneficiaries() {
 
   useEffect(() => {
     axios
-      .post("http://localhost:8080/getBeneficiaryDetails", {
+      .post("http://localhost:8080/api/user/getBeneficiaryDetails", {
         mobileNumber: sessionStorage.getItem("mobileNumber"),
       })
       .then((res) => {

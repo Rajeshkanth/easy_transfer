@@ -5,9 +5,7 @@ function SavedAccounts(props) {
   return (
     <div
       className={
-        beneficiaries.length < 4
-          ? "h-1/2 md:h-full lg:h-96 md:-ml-20 lg:-ml-24 xl:-ml-32 md:-mt-20 lg:-mt-28 xl:-mt-32 md:w-64 lg:w-10/12 border-b-2 md:border-b-0 bg-white hover:bg-gray-100 space-y-2 md:space-y-1 md:shadow-md shadow-gray-300 rounded-md pt-4 pb-8"
-          : "h-1/2 md:h-full lg:h-full md:-ml-20 lg:-ml-24 xl:-ml-32 md:-mt-20 lg:-mt-28 xl:-mt-28 md:w-64 lg:w-10/12 border-b-2 md:border-b-0 bg-white hover:bg-gray-100 space-y-2 md:space-y-1 md:shadow-md shadow-gray-300 rounded-md pt-4 pb-8"
+        "h-1/2 md:h-80 lg:h-96 xl:h-96 md:-ml-20 lg:-ml-24 xl:-ml-32 md:-mt-28 lg:-mt-44 xl:-mt-28 md:w-64 lg:w-10/12 border-b-2 md:border-b-0 bg-white hover:bg-gray-100 space-y-2 md:space-y-1 md:shadow-md shadow-gray-300 rounded-md pt-4 pb-8"
       }
     >
       <div className="grid grid-cols-2 gap-32 sm:gap-80 md:gap-0 xl:gap-20 pl-4 lg:pl-8">
@@ -39,8 +37,8 @@ function SavedAccounts(props) {
             </div>
           ))
         ) : (
-          <p className="grid items-center w-full justify-center h-full">
-            You don't have any saved accounts, yet.
+          <p className="flex items-center text-sm w-full justify-center h-full">
+            No saved accounts.
           </p>
         )}
       </div>

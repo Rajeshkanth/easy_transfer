@@ -1,6 +1,6 @@
 import { memo, useEffect } from "react";
 import { motion, stagger, useAnimate } from "framer-motion";
-import { cn } from "../assets/utils/cn";
+import { cn } from "../../assets/utils/cn";
 
 export const TextGenerateEffect = ({ words, className }) => {
   const [scope, animate] = useAnimate();

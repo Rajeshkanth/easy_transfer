@@ -1,6 +1,6 @@
 {
-  "homepage": "https://rajeshkanth.github.io/paymentpage",
-  "name": "paymentform",
+  "homepage": "https://rajeshkanth.github.io/easy_transfer",
+  "name": "easy_transfer",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

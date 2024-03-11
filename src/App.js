@@ -2,12 +2,12 @@ import { createContext, useState, useEffect, memo } from "react";
 import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import { io } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
-import Beneficiaries from "./components/Beneficiaries";
-import HomePage from "./components/HomePage";
+import Beneficiaries from "./components/accounts/Beneficiaries";
+import HomePage from "./components/auth/HomePage";
 import Profile from "./components/Profile";
-import Success from "./components/Success";
-import Transactions from "./components/Transactions";
-import PrivateRoutes from "./components/PrivateRoutes";
+import Success from "./components/transactions/Success";
+import Transactions from "./components/transactions/Transactions";
+import PrivateRoutes from "./components/routes/PrivateRoutes";
 import PaymentPage from "./components/PaymentPage";
 export const store = createContext();
 

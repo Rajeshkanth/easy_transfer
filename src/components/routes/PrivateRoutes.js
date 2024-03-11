@@ -1,5 +1,5 @@
 import React, { memo, useContext } from "react";
-import { store } from "../App";
+import { store } from "../../App";
 import { Navigate, Outlet } from "react-router";
 
 function PrivateRoutes() {
