@@ -1,16 +1,14 @@
-import React, { memo, useContext, useEffect } from "react";
+import React, { memo, useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { store } from "../../App";
 import Menu from "../utils/Menu";
 import SideBar from "../utils/SideBar";
-import { FaArrowLeftLong } from "react-icons/fa6";
-import { MdKeyboardArrowLeft } from "react-icons/md";
-import { RiMenuUnfoldFill } from "react-icons/ri";
 import { useIdleTimer } from "react-idle-timer";
 import axios from "axios";
-import PendingTransactions from "./PendingTransactions";
-import CanceledTransactions from "./CanceledTransactions";
 import ConfirmedTransactions from "./ConfirmedTransactions";
+import FooterComponent from "../utils/FooterComponent";
+import { paymentFailedSvg } from "../utils/CautionSvg";
+import AlertModal from "../utils/AlertModal";
 
 function Transactions() {
   const {
@@ -28,20 +26,56 @@ function Transactions() {
     setIsLoggedOut,
     handleSocket,
     setLoggedUser,
+    signOutAlert,
+    setSignOutAlert,
+    logOutCanceled,
+    clearAll,
   } = useContext(store);
 
+  const logOutConfirmed = () => {
+    setSignOutAlert(false);
+    clearSession();
+    clearAll();
+    setLogOut(true);
+    navigate("/");
+  };
   const navigate = useNavigate();
   const location = useLocation();
   const prevPath = location.state?.prevPath;
+  const buttons = [
+    {
+      label: "Yes",
+      method: logOutConfirmed,
+      bg: "bg-gray-800 focus:ring-gray-600 text-lg font-semibold",
+    },
+    {
+      label: "No",
+      method: logOutCanceled,
+      bg: "bg-red-600 focus:ring-gray-600 text-lg font-semibold",
+    },
+  ];
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
+
+  const totalItems = recentTransactions ? recentTransactions.length : 0;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = Math.min(startIndex + itemsPerPage - 1, totalItems - 1);
+  const currentTransactions = recentTransactions
+    ? recentTransactions.reverse().slice(startIndex, endIndex + 1)
+    : [];
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   const handleMenuClick = (menuItem) => {
     switch (menuItem) {
       case "Menu":
         setIsProfileClicked(true);
-        break;
-      case "Profile":
-        navigate("/Profile", { state: { prevPath: location.pathname } });
-        setIsProfileClicked(false);
         break;
       case "Home":
         navigate("/transferPage", { state: { prevPath: location.pathname } });
@@ -49,14 +83,8 @@ function Transactions() {
         break;
       case "Back":
         {
-          prevPath ? navigate(prevPath) : navigate("/transferPage");
+          prevPath ? navigate(prevPath) : navigate("/beneficiaries");
         }
-        setIsProfileClicked(false);
-        break;
-      case "Rewards":
-        setIsProfileClicked(false);
-        break;
-      case "Contact":
         setIsProfileClicked(false);
         break;
       case "Beneficiaries":
@@ -64,13 +92,7 @@ function Transactions() {
         setIsProfileClicked(false);
         break;
       case "Log Out":
-        setSavedAcc([]);
-        clearSession();
-        setRecentTransactions([]);
-        setLogOut(true);
-        setIsLoggedOut(true);
-        setIsProfileClicked(false);
-        navigate("/");
+        setSignOutAlert(true);
         break;
       default:
         return;
@@ -78,33 +100,9 @@ function Transactions() {
   };
 
   const getMenuProps = () => {
-    if (windowWidth > 1024) {
+    if (windowWidth > 640) {
       return {
-        nav: [
-          { icon: <MdKeyboardArrowLeft />, id: "Back" },
-          "Beneficiaries",
-          "Profile",
-          "Rewards",
-          "Contact",
-          "Log Out",
-        ],
-        onClickHandler: handleMenuClick,
-      };
-    } else if (windowWidth > 768) {
-      return {
-        nav: [
-          { icon: <FaArrowLeftLong />, id: "Back" },
-          "Beneficiaries",
-          "Profile",
-          "Rewards",
-          "Contact",
-          "Log Out",
-        ],
-        onClickHandler: handleMenuClick,
-      };
-    } else if (windowWidth > 640) {
-      return {
-        nav: [{ icon: <RiMenuUnfoldFill />, id: "Menu" }],
+        nav: ["Beneficiaries", "Log Out"],
         onClickHandler: handleMenuClick,
       };
     }
@@ -114,14 +112,7 @@ function Transactions() {
 
   const getSideBarProps = () => {
     return {
-      nav: [
-        "Back",
-        "Beneficiaries",
-        "Profile",
-        "Rewards",
-        "Contact",
-        "Log Out",
-      ],
+      nav: ["Back", "Log Out"],
       onClickHandler: handleMenuClick,
     };
   };
@@ -200,20 +191,30 @@ function Transactions() {
 
   return (
     <>
-      {windowWidth > 768 ? null : isProfileClicked ? (
-        <>
-          <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
-        </>
+      {windowWidth > 640 ? null : isProfileClicked ? (
+        <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
       ) : null}
-      <div className="h-auto md:h-screen w-screen pt-0 md:pt-2 pb-8 md:fixed font-poppins bg-gray-800 text-white">
-        <Menu {...menuProps} onClickHandler={handleMenuClick} />
 
-        <div className=" grid  pt-20 md:pt-0 md:grid-cols-2 gap-0 lg:gap-10 md:pl-16 lg:pl-20 xl:pl-24 md:mt-4 box-border">
-          <PendingTransactions data={{ recentTransactions }} />
-          <CanceledTransactions data={{ recentTransactions }} />
-          <ConfirmedTransactions data={{ recentTransactions }} />
-        </div>
+      <div className="h-full md:h-full w-screen pb-36 fixed font-poppins bg-white text-white">
+        <Menu {...menuProps} onClickHandler={handleMenuClick} />
+        <ConfirmedTransactions
+          data={{
+            currentTransactions,
+            handlePageChange,
+            currentPage,
+            totalPages,
+            windowWidth,
+          }}
+        />
+        <FooterComponent />
       </div>
+      {signOutAlert ? (
+        <AlertModal
+          buttons={buttons}
+          icon={paymentFailedSvg}
+          msg={"Do you want to sign out?"}
+        />
+      ) : null}
     </>
   );
 }

@@ -8,6 +8,12 @@ module.exports = {
   darkMode: "class",
   theme: {
     extend: {
+      backgroundImage: {
+        "form-bg":
+          "url('https://images.ctfassets.net/jwea2w833xe7/29MVRQN52gZ5mzeERWn7fl/6e0905fb853df590526d2d6c8cac7787/bank_desktop_layer_03.webp')",
+        "form-login-bg":
+          "url('https://images.ctfassets.net/jwea2w833xe7/tNVzSyTyL12aLV0AVJDPa/55824ff57503cee90f7916be5e172705/send_desktop_layer_01.webp')",
+      },
       fontFamily: {
         poppins: ["Poppins", "sans-serif", "!important"],
       },
@@ -41,6 +47,7 @@ module.exports = {
       },
       width: {
         100: "30rem",
+        "custom-95": "95%",
       },
       margin: {
         92: "22.5rem",

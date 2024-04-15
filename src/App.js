@@ -9,9 +9,12 @@ import Success from "./components/transactions/Success";
 import Transactions from "./components/transactions/Transactions";
 import PrivateRoutes from "./components/routes/PrivateRoutes";
 import PaymentPage from "./components/PaymentPage";
+import ServerError from "./components/auth/ServerError";
+import ProfileForm from "./components/forms/ProfileForm";
+import Toast from "./components/utils/Toast";
 export const store = createContext();
 
-const socket = io.connect("http://localhost:8080", {
+const socket = io.connect("http://localhost:8081", {
   query: {
     tabId: sessionStorage.getItem("tabId"),
   },
@@ -19,10 +22,10 @@ const socket = io.connect("http://localhost:8080", {
 
 function getDate() {
   const today = new Date();
-  const month = today.getMonth() + 1;
+  const month = String(today.getMonth() + 1).padStart(2, "0");
   const year = today.getFullYear();
-  const date = today.getDate();
-  return `${month}/${date}/${year}`;
+  const date = String(today.getDate()).padStart(2, "0");
+  return `${year}/${month}/${date}`;
 }
 
 function App() {
@@ -76,6 +79,7 @@ function App() {
   const [isLoggedOut, setIsLoggedOut] = useState(false);
   const [isEditProfile, setIsEditProfile] = useState(false);
   const [inputValues, setInputValues] = useState({});
+  const [signOutAlert, setSignOutAlert] = useState(false);
 
   const handleSocket = () => {
     if (connectionMode === "socket") {
@@ -92,6 +96,10 @@ function App() {
     setRecentTransactions([]);
     setIsLoggedOut(true);
     setIsProfileClicked(false);
+  };
+
+  const logOutCanceled = () => {
+    setSignOutAlert(false);
   };
 
   const handleUserName = (e) => {
@@ -238,6 +246,9 @@ function App() {
         setLoader,
         notify,
         setNotify,
+        signOutAlert,
+        setSignOutAlert,
+        logOutCanceled,
       }}
     >
       <Router>
@@ -245,11 +256,12 @@ function App() {
           <Route element={<PrivateRoutes />}>
             <Route path="/transferPage" element={<PaymentPage />}></Route>
             <Route path="/success" element={<Success />}></Route>
-            <Route path="/profile" element={<Profile />}></Route>
             <Route path="/beneficiaries" element={<Beneficiaries />}></Route>
             <Route path="/transactions" element={<Transactions />}></Route>
           </Route>
           <Route path="/" element={<HomePage />}></Route>
+          <Route path="/error" element={<ServerError />}></Route>
+          <Route path="/toast" element={<Toast />}></Route>
         </Routes>
       </Router>
     </store.Provider>

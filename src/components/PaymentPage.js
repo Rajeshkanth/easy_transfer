@@ -4,14 +4,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import axios from "axios";
 import { store } from "../App";
-import Menu from "./utils/Menu";
-import SideBar from "./utils/SideBar";
-import { TextGenerateEffect } from "./utils/TextGenerate";
-import { RiMenuUnfoldFill } from "react-icons/ri";
 import { useIdleTimer } from "react-idle-timer";
 import PaymentForm from "../components/forms/PaymentForm";
+import ScrollReveal from "scrollreveal";
+import { Toaster, toast } from "sonner";
 
-function PaymentPage() {
+function PaymentPage(props) {
   const {
     clearSession,
     setInitatedAmountSend,
@@ -29,7 +27,6 @@ function PaymentPage() {
     setLoggedUser,
     windowWidth,
     setWindowWidth,
-    isProfileClicked,
     setIsProfileClicked,
     sendByBeneficiaries,
     setSendByBeneficiaries,
@@ -41,59 +38,14 @@ function PaymentPage() {
     setRecentTransactions,
     setIsLoggedOut,
     handleSocket,
+    saveBeneficiary,
+    handleSaveBeneficiaryCheckMark,
   } = useContext(store);
+  const { setNewReceiver, newReceiver } = props.data;
 
   const navigate = useNavigate();
-  const location = useLocation();
   const [allInput, setAllInput] = useState(false);
-  const nav = [
-    "Beneficiaries",
-    "Profile",
-    "Transactions",
-    "Rewards",
-    "Contact",
-    "Log Out",
-  ];
-
-  const handleMenuClick = (menuItem) => {
-    switch (menuItem) {
-      case "Profile":
-        navigate("/profile ", { state: { prevPath: location.pathname } });
-        setIsProfileClicked(false);
-        break;
-      case "Back":
-        navigate("/transferPage", { state: { prevPath: location.pathname } });
-        setIsProfileClicked(false);
-        break;
-      case "Beneficiaries":
-        navigate("/beneficiaries", { state: { prevPath: location.pathname } });
-        setIsProfileClicked(false);
-        break;
-      case "Transactions":
-        navigate("/transactions");
-        setIsProfileClicked(false);
-        break;
-      case "Rewards":
-        setIsProfileClicked(false);
-        break;
-      case "Contact":
-        setIsProfileClicked(false);
-        break;
-      case "Menu":
-        setIsProfileClicked(true);
-        break;
-      case "Log Out":
-        handleSocket();
-        setSavedAcc([]);
-        setRecentTransactions([]);
-        setIsLoggedOut(true);
-        setIsProfileClicked(false);
-        logout();
-        break;
-      default:
-        console.log(`Unknown menu item: ${menuItem}`);
-    }
-  };
+  const [saveBenficiaryCheck, setSaveBeneficiaryCheck] = useState(false);
 
   const handleAmountToSend = (e) => {
     const value = e.target.value;
@@ -178,44 +130,78 @@ function PaymentPage() {
 
   const sendAmountByPolling = async (e) => {
     e.preventDefault();
+    const uid = uuid();
+    sessionStorage.setItem("uid", uid);
+
     try {
       setSendByBeneficiaries(false);
       setInitatedAmountSend(true);
-      const newReceiver = {
+      const newTransactions = {
         amount: amount,
-        accNum: toAccountNumber,
-        accHolder: toAccountHolderName,
+        accountNumber: toAccountNumber,
+        name: toAccountHolderName,
         ifsc: toIFSCNumber,
         tabId: sessionStorage.getItem("tabId"),
         type: "polling",
         mobileNumber: sessionStorage.getItem("mobileNumber"),
-      };
-
-      const newTransactions = {
-        amount: amount,
+        uid: uid,
         date: currentDate,
-        description: `Sent to ${toAccountHolderName}`,
         status: `pending`,
-        name: toAccountHolderName,
-        uid: uuid(),
       };
+      if (saveBenficiaryCheck) {
+        await axios
+          .post("http://localhost:8080/api/user/addNewBeneficiary", {
+            beneficiaryName: toAccountHolderName,
+            accountNumber: toAccountNumber,
+            ifsc: toIFSCNumber,
+            mobileNumber: sessionStorage.getItem("mobileNumber"),
+          })
+          .then((res) => {
+            if (res.status === 400) {
+              return toast.error("Account already exists");
+            }
+            switch (res.status) {
+              case 200:
+                const savedDetail = {
+                  beneficiaryName: res.data.beneficiaryName,
+                  accountNumber: res.data.accountNumber,
+                  ifsc: res.data.ifsc,
+                };
+                setSavedAcc((prev) => [...prev, savedDetail]);
+                break;
+              case 400:
+                alert("Account number already saved");
+                toast.error("Account number already saved");
+                break;
+              default:
+                break;
+            }
+          });
 
-      navigate("/success");
-      handleAllInput();
+        navigate("/success");
+        handleAllInput();
 
-      const response = await axios.post(
-        "http://localhost:8080/api/transaction/fromPaymentAlert",
-        {
-          data: newReceiver,
-          newTransaction: newTransactions,
-          mobileNumber: sessionStorage.getItem("mobileNumber"),
-        }
-      );
-      if (response.status === 200) {
-        setAllInput(false);
+        await axios
+          .post("http://localhost:8080/api/transaction/fromPaymentAlert", {
+            newTransaction: newTransactions,
+            mobileNumber: sessionStorage.getItem("mobileNumber"),
+          })
+          .then((response) => {
+            switch (response.status) {
+              case 200:
+                setAllInput(false);
+                break;
+              default:
+                break;
+            }
+          });
       }
     } catch (err) {
-      console.error(err);
+      if (err.response.status === 400)
+        return toast.error("Account number already exists", {
+          className: "text-red-600 z-200",
+        });
+      toast.error("Internal server error");
     }
   };
 
@@ -226,40 +212,11 @@ function PaymentPage() {
     setToIFSCNumber("");
   };
 
-  const getMenuProps = () => {
-    if (windowWidth > 768) {
-      return {
-        nav,
-        onClickHandler: handleMenuClick,
-      };
-    } else if (windowWidth > 640) {
-      return {
-        nav: [
-          "Beneficiaries",
-          "Profile",
-          "Transactions",
-          { icon: <RiMenuUnfoldFill />, id: "Menu" },
-        ],
-        onClickHandler: handleMenuClick,
-      };
-    }
-  };
-
-  const menuProps = getMenuProps();
-
-  const getSideBarProps = () => {
-    return {
-      nav,
-    };
-  };
-
-  const sideBarProps = getSideBarProps();
-
   const cancelTransfer = () => {
     setSendByBeneficiaries(false);
     handleAllInput("");
     setAllInput(false);
-    navigate("/beneficiaries");
+    setNewReceiver(!newReceiver);
   };
 
   const onIdle = () => {
@@ -303,42 +260,33 @@ function PaymentPage() {
 
   return (
     <>
-      <div className="h-screen bg-gray-800 text-white font-sans fixed w-screen ">
-        <Menu {...menuProps} onClickHandler={handleMenuClick} />
-        <div className="w-full h-full fixed sm:grid grid-cols-2  gap-10 ">
-          <div className="w-auto hidden sm:block pl-8 cursor-default m-auto sm:mt-54 md:mt-32 xl:mt-48">
-            <TextGenerateEffect
-              words={`The Secure,  \n easiest and fastest \n way to transfer money.`}
-            />
-            <p className="ml-0 mt-16 text-xs md:text-sm text-gray-300 lg:text-xl">
-              send & receive money in minutes without paying extra charges.
-            </p>
-          </div>
-          <div className="w-4/5 xl:w-8/12 max-h-full pt-28 sm:pt-8 m-auto md:m-0 md:ml-12 lg:ml-16 xl:ml-40 md:pt-12 xl:pt-20">
-            <PaymentForm
-              data={{
-                sendAmountByPolling,
-                sendAmountBySocket,
-                sendByBeneficiaries,
-                allInput,
-                toAccountHolderName,
-                toAccountNumber,
-                toIFSCNumber,
-                setToAccountHolderName,
-                handleAccNumToSend,
-                handleToIfsc,
-                handleAmountToSend,
-                amount,
-                connectionMode,
-                cancelTransfer,
-              }}
-            />
-          </div>
-        </div>
+      <div
+        className="h-screen backdrop-blur-sm flex justify-center items-center text-white font-poppins w-screen top-0 fixed px-5 sm:px-0"
+        onClick={() => setNewReceiver(!newReceiver)}
+      >
+        <PaymentForm
+          data={{
+            sendAmountByPolling,
+            sendAmountBySocket,
+            sendByBeneficiaries,
+            allInput,
+            toAccountHolderName,
+            toAccountNumber,
+            toIFSCNumber,
+            setToAccountHolderName,
+            handleAccNumToSend,
+            handleToIfsc,
+            handleAmountToSend,
+            amount,
+            connectionMode,
+            cancelTransfer,
+            handleSaveBeneficiaryCheckMark,
+            setSaveBeneficiaryCheck,
+            saveBenficiaryCheck,
+          }}
+        />
+        <Toaster />
       </div>
-      {windowWidth > 768 ? null : isProfileClicked ? (
-        <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
-      ) : null}
     </>
   );
 }

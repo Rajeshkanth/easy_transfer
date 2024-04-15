@@ -4,11 +4,15 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router";
 import Menu from "../utils/Menu";
 import SideBar from "../utils/SideBar";
-import { RiMenuUnfoldFill } from "react-icons/ri";
-import { MdKeyboardArrowLeft } from "react-icons/md";
 import Loader from "../utils/Loader";
 import { useIdleTimer } from "react-idle-timer";
-import SaveAccountForm from "../forms/SaveAccountForm";
+import HomePageSavedAccounts from "./HomePageSavedAccounts";
+import PaymentPage from "../PaymentPage";
+import Profile from "../utils/Profile";
+import RecentTransactions from "../transactions/RecentTransactions";
+import FooterComponent from "../utils/FooterComponent";
+import AlertModal from "../utils/AlertModal";
+import { toast } from "sonner";
 
 function Beneficiaries() {
   const {
@@ -32,6 +36,11 @@ function Beneficiaries() {
     setNotify,
     setRecentTransactions,
     clearAll,
+    setRecentActivity,
+    recentActivity,
+    signOutAlert,
+    setSignOutAlert,
+    logOutCanceled,
   } = useContext(store);
 
   const [savedAccNum, setSavedAccNum] = useState("");
@@ -40,15 +49,33 @@ function Beneficiaries() {
   const [loader, setLoader] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const prevPath = location.state?.prevPath;
   const [allInputsAlert, setAllInputsAlert] = useState(false);
   const [plusIcon, setPlusIcon] = useState(false);
-  const clickable = savedAccNum.length > 15;
+  const [searchBarActive, setSearchBarActive] = useState(false);
+  const [filteredAccounts, setFilteredAccounts] = useState([]);
+  const [newReceiver, setNewReceiver] = useState(false);
 
   const clearAllInputs = () => {
     setSavedBeneficiaryName("");
     setSavedAccNum("");
     setSavedIfsc("");
+  };
+  const logOutConfirmed = () => {
+    setSignOutAlert(false);
+    clearSession();
+    clearAll();
+    setLogOut(true);
+    navigate("/");
+  };
+  const goTo = (path) => {
+    switch (path) {
+      case "transactions":
+        navigate("/transactions");
+        break;
+      case "beneficiaries":
+        navigate("/beneficiaries");
+        break;
+    }
   };
 
   const handleMenuClick = (menuItem) => {
@@ -56,74 +83,64 @@ function Beneficiaries() {
       case "Menu":
         setIsProfileClicked(true);
         break;
-      case "Profile":
-        setSavedAcc([]);
-        navigate("/profile", { state: { prevPath: location.pathname } });
-        setIsProfileClicked(false);
-        break;
       case "Home":
         navigate("/transferPage", { state: { prevPath: location.pathname } });
         setSavedAcc([]);
         setIsProfileClicked(false);
-      case "Back":
-        {
-          prevPath ? navigate(prevPath) : navigate("/transferPage");
-        }
-        setIsProfileClicked(false);
-        setSavedAcc([]);
-        break;
-      case "Rewards":
-        setIsProfileClicked(false);
-        break;
-      case "Contact":
-        setIsProfileClicked(false);
-        break;
       case "Transactions":
         navigate("/transactions");
         setSavedAcc([]);
         setIsProfileClicked(false);
         break;
       case "Log Out":
-        clearSession();
-        clearAll();
-        setLogOut(true);
-        navigate("/");
+        setSignOutAlert(true);
         break;
       default:
         return;
     }
   };
 
+  const paymentFailedSvgPattern = () => {
+    return (
+      <svg
+        class="mx-auto mb-4 text-gray-500 w-12 h-12 "
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 20 20"
+      >
+        <path
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+        />
+      </svg>
+    );
+  };
+  const paymentFailedSvg = paymentFailedSvgPattern();
+
   const getMenuProps = () => {
-    if (windowWidth > 768) {
+    if (windowWidth > 640) {
       return {
-        nav: [
-          { icon: <MdKeyboardArrowLeft />, id: "Back" },
-          "Profile",
-          "Transactions",
-          "Rewards",
-          "Contact",
-          "Log Out",
-        ],
-        onClickHandler: handleMenuClick,
-      };
-    } else if (windowWidth > 640) {
-      return {
-        nav: [{ icon: <RiMenuUnfoldFill />, id: "Menu" }],
+        nav: ["Transactions", "Log Out"],
         onClickHandler: handleMenuClick,
       };
     }
   };
 
   const menuProps = getMenuProps();
+
   const getSideBarProps = () => {
     return {
-      nav: ["Back", "Profile", "Transactions", "Rewards", "Contact", "Log Out"],
+      nav: ["Transactions", "Log Out"],
       onClickHandler: handleMenuClick,
     };
   };
 
   const sideBarProps = getSideBarProps();
+
   const logout = () => {
     setLoggedUser("");
     navigate("/");
@@ -146,106 +163,77 @@ function Beneficiaries() {
     onIdle,
   });
 
-  const handleSavedAccNum = (e) => {
-    const value = e.target.value;
-    if (value.length <= 16) {
-      const sanitizedValue = value.replace(/[^0-9]/g, "");
-      setSavedAccNum(sanitizedValue);
-    }
-  };
-
-  const handleSavedBenificiaryName = (e) => {
-    const value = e.target.value;
-    if (value.length <= 16) {
-      setSavedBeneficiaryName(value);
-    }
-  };
-
-  const handleSavedIfsc = (e) => {
-    const value = e.target.value;
-    if (value.length <= 10) {
-      setSavedIfsc(value);
-    }
-  };
-
   const sendMoney = (index) => {
     const selectedBeneficiary = savedAcc[index];
     setToAccountHolderName(selectedBeneficiary.beneficiaryName);
-    setToAccountNumber(selectedBeneficiary.accNum);
+    setToAccountNumber(selectedBeneficiary.accountNumber);
     setToIFSCNumber(selectedBeneficiary.ifsc);
     setSendByBeneficiaries(true);
-    navigate("/transferPage");
+    setNewReceiver(true);
   };
 
-  const saveBeneficiary = async () => {
-    try {
-      if (connectionMode !== "socket") {
-        await axios
-          .post("http://localhost:8080/api/user/addNewBeneficiary", {
-            savedBeneficiaryName: savedBeneficiaryName,
-            savedAccNum: savedAccNum,
-            savedIfsc: savedIfsc,
-            mobileNumber: sessionStorage.getItem("mobileNumber"),
-          })
-          .then((res) => {
-            switch (res.status) {
-              case 200:
-                const savedDetail = {
-                  beneficiaryName: res.data.beneficiaryName,
-                  accNum: res.data.accNum,
-                  ifsc: res.data.ifsc,
-                };
-                setSavedAcc((prev) => [...prev, savedDetail]);
-                break;
-              case 409:
-                alert("Account number already saved");
-                break;
-              default:
-                break;
-            }
-          });
-      } else {
-        socket.emit("saveNewBeneficiary", {
-          savedBeneficiaryName: savedBeneficiaryName,
-          savedAccNum: savedAccNum,
-          savedIfsc: savedIfsc,
-          mobileNumber: sessionStorage.getItem("mobileNumber"),
-        });
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setPlusIcon(false);
-      setAllInputsAlert(false);
-      setLoader(false);
-    }
-    clearAllInputs();
-  };
+  const buttons = [
+    {
+      label: "Yes",
+      method: logOutConfirmed,
+      bg: "bg-gray-800 focus:ring-gray-600 text-lg font-semibold",
+    },
+    {
+      label: "No",
+      method: logOutCanceled,
+      bg: "bg-red-600 focus:ring-gray-600 text-lg font-semibold",
+    },
+  ];
 
-  const addNewBeneficiary = () => {
-    setPlusIcon(true);
-  };
+  // const saveBeneficiary = async () => {
+  //   try {
+  //     if (connectionMode !== "socket") {
+  //       await axios
+  //         .post("http://localhost:8080/api/user/addNewBeneficiary", {
+  //           beneficiaryName: savedBeneficiaryName,
+  //           accountNumber: savedAccNum,
+  //           ifsc: savedIfsc,
+  //           mobileNumber: sessionStorage.getItem("mobileNumber"),
+  //         })
+  //         .then((response) => {
+  //           const savedDetail = {
+  //             beneficiaryName: response.data.beneficiaryName,
+  //             accountNumber: response.data.accountNumber,
+  //             ifsc: response.data.ifsc,
+  //           };
+  //           switch (response.status) {
+  //             case 200:
+  //               setSavedAcc((prev) => [...prev, savedDetail]);
+  //               break;
+  //             case 400:
+  //               console.log("exists");
+  //               toast("Account already exists");
+  //               break;
+  //             default:
+  //               toast("Something went wrong");
+  //               break;
+  //           }
+  //         });
+  //     } else {
+  //       socket.emit("saveNewBeneficiary", {
+  //         savedBeneficiaryName: savedBeneficiaryName,
+  //         savedAccNum: savedAccNum,
+  //         savedIfsc: savedIfsc,
+  //         mobileNumber: sessionStorage.getItem("mobileNumber"),
+  //       });
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //   } finally {
+  //     setPlusIcon(false);
+  //     setAllInputsAlert(false);
+  //     setLoader(false);
+  //   }
+  //   clearAllInputs();
+  // };
 
-  const closeBeneficiaryAdding = () => {
-    setPlusIcon(false);
-    clearAllInputs();
-    setAllInputsAlert(false);
-  };
-
-  const handleSaveButtonClick = (e) => {
-    e.preventDefault();
-    if (
-      clickable &&
-      savedBeneficiaryName &&
-      savedAccNum &&
-      savedIfsc &&
-      String(savedAccNum).length > 15 &&
-      String(savedIfsc).length > 9
-    ) {
-      saveBeneficiary();
-    } else {
-      setAllInputsAlert(true);
-    }
+  const transferPage = () => {
+    setNewReceiver(!newReceiver);
   };
 
   useEffect(() => {
@@ -285,7 +273,9 @@ function Beneficiaries() {
         mobileNumber: sessionStorage.getItem("mobileNumber"),
       })
       .then((res) => {
+        console.log(res.data);
         setSavedAcc(res.data);
+        console.log(savedAcc);
       })
       .catch((err) => {
         return err;
@@ -319,102 +309,93 @@ function Beneficiaries() {
     };
   }, [windowWidth]);
 
+  useEffect(() => {
+    const loggedNumber = sessionStorage.getItem("mobileNumber");
+
+    axios
+      .post("http://localhost:8080/api/transaction/transactionDetails", {
+        mobileNumber: loggedNumber,
+      })
+      .then((res) => {
+        setRecentActivity(res.data.transactions);
+      })
+      .catch((err) => console.log(err));
+
+    return () => {
+      socket.off();
+      setRecentActivity([]);
+    };
+  }, []);
+
   return (
     <>
       {isProfileClicked ? (
         <SideBar {...sideBarProps} onClickHandler={handleMenuClick} />
       ) : null}
-      <div className="h-auto md:h-screen w-screen pb-8 md:fixed  bg-gray-800 text-white">
+
+      <div className="h-auto md:h-screen w-screen md:fixed sm:pb-8 bg-white text-white font-poppins">
         <Menu {...menuProps} onClickHandler={handleMenuClick} />
-        <div className="h-4/5 md:h-screen m-auto bg-white block md:flex  md:pl-0 box-border">
-          <div className="m-auto h-screen md:h-9/10 w-full text-gray-800 bg-white pt-32 sm:pt-16 md:pt-0 mt-0 pb-4 md:pb-16 box-border overflow-x-auto space-y-2 lg:space-y-0">
-            <div
-              className={
-                windowWidth < 450
-                  ? "grid grid-cols-3 gap-0 fixed sm:sticky top-16 sm:top-0 h-auto z-10 pt-4 md:pt-3 pb-5 text-white bg-gray-800 w-full pl-8 sm:pl-16"
-                  : "grid grid-cols-4 gap-0 fixed sm:sticky top-16 sm:top-0 h-auto z-10 pt-4 md:pt-3 pb-5 text-white bg-gray-800 w-full pl-8 sm:pl-16 xl:pl-24"
-              }
+
+        <div className="h-auto md:h-full w-screen m-auto block md:flex justify-between md:gap-8 lg:gap-8 xl:gap-24 box-border px-6 pt-24 md:pt-0 md:mt-8">
+          {windowWidth < 640 ? (
+            <button
+              className=" w-full text-white font-base mb-4 border bg-gray-800 py-2 rounded-xl"
+              onClick={transferPage}
             >
-              <h1 className="font-bold w-1/4 text-sm md:text-sm xl:text-xl items-center flex -ml-4 md:ml-0">
-                Name
-              </h1>
-              <h1 className="font-bold w-1/4 text-sm md:text-sm xl:text-xl items-center flex -ml-8">
-                Account
-              </h1>
-              {windowWidth < 450 ? null : (
-                <h1 className="font-bold w-1/4 text-sm md:text-sm xl:text-lg items-center flex">
-                  IFSC
-                </h1>
-              )}
-              <h1
-                className="font-bold w-full md:w-4/5 py-2 lg:w-3/5 -ml-4 md:mr-3 border-2 rounded-md cursor-pointer hover:bg-gray-100 hover:text-gray-800 text-center text-xs md:text-sm xl:text-lg bg-white text-gray-700"
-                onClick={addNewBeneficiary}
-              >
-                + Add Beneficiary
-              </h1>
-            </div>
-            {savedAcc.length !== 0 ? (
-              savedAcc
-                .filter((item) => String(item.accNum).length > 15)
-                .map((item, index) => (
-                  <div
-                    key={index}
-                    className={
-                      windowWidth < 450
-                        ? "grid grid-cols-3 h-auto z-10 pt-5 pb-3 text-gray-700 w-full pl-8 pr-4"
-                        : "grid grid-cols-4 h-auto z-10 pt-3 pb-3 text-gray-700 w-full pl-8 sm:pl-16 xl:pl-24 pr-4 md:pr-20 lg:pr-24 xl:pr-32"
-                    }
-                  >
-                    <h1 className="flex items-center capitalize text-xs md:text-sm xl:text-16 -ml-4 md:ml-0">
-                      {item.beneficiaryName}
-                    </h1>
-                    <h1 className="flex items-center text-xs md:text-sm xl:text-16 -ml-8">
-                      {item.accNum}
-                    </h1>
-                    {windowWidth < 450 ? null : (
-                      <h1 className="flex items-center text-xs uppercase md:text-sm xl:text-16 md:ml-4 lg:ml-8 xl:ml-12">
-                        {item.ifsc}
-                      </h1>
-                    )}
-                    <button
-                      onClick={() => sendMoney(index)}
-                      className="text-xs px-4 py-3 md:text-16 lg:px-2 w-3/4 md:w-3/4 lg:w-1/2 ml-4 md:ml-16 lg:ml-20 xl:ml-24 border border-gray-300 focus:outline-none rounded-lg bg-gray-800 text-white hover:bg-gray-600 hover:cursor-pointer"
-                    >
-                      Send
-                    </button>
-                  </div>
-                ))
-            ) : (
-              <p className="grid items-center w-full justify-center h-full">
-                You don't have any saved accounts, yet.
-              </p>
-            )}
+              New Transfer
+            </button>
+          ) : null}
+          <div className="md:max-w-xl lg:max-w-xs md:w-2/5 xl:w-1/2 h-full md:h-auto bg-transparent ">
+            <Profile />
+            <RecentTransactions data={{ recentActivity, goTo, windowWidth }} />
           </div>
 
-          {plusIcon ? (
-            <SaveAccountForm
+          <div className="h-auto w-auto md:w-3/5 lg:w-3/4 px-0 md:px-1 pb-8 md:pb-36 mt-8 md:mt-0">
+            <HomePageSavedAccounts
               data={{
-                closeBeneficiaryAdding,
-                handleSaveButtonClick,
-                savedBeneficiaryName,
-                allInputsAlert,
-                handleSavedBenificiaryName,
-                savedIfsc,
-                savedAccNum,
-                handleSavedAccNum,
-                handleSavedIfsc,
+                transferPage,
+                savedAcc,
+                filteredAccounts,
+                searchBarActive,
+                sendMoney,
+                searchBarActive,
+                setSearchBarActive,
+                setFilteredAccounts,
+                windowWidth,
               }}
             />
-          ) : null}
+          </div>
         </div>
+        {windowWidth > 768 ? <FooterComponent /> : null}
       </div>
 
+      {windowWidth < 768 ? (
+        <div className="relative pt-0">
+          <FooterComponent />
+        </div>
+      ) : null}
+
       {loader ? (
-        <>
-          <div className="fixed h-screen w-screen top-0">
-            <Loader bg={"bg-transparent backdrop-blur-md"} />
-          </div>
-        </>
+        <div className="fixed h-screen w-screen top-0">
+          <Loader bg={"bg-transparent backdrop-blur-md"} />
+        </div>
+      ) : null}
+
+      {newReceiver ? (
+        <PaymentPage
+          data={{
+            newReceiver,
+            setNewReceiver,
+            
+          }}
+        />
+      ) : null}
+      {signOutAlert ? (
+        <AlertModal
+          buttons={buttons}
+          icon={paymentFailedSvg}
+          msg={"Do you want to sign out?"}
+        />
       ) : null}
     </>
   );

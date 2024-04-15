@@ -18,8 +18,8 @@ function SideBar(props) {
 
   return (
     <>
-      <div className="w-4/6  sm:w-1/2 bg-gray-800 backdrop-blur-xl h-screen z-200 text-white font-sans fixed top-0  ">
-        <div className=" pt-2 pb-8 border-box h-full font-sans">
+      <div className="w-4/6 sm:w-1/2 bg-gray-800 backdrop-blur-xl h-screen z-200 text-white font-sans fixed top-0 ">
+        <div className=" pt-2 pb-8 border-box h-screen font-sans">
           <div className="flex justify-between items-center border-b-2 border-gray-600  text-white box-border pb-3 cursor-pointer ">
             <h1 className="ml-8 text-xl font-bold ">Menu</h1>
             <p className=" mr-4" onClick={closeProfile}>

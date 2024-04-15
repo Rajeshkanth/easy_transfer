@@ -1,5 +1,6 @@
 import React, { memo, useEffect } from "react";
 import axios from "axios";
+import { toast } from "sonner";
 
 function ProfileForm(props) {
   const {
@@ -33,6 +34,15 @@ function ProfileForm(props) {
     accFromDb,
     dobFromDb,
   } = props.states;
+
+  const allFieldsFilled =
+    userName &&
+    age &&
+    (dob || dobFromDb) &&
+    (accNumber || accFromDb) &&
+    (card || cardFromDb) &&
+    (cvv || cvvFromDb) &&
+    (expireDate || expireDateFromDb !== undefined);
 
   const handleUserName = (e) => {
     setUserName(e.target.value);
@@ -93,10 +103,29 @@ function ProfileForm(props) {
     }
   };
 
-  const cancelEdit = () => {
-    setIsEditProfile(false);
+  const clearProfileEditForm = () => {
+    setUserNameFromDb("");
+    setAccFromDb("");
+    setAgeFromDb("");
+    setDobFromDb("");
+    setCardFromDb("");
+    setCvvFromDb("");
+    setExpireDateFromDb("");
+  };
+
+  const clearProfileField = () => {
     setUserName("");
     setAge("");
+    setDob("");
+    setAccNumber("");
+    setCard("");
+    setCvv("");
+    setExpireDate("");
+  };
+
+  const cancelEdit = () => {
+    setIsEditProfile(false);
+    clearProfileField();
   };
 
   const updateProfile = async (e) => {
@@ -120,7 +149,7 @@ function ProfileForm(props) {
         await axios
           .post("http://localhost:8080/api/user/updateProfile", {
             mobileNumber: mobileNumber,
-            name: userName,
+            userName: userName,
             age: age,
             dob: dob || dobFromDb,
             accNum: accNumber || accFromDb,
@@ -129,9 +158,9 @@ function ProfileForm(props) {
             expireDate: expireDate || expireDateFromDb,
           })
           .then((res) => {
+            const { userName, age, dob, accNum, card, cvv, expireDate } =
+              res.data;
             if (res.status === 200) {
-              const { userName, age, dob, accNum, card, cvv, expireDate } =
-                res.data;
               setUserNameFromDb(userName);
               setAccFromDb(accNum);
               setAgeFromDb(age);
@@ -140,7 +169,13 @@ function ProfileForm(props) {
               setCvvFromDb(cvv);
               setExpireDateFromDb(expireDate);
               cancelEdit();
+              toast.success("Profile updated.", {
+                className: "text-green-500",
+              });
             }
+          })
+          .catch((err) => {
+            toast.error("Internal server error", { err });
           });
       } else {
         socket.emit("updateProfile", {
@@ -159,122 +194,211 @@ function ProfileForm(props) {
     }
   };
 
-  useEffect(() => {
-    socket.on("profileUpdated", (data) => {
-      const { userName, accNum, dob, card, cvv, age, expireDate } = data;
-      setUserNameFromDb(userName);
-      setAccFromDb(accNum);
-      setAgeFromDb(age);
-      setDobFromDb(dob);
-      setCardFromDb(card);
-      setCvvFromDb(cvv);
-      setExpireDateFromDb(expireDate);
-      cancelEdit();
-    });
-  }, []);
+  // useEffect(() => {
+  //   socket.on("profileUpdated", (data) => {
+  //     const { userName, accNum, dob, card, cvv, age, expireDate } = data;
+  //     setUserNameFromDb(userName);
+  //     setAccFromDb(accNum);
+  //     setAgeFromDb(age);
+  //     setDobFromDb(dob);
+  //     setCardFromDb(card);
+  //     setCvvFromDb(cvv);
+  //     setExpireDateFromDb(expireDate);
+  //     cancelEdit();
+  //   });
+
+  //   return () => {
+  //     clearProfileEditForm();
+  //   };
+  // }, []);
+
+  // useEffect(() => {
+  //   return () => {
+  //     clearProfileEditForm();
+  //   };
+  // }, []);
   return (
-    <>
-      <form
-        onSubmit={(e) => updateProfile(e)}
-        className="w-full sm:w-11/12 lg:w-3/5 h-screen text-gray-800 text-16 m-auto bg-blue-650 sm:ml-14 lg:ml-92 p-5 box-border items-center flex flex-col font-poppins justify-center sm:space-y-2 "
-      >
-        <div className="sm:flex flex-wrap sm:space-x-2 w-3/4 sm:w-full md:w-4/5">
+    <form
+      onSubmit={(e) => updateProfile(e)}
+      autoComplete="off"
+      className="max-w-md mx-auto md:mt-32 lg:mt-36 bg-white shadow-sm shadow-gray-700 rounded-md p-8 px-10 sm:px-12 box-border"
+    >
+      <span className="text-center text-gray-900 w-full flex justify-center mb-3 font-semibold text-lg">
+        Update Profile
+      </span>
+      <div className="grid md:grid-cols-2 md:gap-6">
+        <div className="relative z-0 w-full mb-6 group">
           <input
-            className="block w-full sm:w-1/2 text-16 px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
             type="text"
-            value={userName}
-            onChange={handleUserName}
-            placeholder="Enter user name"
+            name="floating_name"
+            id="floating_name"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder=" "
             required
+            value={userName ? userName : ""}
+            onChange={handleUserName}
+            onInvalid={(F) => F.target.setCustomValidity("Enter name")}
+            onInput={(F) => F.target.setCustomValidity("")}
           />
+          <label
+            for="floating_name"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Name
+          </label>
+        </div>
+        <div className="relative z-0 w-full mb-6 group">
           <input
-            className="block w-full sm:w-1/3 px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
             type="tel"
+            name="floating_age"
+            id="floating_age"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder=" "
+            required
             value={age}
             maxLength={3}
             onChange={handleAge}
-            placeholder="Enter age"
-            required
+            onInvalid={(F) => F.target.setCustomValidity("Enter age")}
+            onInput={(F) => F.target.setCustomValidity("")}
           />
+          <label
+            for="floating_age"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-0 peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            age
+          </label>
         </div>
-        <div className="sm:flex flex-wrap sm:space-x-2 w-3/4 sm:w-full md:w-4/5">
+      </div>
+      <div className="grid md:grid-cols-2 md:gap-6">
+        <div className="relative z-0 w-full mb-6 group">
           <input
-            className="block w-full sm:w-1/3 px-4 py-2 mb-3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
+            type="tel"
+            // pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+            name="floating_phone"
+            id="floating_phone"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder=" "
+            required
+            readOnly
+            value={sessionStorage.getItem("mobileNumber")}
+            onInvalid={(F) => F.target.setCustomValidity("Enter mobile number")}
+            onInput={(F) => F.target.setCustomValidity("")}
+          />
+          <label
+            for="floating_phone"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Phone number
+          </label>
+        </div>
+        <div className="relative z-0 w-full mb-6 group">
+          <input
             type="date"
+            name="floating_dob"
+            id="floating_dob"
+            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder=" "
+            required
             disabled={dobFromDb ? true : false}
             value={dobFromDb ? dobFromDb : dob}
             onChange={handleDob}
-            placeholder="Date of birth"
-            required
+            onInvalid={(F) => F.target.setCustomValidity("Enter date of birth")}
+            onInput={(F) => F.target.setCustomValidity("")}
           />
-          <input
-            maxLength={16}
-            type="tel"
-            disabled={accFromDb ? true : false}
-            value={accFromDb ? accFromDb : accNumber}
-            onChange={handleAccNumber}
-            className="block px-4 py-2 mb-3 w-full sm:w-3/6 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
-            placeholder="Enter account number"
-            required
-          />
-        </div>
-        <div className=" flex flex-wrap sm:space-x-2 w-3/4 sm:w-full md:w-4/5">
-          <input
-            type="tel"
-            readOnly
-            value={sessionStorage.getItem("mobileNumber")}
-            required
-            className="block px-4 py-2 mb-3 w-full sm:w-1/3 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
-          />
-          <input
-            maxLength={16}
-            type="tel"
-            value={cardFromDb ? cardFromDb : card}
-            disabled={cardFromDb ? true : false}
-            onChange={handleCardNumber}
-            required
-            placeholder="Enter card details"
-            className="block px-4 py-2 mb-3 w-full sm:w-1/2 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
-          />
-        </div>
-        <div className=" sm:flex flex-wrap  sm:space-x-2 w-3/4 sm:w-full md:w-4/5">
-          <input
-            maxLength={5}
-            type="tel"
-            value={cvvFromDb ? cvvFromDb : cvv}
-            disabled={cvvFromDb ? true : false}
-            placeholder="CVV"
-            onChange={handleCvv}
-            required
-            className="block px-4 py-2 mb-3 w-full sm:w-1/3  bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
-          />
-          <input
-            type="text"
-            value={expireDateFromDb ? expireDateFromDb : expireDate}
-            disabled={expireDateFromDb ? true : false}
-            onChange={handleExpireDate}
-            placeholder="MM/YY"
-            required
-            className="block px-4 py-2 mb-3 w-full sm:w-1/2 bg-slate-100 border border-gray-300 rounded-md focus:outline-none focus:border-white"
-          />
-        </div>
-        <div className=" w-3/4 sm:w-full md:w-4/5 text-white space-x-2 flex">
-          <input
-            type="submit"
-            value="Confirm"
-            required
-            className="block py-2 mb-3 w-1/2 sm:w-1/3 relative box-border hover:cursor-pointer bg-gray-800 border-2 border-white rounded-md focus:outline-none "
-          />
-
-          <button
-            onClick={cancelEdit}
-            className=" block px-4 py-2 mb-3 w-1/2 box-border bg-gray-800 border-2 hover:border-white rounded-md focus:outline-none focus:border-white"
+          <label
+            for="floating_dob"
+            class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
-            Cancel
-          </button>
+            Date of birth
+          </label>
         </div>
-      </form>
-    </>
+      </div>
+      <div class="relative z-0 w-full mb-6 group">
+        <input
+          name="floating_account_number"
+          id="floating_account_number"
+          className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+          required
+          maxLength={16}
+          type="tel"
+          disabled={accFromDb ? true : false}
+          value={accFromDb ? accFromDb : accNumber}
+          onChange={handleAccNumber}
+          placeholder=" "
+          onInvalid={(F) => F.target.setCustomValidity("Enter account number")}
+          onInput={(F) => F.target.setCustomValidity("")}
+        />
+        <label
+          for="floating_account_number"
+          class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+        >
+          Account number
+        </label>
+      </div>
+      <div class="relative z-0 w-full mb-6 group">
+        <input
+          type="tel"
+          name="floating_card"
+          id="floating_card"
+          class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+          placeholder=" "
+          required
+          maxLength={16}
+          value={cardFromDb ? cardFromDb : card}
+          disabled={cardFromDb ? true : false}
+          onChange={handleCardNumber}
+          onInvalid={(F) => F.target.setCustomValidity("Enter card number")}
+          onInput={(F) => F.target.setCustomValidity("")}
+        />
+        <label
+          for="floating_card"
+          class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+        >
+          Debit card
+        </label>
+      </div>
+      <div class="relative z-0 w-full mb-8 group">
+        <input
+          type="tel"
+          name="repeat_password"
+          id="floating_repeat_password"
+          class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+          placeholder=" "
+          required
+          maxLength={3}
+          value={cvvFromDb ? cvvFromDb : cvv}
+          disabled={cvvFromDb ? true : false}
+          onChange={handleCvv}
+          onInvalid={(F) => F.target.setCustomValidity("Enter cvv")}
+          onInput={(F) => F.target.setCustomValidity("")}
+        />
+        <label
+          for="floating_repeat_password"
+          class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+        >
+          CVV
+        </label>
+      </div>
+      <div class="relative z-0 w-full flex justify-between gap-2 sm:gap-5 group">
+        <button
+          disabled={!allFieldsFilled}
+          type="submit"
+          class={`text-white ${
+            allFieldsFilled
+              ? `bg-gray-800 hover:bg-gray-900 focus:ring-4`
+              : `bg-gray-400`
+          } focus:outline-none focus:ring-gray-700 font-medium rounded-lg text-sm w-1/2 px-5 py-2.5 text-center `}
+        >
+          Submit
+        </button>
+        <button
+          class="text-white bg-gray-700 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-700 font-medium rounded-lg text-sm w-1/2 px-5 py-2.5 text-center "
+          onClick={cancelEdit}
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
   );
 }
 
