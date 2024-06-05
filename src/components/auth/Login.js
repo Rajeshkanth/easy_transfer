@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, memo, useRef } from "react";
+import React, { useContext, useState, useEffect, memo } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router";
 import { store } from "../../App";
@@ -23,7 +23,6 @@ function Login() {
     socket,
     setIsLogin,
     setLoader,
-    loader,
     setNewUser,
     isNewUser,
     loginFailed,
@@ -206,13 +205,7 @@ function Login() {
                 value={mobileNumber}
                 onChange={handleMobileNumber}
                 inputProps={
-                  loginInputAlert && !mobileNumber
-                    ? {
-                        required: true,
-                        className:
-                          "outline-0 h-10 w-full border border-red-600 rounded-lg text-base pl-11 p-4 font-poppins border-box",
-                      }
-                    : isNewUser
+                  isNewUser
                     ? {
                         required: true,
                         className:
@@ -232,9 +225,7 @@ function Login() {
                 }
                 dialCodeEditable={false}
                 buttonClass={
-                  loginInputAlert && !mobileNumber
-                    ? "border-red-600 border-2 rounded-lg rounded-br-0 rounded-tr-0 bg-white font-poppins hover:rounded-br-0 hover:rounded-tr-0"
-                    : isNewUser
+                  isNewUser
                     ? "border-red-600 border-2 rounded-lg rounded-br-0 rounded-tr-0 bg-white font-poppins hover:rounded-br-0 hover:rounded-tr-0"
                     : mobileNumber && !isValidNumber
                     ? "border-red-600 border-2 rounded-lg rounded-br-0 rounded-tr-0 bg-white font-poppins hover:rounded-br-0 hover:rounded-tr-0"
@@ -251,12 +242,6 @@ function Login() {
                   )
                 ) : null}
 
-                {!mobileNumber && loginInputAlert ? (
-                  <p className="text-xs w-4/5 relative bottom-0 text-red-500">
-                    Enter mobile number
-                  </p>
-                ) : null}
-
                 {isNewUser ? (
                   <p className="text-xs mt-1 text-red-500">
                     Invalid credentials
@@ -271,9 +256,7 @@ function Login() {
               <input
                 name="password"
                 className={
-                  loginInputAlert && !password
-                    ? "outline-0 h-10 w-full rounded-lg p-4 pl-2 sm:p-4 border text-base border-red-600 border-box"
-                    : loginFailed
+                  loginFailed
                     ? "outline-0 h-10 w-full rounded-lg p-4 pl-2 sm:p-4 border text-base border-red-600 border-box"
                     : "outline-0 h-10 w-full rounded-lg p-4 pl-2 sm:p-4 border text-base border-slate-300 border-box "
                 }
@@ -312,12 +295,6 @@ function Login() {
             </div>
 
             <div className="w-4/5 ">
-              {loginInputAlert && !password ? (
-                <p className="relative bottom-1  text-red-500 text-xs cursor-default ">
-                  Enter Password
-                </p>
-              ) : null}
-
               {loginFailed && !isNewUser ? (
                 <p className="relative bottom-1  text-xs  text-red-500">
                   Invalid credentials
@@ -325,14 +302,14 @@ function Login() {
               ) : null}
             </div>
 
-            <div className="w-4/5 items-center flex justify-center">
+            <div className="w-4/5 items-center flex flex-col justify-center">
               <button
                 type="submit"
                 disabled={
                   (!isValidNumber && !mobileNumber) || password.length < 6
                 }
                 className={`w-full border-0 outline-0 text-white text-center p-2 font-bold  h-auto mt-4 rounded-lg ${
-                  (!isValidNumber && !mobileNumber) || password.length < 6
+                  !isValidNumber || !mobileNumber || password.length < 6
                     ? `bg-gray-500`
                     : `bg-gray-800 hover:bg-gray-900`
                 }`}

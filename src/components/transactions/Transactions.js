@@ -30,6 +30,7 @@ function Transactions() {
     setSignOutAlert,
     logOutCanceled,
     clearAll,
+    kc,
   } = useContext(store);
 
   const logOutConfirmed = () => {
@@ -37,7 +38,7 @@ function Transactions() {
     clearSession();
     clearAll();
     setLogOut(true);
-    navigate("/");
+    kc.logout();
   };
   const navigate = useNavigate();
   const location = useLocation();
@@ -83,12 +84,12 @@ function Transactions() {
         break;
       case "Back":
         {
-          prevPath ? navigate(prevPath) : navigate("/beneficiaries");
+          prevPath ? navigate(prevPath) : navigate("/");
         }
         setIsProfileClicked(false);
         break;
       case "Beneficiaries":
-        navigate("/Beneficiaries");
+        navigate("/");
         setIsProfileClicked(false);
         break;
       case "Log Out":
@@ -139,9 +140,17 @@ function Transactions() {
 
   useEffect(() => {
     axios
-      .post("http://localhost:8080/api/transaction/transactionDetails", {
-        mobileNumber: sessionStorage.getItem("mobileNumber"),
-      })
+      .post(
+        "http://localhost:8080/api/transaction/transactionDetails",
+        {
+          mobileNumber: sessionStorage.getItem("mobileNumber"),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
+        }
+      )
       .then((res) => {
         setRecentTransactions(res.data.transactions);
       })

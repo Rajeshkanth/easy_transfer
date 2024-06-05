@@ -11,7 +11,7 @@ function Menu(props) {
   const navigate = useNavigate();
 
   const home = () => {
-    navigate("/beneficiaries");
+    navigate("/");
   };
 
   const handleClick = (item) => {

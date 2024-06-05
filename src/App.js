@@ -1,17 +1,29 @@
 import { createContext, useState, useEffect, memo } from "react";
-import { HashRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Keycloak from "keycloak-js";
 import { io } from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 import Beneficiaries from "./components/accounts/Beneficiaries";
-import HomePage from "./components/auth/HomePage";
-import Profile from "./components/Profile";
 import Success from "./components/transactions/Success";
 import Transactions from "./components/transactions/Transactions";
-import PrivateRoutes from "./components/routes/PrivateRoutes";
 import PaymentPage from "./components/PaymentPage";
 import ServerError from "./components/auth/ServerError";
-import ProfileForm from "./components/forms/ProfileForm";
 import Toast from "./components/utils/Toast";
+import axios from "axios";
+import { toast } from "sonner";
+
+const httpClient = axios.create({});
+
+export { httpClient };
+
+let initOption = {
+  url: "http://localhost:8180/",
+  realm: "easy_transfer_realm",
+  clientId: "react",
+};
+
+let kc = new Keycloak(initOption);
+
 export const store = createContext();
 
 const socket = io.connect("http://localhost:8081", {
@@ -137,9 +149,55 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    kc.init({
+      onLoad: "login-required",
+      checkLoginIframe: true,
+      pkceMethod: "S256",
+    }).then(
+      (auth) => {
+        if (!auth) {
+          alert(auth);
+        }
+        sessionStorage.setItem("token", kc.token ? kc.token : "");
+
+        httpClient.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${kc.token}`;
+
+        axios
+          .get(
+            "http://localhost:8180/realms/easy_transfer_realm/protocol/openid-connect/userinfo",
+            {
+              headers: {
+                Authorization: `Bearer ${kc.token}`,
+              },
+            }
+          )
+          .then((response) => {
+            console.log(response.data);
+            sessionStorage.setItem("mobileNumber", response.data.preferred_username);
+          })
+          .catch((error) => {
+            toast.error("Internal error occurred");
+            console.error("Failed to fetch user info:", error);
+          });
+
+        kc.onTokenExpired = () => {
+          toast.error("Session expired");
+        };
+      },
+
+      () => {
+        toast.error("Authentication failed!");
+      }
+    );
+  }, []);
+
   return (
     <store.Provider
       value={{
+        kc,
         clearSession,
         cardFromDb,
         cvvFromDb,
@@ -253,15 +311,12 @@ function App() {
     >
       <Router>
         <Routes>
-          <Route element={<PrivateRoutes />}>
-            <Route path="/transferPage" element={<PaymentPage />}></Route>
-            <Route path="/success" element={<Success />}></Route>
-            <Route path="/beneficiaries" element={<Beneficiaries />}></Route>
-            <Route path="/transactions" element={<Transactions />}></Route>
-          </Route>
-          <Route path="/" element={<HomePage />}></Route>
-          <Route path="/error" element={<ServerError />}></Route>
-          <Route path="/toast" element={<Toast />}></Route>
+          <Route path="/" Component={Beneficiaries}></Route>
+          <Route path="/transferPage" Component={PaymentPage}></Route>
+          <Route path="/success" Component={Success}></Route>
+          <Route path="/transactions" Component={Transactions}></Route>
+          <Route path="/error" Component={ServerError}></Route>
+          <Route path="/toast" Component={Toast}></Route>
         </Routes>
       </Router>
     </store.Provider>

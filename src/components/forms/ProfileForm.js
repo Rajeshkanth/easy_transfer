@@ -1,4 +1,4 @@
-import React, { memo, useEffect } from "react";
+import React, { memo } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -33,6 +33,8 @@ function ProfileForm(props) {
     socket,
     accFromDb,
     dobFromDb,
+    mobileNumber,
+    setMobileNumber,
   } = props.states;
 
   const allFieldsFilled =
@@ -54,6 +56,11 @@ function ProfileForm(props) {
       const sanitizedValue = value.replace(/[^0-9]/g, "");
       setAge(sanitizedValue);
     }
+  };
+
+  const handleMobileNumber = (e) => {
+    sessionStorage.setItem("mobileNumber", e.target.value);
+    setMobileNumber(e.target.value);
   };
 
   const handleDob = (e) => {
@@ -143,20 +150,31 @@ function ProfileForm(props) {
       return;
     }
 
+    // const updatedMobileNumber = sessionStorage.getItem("mobileNumber")
+    //   ? sessionStorage.getItem("mobileNumber")
+    //   : mobileNumber;
     const mobileNumber = sessionStorage.getItem("mobileNumber");
     try {
       if (connectionMode !== "socket") {
         await axios
-          .post("http://localhost:8080/api/user/updateProfile", {
-            mobileNumber: mobileNumber,
-            userName: userName,
-            age: age,
-            dob: dob || dobFromDb,
-            accNum: accNumber || accFromDb,
-            card: card || cardFromDb,
-            cvv: cvv || cvvFromDb,
-            expireDate: expireDate || expireDateFromDb,
-          })
+          .post(
+            "http://localhost:8080/api/user/updateProfile",
+            {
+              mobileNumber: mobileNumber,
+              userName: userName,
+              age: age,
+              dob: dob || dobFromDb,
+              accNum: accNumber || accFromDb,
+              card: card || cardFromDb,
+              cvv: cvv || cvvFromDb,
+              expireDate: expireDate || expireDateFromDb,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+              },
+            }
+          )
           .then((res) => {
             const { userName, age, dob, accNum, card, cvv, expireDate } =
               res.data;
@@ -221,7 +239,7 @@ function ProfileForm(props) {
     <form
       onSubmit={(e) => updateProfile(e)}
       autoComplete="off"
-      className="max-w-md mx-auto md:mt-32 lg:mt-36 bg-white shadow-sm shadow-gray-700 rounded-md p-8 px-10 sm:px-12 box-border"
+      className="max-w-md mx-auto bg-white shadow-sm shadow-gray-700 rounded-md p-8 px-10 sm:px-12 box-border"
     >
       <span className="text-center text-gray-900 w-full flex justify-center mb-3 font-semibold text-lg">
         Update Profile
@@ -279,8 +297,9 @@ function ProfileForm(props) {
             className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
             placeholder=" "
             required
-            readOnly
+            // readOnly={sessionStorage.getItem("mobileNumber") ? true : false}
             value={sessionStorage.getItem("mobileNumber")}
+            // onChange={handleMobileNumber}
             onInvalid={(F) => F.target.setCustomValidity("Enter mobile number")}
             onInput={(F) => F.target.setCustomValidity("")}
           />
@@ -307,13 +326,13 @@ function ProfileForm(props) {
           />
           <label
             for="floating_dob"
-            class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+            className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
           >
             Date of birth
           </label>
         </div>
       </div>
-      <div class="relative z-0 w-full mb-6 group">
+      <div className="relative z-0 w-full mb-6 group">
         <input
           name="floating_account_number"
           id="floating_account_number"
@@ -335,7 +354,7 @@ function ProfileForm(props) {
           Account number
         </label>
       </div>
-      <div class="relative z-0 w-full mb-6 group">
+      <div className="relative z-0 w-full mb-6 group">
         <input
           type="tel"
           name="floating_card"
@@ -357,33 +376,57 @@ function ProfileForm(props) {
           Debit card
         </label>
       </div>
-      <div class="relative z-0 w-full mb-8 group">
-        <input
-          type="tel"
-          name="repeat_password"
-          id="floating_repeat_password"
-          class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-          placeholder=" "
-          required
-          maxLength={3}
-          value={cvvFromDb ? cvvFromDb : cvv}
-          disabled={cvvFromDb ? true : false}
-          onChange={handleCvv}
-          onInvalid={(F) => F.target.setCustomValidity("Enter cvv")}
-          onInput={(F) => F.target.setCustomValidity("")}
-        />
-        <label
-          for="floating_repeat_password"
-          class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-        >
-          CVV
-        </label>
+      <div className="grid md:grid-cols-2 md:gap-6">
+        <div className="relative z-0 w-full mb-8 group">
+          <input
+            type="tel"
+            name="cvv"
+            id="cvv"
+            class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder=" "
+            required
+            maxLength={3}
+            value={cvvFromDb ? cvvFromDb : cvv}
+            disabled={cvvFromDb ? true : false}
+            onChange={handleCvv}
+            onInvalid={(F) => F.target.setCustomValidity("Enter cvv")}
+            onInput={(F) => F.target.setCustomValidity("")}
+          />
+          <label
+            for="cvv"
+            class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            CVV
+          </label>
+        </div>
+        <div className="relative z-0 w-full mb-8 group">
+          <input
+            type="tel"
+            name="expire_date"
+            id="expire_date"
+            class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+            placeholder=" "
+            required
+            maxLength={5}
+            value={expireDateFromDb ? expireDateFromDb : expireDate}
+            disabled={expireDateFromDb ? true : false}
+            onChange={handleExpireDate}
+            onInvalid={(F) => F.target.setCustomValidity("Enter expire date")}
+            onInput={(F) => F.target.setCustomValidity("")}
+          />
+          <label
+            for="expire_date"
+            class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
+          >
+            Expire date
+          </label>
+        </div>
       </div>
-      <div class="relative z-0 w-full flex justify-between gap-2 sm:gap-5 group">
+      <div className="relative z-0 w-full flex justify-between gap-2 sm:gap-5 group">
         <button
           disabled={!allFieldsFilled}
           type="submit"
-          class={`text-white ${
+          className={`text-white ${
             allFieldsFilled
               ? `bg-gray-800 hover:bg-gray-900 focus:ring-4`
               : `bg-gray-400`
@@ -392,7 +435,7 @@ function ProfileForm(props) {
           Submit
         </button>
         <button
-          class="text-white bg-gray-700 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-700 font-medium rounded-lg text-sm w-1/2 px-5 py-2.5 text-center "
+          className="text-white bg-gray-800 hover:bg-gray-900 focus:ring-4 focus:outline-none focus:ring-gray-700 font-medium rounded-lg text-sm w-1/2 px-5 py-2.5 text-center"
           onClick={cancelEdit}
         >
           Cancel

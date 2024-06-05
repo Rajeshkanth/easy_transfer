@@ -12,7 +12,6 @@ function HomePage() {
     isLogin,
     setLoginFailed,
     setNewUser,
-    passwordError,
     setIsLoggedOut,
   } = useContext(store);
 

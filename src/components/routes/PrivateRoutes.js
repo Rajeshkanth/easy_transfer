@@ -4,6 +4,7 @@ import { Navigate, Outlet } from "react-router";
 
 function PrivateRoutes() {
   const { isLoggedOut } = useContext(store);
+
   return <>{isLoggedOut ? <Navigate to={"/"} /> : <Outlet />}</>;
 }
 

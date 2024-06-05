@@ -1,8 +1,7 @@
 import React, { useContext, useState, useEffect, memo } from "react";
 import { store } from "../../App";
 import axios from "axios";
-import { FaRegEye } from "react-icons/fa";
-import { FaRegEyeSlash } from "react-icons/fa";
+import { FaRegEye,FaRegEyeSlash } from "react-icons/fa";
 import logo from "../../assets/images/green-white-logo.png";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";

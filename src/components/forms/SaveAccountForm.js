@@ -5,7 +5,6 @@ function SaveAccountForm(props) {
     closeBeneficiaryAdding,
     handleSaveButtonClick,
     savedBeneficiaryName,
-    allInputsAlert,
     handleSavedBenificiaryName,
     savedIfsc,
     savedAccNum,

@@ -17,9 +17,6 @@ function Balance() {
           </h1>
         </div>
       </div>
-      {/* <div className="text-gray-800 bg-white">
-        <h1>name</h1>
-      </div> */}
     </div>
   );
 }

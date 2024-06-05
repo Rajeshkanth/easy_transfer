@@ -12,7 +12,6 @@ import Profile from "../utils/Profile";
 import RecentTransactions from "../transactions/RecentTransactions";
 import FooterComponent from "../utils/FooterComponent";
 import AlertModal from "../utils/AlertModal";
-import { toast } from "sonner";
 
 function Beneficiaries() {
   const {
@@ -41,6 +40,7 @@ function Beneficiaries() {
     signOutAlert,
     setSignOutAlert,
     logOutCanceled,
+    kc,
   } = useContext(store);
 
   const [savedAccNum, setSavedAccNum] = useState("");
@@ -49,23 +49,16 @@ function Beneficiaries() {
   const [loader, setLoader] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const [allInputsAlert, setAllInputsAlert] = useState(false);
-  const [plusIcon, setPlusIcon] = useState(false);
   const [searchBarActive, setSearchBarActive] = useState(false);
   const [filteredAccounts, setFilteredAccounts] = useState([]);
   const [newReceiver, setNewReceiver] = useState(false);
 
-  const clearAllInputs = () => {
-    setSavedBeneficiaryName("");
-    setSavedAccNum("");
-    setSavedIfsc("");
-  };
   const logOutConfirmed = () => {
     setSignOutAlert(false);
     clearSession();
     clearAll();
     setLogOut(true);
-    navigate("/");
+    kc.logout();
   };
   const goTo = (path) => {
     switch (path) {
@@ -143,7 +136,7 @@ function Beneficiaries() {
 
   const logout = () => {
     setLoggedUser("");
-    navigate("/");
+    kc.logout();
   };
 
   const onIdle = () => {
@@ -269,13 +262,19 @@ function Beneficiaries() {
 
   useEffect(() => {
     axios
-      .post("http://localhost:8080/api/user/getBeneficiaryDetails", {
-        mobileNumber: sessionStorage.getItem("mobileNumber"),
-      })
+      .post(
+        "http://localhost:8080/api/user/getBeneficiaryDetails",
+        {
+          mobileNumber: sessionStorage.getItem("mobileNumber"),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
+        }
+      )
       .then((res) => {
-        console.log(res.data);
         setSavedAcc(res.data);
-        console.log(savedAcc);
       })
       .catch((err) => {
         return err;
@@ -295,7 +294,7 @@ function Beneficiaries() {
       setLogOut(false);
       setNotify(true);
     };
-  }, []);
+  }, [kc]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -313,9 +312,17 @@ function Beneficiaries() {
     const loggedNumber = sessionStorage.getItem("mobileNumber");
 
     axios
-      .post("http://localhost:8080/api/transaction/transactionDetails", {
-        mobileNumber: loggedNumber,
-      })
+      .post(
+        "http://localhost:8080/api/transaction/transactionDetails",
+        {
+          mobileNumber: loggedNumber,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
+        }
+      )
       .then((res) => {
         setRecentActivity(res.data.transactions);
       })
@@ -325,7 +332,7 @@ function Beneficiaries() {
       socket.off();
       setRecentActivity([]);
     };
-  }, []);
+  }, [kc]);
 
   return (
     <>
@@ -386,7 +393,6 @@ function Beneficiaries() {
           data={{
             newReceiver,
             setNewReceiver,
-            
           }}
         />
       ) : null}

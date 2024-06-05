@@ -1,12 +1,10 @@
-import React, { memo, useContext, useEffect } from "react";
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { memo, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import axios from "axios";
 import { store } from "../App";
 import { useIdleTimer } from "react-idle-timer";
 import PaymentForm from "../components/forms/PaymentForm";
-import ScrollReveal from "scrollreveal";
 import { Toaster, toast } from "sonner";
 
 function PaymentPage(props) {
@@ -38,7 +36,7 @@ function PaymentPage(props) {
     setRecentTransactions,
     setIsLoggedOut,
     handleSocket,
-    saveBeneficiary,
+    kc,
     handleSaveBeneficiaryCheckMark,
   } = useContext(store);
   const { setNewReceiver, newReceiver } = props.data;
@@ -150,12 +148,20 @@ function PaymentPage(props) {
       };
       if (saveBenficiaryCheck) {
         await axios
-          .post("http://localhost:8080/api/user/addNewBeneficiary", {
-            beneficiaryName: toAccountHolderName,
-            accountNumber: toAccountNumber,
-            ifsc: toIFSCNumber,
-            mobileNumber: sessionStorage.getItem("mobileNumber"),
-          })
+          .post(
+            "http://localhost:8080/api/user/addNewBeneficiary",
+            {
+              beneficiaryName: toAccountHolderName,
+              accountNumber: toAccountNumber,
+              ifsc: toIFSCNumber,
+              mobileNumber: sessionStorage.getItem("mobileNumber"),
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${kc.token}`,
+              },
+            }
+          )
           .then((res) => {
             if (res.status === 400) {
               return toast.error("Account already exists");
@@ -177,25 +183,32 @@ function PaymentPage(props) {
                 break;
             }
           });
+      }
+      navigate("/success");
+      handleAllInput();
 
-        navigate("/success");
-        handleAllInput();
-
-        await axios
-          .post("http://localhost:8080/api/transaction/fromPaymentAlert", {
+      await axios
+        .post(
+          "http://localhost:8080/api/transaction/fromPaymentAlert",
+          {
             newTransaction: newTransactions,
             mobileNumber: sessionStorage.getItem("mobileNumber"),
-          })
-          .then((response) => {
-            switch (response.status) {
-              case 200:
-                setAllInput(false);
-                break;
-              default:
-                break;
-            }
-          });
-      }
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            },
+          }
+        )
+        .then((response) => {
+          switch (response.status) {
+            case 200:
+              setAllInput(false);
+              break;
+            default:
+              break;
+          }
+        });
     } catch (err) {
       if (err.response.status === 400)
         return toast.error("Account number already exists", {

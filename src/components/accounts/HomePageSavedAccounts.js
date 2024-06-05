@@ -43,6 +43,11 @@ function HomePageSavedAccounts(props) {
         {
           mobileNumber: sessionStorage.getItem("mobileNumber"),
           accountNumber: accountNumberToDelete,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+          },
         }
       );
 
